@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\Admin\" />
     <Folder Include="Controllers\Auth\" />
     <Folder Include="Controllers\Users\" />
     <Folder Include="Data\Migrations\" />
