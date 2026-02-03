@@ -1,0 +1,326 @@
+@model QLPhanPhoiThuoc.Models.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Đăng nhập";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Quản lý thuốc bệnh viện</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        body::before {
+            content:''; position:fixed; top:-30%; left:-15%;
+            width:600px; height:600px;
+            background:radial-gradient(circle, rgba(56,189,248,0.08) 0%, transparent 70%);
+            border-radius:50%; pointer-events:none;
+        }
+        body::after {
+            content:''; position:fixed; bottom:-25%; right:-10%;
+            width:500px; height:500px;
+            background:radial-gradient(circle, rgba(251,113,133,0.07) 0%, transparent 70%);
+            border-radius:50%; pointer-events:none;
+        }
+
+        /* ─── Container ─── */
+        .auth-container {
+            background:#fff;
+            border-radius:24px;
+            box-shadow:0 25px 60px rgba(0,0,0,0.35);
+            overflow:hidden;
+            max-width:1020px;
+            width:100%;
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            min-height:600px;
+            position:relative;
+            z-index:1;
+        }
+
+        /* ─── LEFT ─── */
+        .auth-left {
+            background:linear-gradient(160deg,#1e3a5f 0%,#0f2847 50%,#162d4a 100%);
+            padding:60px 40px;
+            color:#fff;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            position:relative;
+            overflow:hidden;
+        }
+        .auth-left::before {
+            content:''; position:absolute; top:-40%; right:-30%;
+            width:80%; height:80%;
+            background:radial-gradient(circle,rgba(56,189,248,0.12) 0%,transparent 70%);
+            border-radius:50%;
+        }
+        .auth-left::after {
+            content:''; position:absolute; bottom:-35%; left:-20%;
+            width:70%; height:70%;
+            background:radial-gradient(circle,rgba(251,113,133,0.1) 0%,transparent 70%);
+            border-radius:50%;
+        }
+        .auth-left-content { position:relative; z-index:1; }
+
+        .auth-left h1 {
+            font-size:2.4rem; margin-bottom:16px; font-weight:700;
+            line-height:1.2; letter-spacing:-0.5px;
+        }
+        .auth-left h1 i {
+            display:block; font-size:2.8rem; margin-bottom:14px;
+            background:linear-gradient(135deg,#38bdf8,#fb7185);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+            background-clip:text;
+        }
+        .auth-left > .auth-left-content > p {
+            font-size:1rem; opacity:.75; line-height:1.6; color:#cbd5e1;
+        }
+
+        .vneid-badge {
+            display:inline-flex; align-items:center; gap:6px;
+            background:linear-gradient(135deg,#fbbf24,#f59e0b);
+            color:#1e293b; padding:6px 14px; border-radius:20px;
+            font-size:.78rem; font-weight:700; margin-bottom:22px;
+            box-shadow:0 3px 10px rgba(245,158,11,.3);
+        }
+
+        .feature-list { list-style:none; margin-top:32px; }
+        .feature-list li {
+            padding:11px 0; display:flex; align-items:center;
+            font-size:.95rem; color:#cbd5e1;
+            border-bottom:1px solid rgba(255,255,255,.06);
+        }
+        .feature-list li:last-child { border-bottom:none; }
+        .feature-list li i {
+            margin-right:14px; font-size:1rem;
+            width:34px; height:34px; border-radius:9px;
+            display:flex; align-items:center; justify-content:center;
+            flex-shrink:0;
+        }
+        .feature-list li:nth-child(1) i { background:rgba(56,189,248,.15); color:#38bdf8; }
+        .feature-list li:nth-child(2) i { background:rgba(251,113,133,.15); color:#fb7185; }
+        .feature-list li:nth-child(3) i { background:rgba(167,139,250,.15); color:#a78bfa; }
+        .feature-list li:nth-child(4) i { background:rgba(74,222,128,.15); color:#4ade80; }
+
+        /* ─── RIGHT ─── */
+        .auth-right {
+            padding:60px 50px;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            background:#fafbfc;
+        }
+
+        .auth-header { text-align:center; margin-bottom:36px; }
+        .auth-header .logo-wrap {
+            width:64px; height:64px; margin:0 auto 18px;
+            border-radius:16px;
+            background:linear-gradient(135deg,#1e3a5f,#0f2847);
+            display:flex; align-items:center; justify-content:center;
+            font-size:1.8rem; color:#38bdf8;
+            box-shadow:0 6px 20px rgba(30,58,95,.25);
+        }
+        .auth-header h2 { color:#0f172a; font-size:1.75rem; font-weight:700; margin-bottom:6px; }
+        .auth-header p { color:#64748b; font-size:.93rem; }
+
+        /* ─── Form ─── */
+        .form-group { margin-bottom:22px; }
+        .form-label {
+            display:block; margin-bottom:7px; color:#1e293b;
+            font-weight:600; font-size:.88rem; letter-spacing:.2px;
+        }
+
+        .input-wrapper { position:relative; }
+        .input-wrapper .icon-left {
+            position:absolute; left:15px; top:50%;
+            transform:translateY(-50%); color:#94a3b8;
+            font-size:1rem; pointer-events:none; z-index:2;
+        }
+        .input-wrapper .toggle-pw {
+            position:absolute; right:14px; top:50%;
+            transform:translateY(-50%); color:#94a3b8;
+            font-size:1rem; cursor:pointer; z-index:2;
+            background:none; border:none; padding:5px;
+            border-radius:7px; transition:color .2s, background .2s;
+            display:flex; align-items:center; justify-content:center;
+        }
+        .input-wrapper .toggle-pw:hover { color:#1e3a5f; background:rgba(30,58,95,.07); }
+
+        .form-control {
+            width:100%; padding:13px 44px 13px 44px;
+            border:2px solid #e2e8f0; border-radius:12px;
+            font-size:.95rem; color:#0f172a; background:#fff;
+            transition:border-color .25s, box-shadow .25s;
+        }
+        .form-control:focus {
+            outline:none; border-color:#38bdf8;
+            box-shadow:0 0 0 3px rgba(56,189,248,.18);
+        }
+        .form-control::placeholder { color:#94a3b8; }
+        .input-wrapper.no-right .form-control { padding-right:18px; }
+
+        .text-danger { color:#fb7185; font-size:.82rem; margin-top:5px; display:block; }
+
+        /* ─── Remember / Forgot row ─── */
+        .auth-links {
+            display:flex; justify-content:space-between; align-items:center;
+            margin-bottom:22px; font-size:.88rem;
+        }
+        .auth-links .form-check { display:flex; align-items:center; gap:8px; }
+        .auth-links .form-check-input {
+            width:17px; height:17px; border:2px solid #cbd5e1;
+            border-radius:5px; accent-color:#1e3a5f; cursor:pointer;
+        }
+        .auth-links .form-check-label { color:#64748b; cursor:pointer; font-weight:500; }
+        .auth-links a { color:#38bdf8; text-decoration:none; font-weight:600; transition:color .2s; }
+        .auth-links a:hover { color:#0ea5e9; }
+
+        /* ─── Button ─── */
+        .btn-login {
+            width:100%; padding:14px;
+            background:linear-gradient(135deg,#1e3a5f 0%,#162d4a 100%);
+            border:none; border-radius:12px; color:#fff;
+            font-size:1rem; font-weight:600; cursor:pointer;
+            transition:transform .2s, box-shadow .2s;
+            text-transform:uppercase; letter-spacing:.8px;
+            display:flex; align-items:center; justify-content:center; gap:10px;
+        }
+        .btn-login:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(30,58,95,.35); }
+        .btn-login:active { transform:translateY(0); }
+
+        /* ─── Alerts ─── */
+        .alert { padding:12px 16px; border-radius:10px; margin-bottom:18px; font-size:.88rem; display:flex; align-items:center; gap:10px; }
+        .alert-danger { background:#fff1f2; color:#e11d48; border:1px solid #fecdd3; }
+        .alert-success { background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0; }
+
+        /* ─── Footer ─── */
+        .auth-footer { text-align:center; margin-top:24px; font-size:.9rem; color:#64748b; }
+        .auth-footer a { color:#38bdf8; text-decoration:none; font-weight:600; transition:color .2s; }
+        .auth-footer a:hover { color:#0ea5e9; }
+
+        /* ─── Responsive ─── */
+        media (max-width:768px) {
+            .auth-container { grid-template-columns:1fr; }
+            .auth-left { padding:40px 30px; min-height:240px; }
+            .auth-left h1 { font-size:1.8rem; }
+            .feature-list { display:none; }
+            .auth-right { padding:40px 28px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <!-- Left Section -->
+        <div class="auth-left">
+            <div class="auth-left-content">
+                <span class="vneid-badge">
+                    <i class="fas fa-shield-alt"></i> Tích hợp VNeID
+                </span>
+                <h1>
+                    <i class="fas fa-hospital"></i>
+                    Hệ thống Quản lý Thuốc
+                </h1>
+                <p>Giải pháp quản lý phân phối thuốc hiện đại, tích hợp VNeID và BHYT điện tử cho bệnh viện.</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-id-card"></i><span>Tích hợp VNeID – Định danh số công dân</span></li>
+                    <li><i class="fas fa-credit-card"></i><span>Tra cứu thẻ BHYT điện tử tự động</span></li>
+                    <li><i class="fas fa-prescription-bottle-alt"></i><span>Quản lý đơn thuốc &amp; kho thuốc thông minh</span></li>
+                    <li><i class="fas fa-qrcode"></i><span>Thanh toán VietQR nhanh chóng</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Right Section -->
+        <div class="auth-right">
+            <div class="auth-header">
+                <div class="logo-wrap"><i class="fas fa-hospital"></i></div>
+                <h2>Đăng nhập</h2>
+                <p>Chào mừng bạn trở lại!</p>
+            </div>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+                </div>
+            }
+
+            <form method="post" asp-action="Login" asp-controller="Account">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <div class="form-group">
+                    <label asp-for="Username" class="form-label">Tên đăng nhập</label>
+                    <div class="input-wrapper no-right">
+                        <i class="fas fa-user icon-left"></i>
+                        <input asp-for="Username" class="form-control" placeholder="Nhập tên đăng nhập" autocomplete="username" />
+                    </div>
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Password" class="form-label">Mật khẩu</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock icon-left"></i>
+                        <input asp-for="Password" type="password" class="form-control" placeholder="Nhập mật khẩu" autocomplete="current-password" id="passwordInput" />
+                        <button type="button" class="toggle-pw" onclick="togglePw('passwordInput',this)" aria-label="Hiện/Ẩn mật khẩu">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <div class="auth-links">
+                    <div class="form-check">
+                        <input asp-for="RememberMe" type="checkbox" class="form-check-input" id="rememberMe" />
+                        <label class="form-check-label" for="rememberMe">Ghi nhớ đăng nhập</label>
+                    </div>
+                    <a asp-action="ForgotPassword">Quên mật khẩu?</a>
+                </div>
+
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                </button>
+
+                <div class="auth-footer">
+                    <p>Chưa có tài khoản? <a asp-action="Register">Đăng ký ngay</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function togglePw(id, btn) {
+            const inp = document.getElementById(id);
+            const ic  = btn.querySelector('i');
+            if (inp.type === 'password') {
+                inp.type = 'text';
+                ic.classList.replace('fa-eye','fa-eye-slash');
+            } else {
+                inp.type = 'password';
+                ic.classList.replace('fa-eye-slash','fa-eye');
+            }
+        }
+    </script>
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }
+</body>
+</html>
