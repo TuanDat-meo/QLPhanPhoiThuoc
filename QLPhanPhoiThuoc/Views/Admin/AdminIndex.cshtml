@@ -8,40 +8,194 @@
 }
 
 <style>
-    /* ==================== OPTIMIZED STYLES - NO LAG ==================== */
+    /* ==================== MODERN COMPACT SIDEBAR LAYOUT ==================== */
     
-    /* Disable expensive animations on load */
     .admin-container {
         display: flex;
-        gap: 20px;
+        gap: 25px;
         min-height: calc(100vh - 200px);
-        will-change: auto; /* Remove will-change to reduce GPU usage */
+        padding: 20px;
     }
 
-    /* Welcome Banner - Simplified */
-    .welcome-banner {
-        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
-        color: white;
-        padding: 20px 30px;
+    /* ==================== COMPACT SIDEBAR ==================== */
+    .sidebar {
+        width: 260px;
+        background: white;
         border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(30, 58, 95, 0.3);
-        margin-bottom: 30px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        padding: 0;
+        height: fit-content;
+        max-height: calc(100vh - 140px);
+        overflow-y: auto;
+        position: sticky;
+        top: 90px;
+    }
+
+    .sidebar::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .sidebar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+        background: #1e3a5f;
+        border-radius: 10px;
+    }
+
+    .sidebar-header {
+        padding: 20px;
+        border-bottom: 1px solid #e9ecef;
+        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
+        border-radius: 12px 12px 0 0;
+        color: white;
+    }
+
+    .sidebar-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .sidebar-subtitle {
+        font-size: 0.85rem;
+        opacity: 0.9;
+        margin-top: 3px;
+    }
+
+    /* Menu Accordion */
+    .menu-accordion {
+        padding: 10px 0;
+    }
+
+    .menu-group {
+        margin-bottom: 5px;
+    }
+
+    .menu-group-header {
+        padding: 12px 20px;
+        cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        transition: opacity 0.3s ease, max-height 0.3s ease;
-        opacity: 1;
-        max-height: 100px;
-        overflow: hidden;
+        transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+        color: #495057;
+        font-weight: 500;
+        user-select: none;
     }
-        .welcome-banner h3{
-            color: white;
-        }
-    .welcome-banner.hidden {
-        opacity: 0;
+
+    .menu-group-header:hover {
+        background: #f8f9fa;
+        color: #1e3a5f;
+        border-left-color: #1e3a5f;
+    }
+
+    .menu-group-header.active {
+        background: linear-gradient(90deg, rgba(30,58,95,0.1) 0%, transparent 100%);
+        color: #1e3a5f;
+        border-left-color: #1e3a5f;
+        font-weight: 600;
+    }
+
+    .menu-header-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+    }
+
+    .menu-header-content i {
+        width: 22px;
+        text-align: center;
+        font-size: 1.1rem;
+    }
+
+    .menu-arrow {
+        transition: transform 0.3s ease;
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    .menu-group-header.active .menu-arrow {
+        transform: rotate(90deg);
+        color: #1e3a5f;
+    }
+
+    /* Submenu */
+    .menu-submenu {
         max-height: 0;
-        margin-bottom: 0;
-        padding: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+        background: #f8f9fa;
+    }
+
+    .menu-submenu.show {
+        max-height: 500px;
+    }
+
+    .submenu-item {
+        padding: 10px 20px 10px 54px;
+        color: #6c757d;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.2s ease;
+        border-left: 3px solid transparent;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+
+    .submenu-item:hover {
+        background: white;
+        color: #1e3a5f;
+        border-left-color: #38bdf8;
+        text-decoration: none;
+        padding-left: 58px;
+    }
+
+    .submenu-item.active {
+        background: white;
+        color: #1e3a5f;
+        border-left-color: #1e3a5f;
+        font-weight: 600;
+    }
+
+    .submenu-item i {
+        font-size: 0.75rem;
+        width: 12px;
+    }
+
+    /* Badge */
+    .menu-badge {
+        background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+        color: white;
+        font-size: 0.7rem;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-weight: 600;
+        margin-left: auto;
+    }
+
+    /* ==================== MAIN CONTENT AREA ==================== */
+    .dashboard-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* Welcome Banner */
+    .welcome-banner {
+        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
+        color: white;
+        padding: 25px 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(30, 58, 95, 0.3);
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
 
     .welcome-content {
@@ -65,6 +219,7 @@
         margin: 0;
         font-size: 1.5rem;
         font-weight: 700;
+        color: white;
     }
 
     .welcome-text p {
@@ -73,155 +228,163 @@
         font-size: 0.95rem;
     }
 
-    .welcome-close {
-        background: rgba(255, 255, 255, 0.2);
-        border: none;
-        color: white;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        cursor: pointer;
-        transition: background 0.2s;
+    /* Content Section */
+    .content-section {
+        display: none;
     }
 
-    .welcome-close:hover {
-        background: rgba(255, 255, 255, 0.3);
+    .content-section.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
     }
 
-    /* Sidebar - Fixed với scrollbar */
-    .sidebar {
-        width: 280px;
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .section-header {
         background: white;
-        border-radius: 10px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.08);
-        padding: 20px 0;
-        height: fit-content;
-        max-height: calc(100vh - 120px);
-        overflow-y: auto; /* Thêm scrollbar khi cần */
-        position: sticky;
-        top: 90px;
-    }
-
-    /* Custom scrollbar cho sidebar */
-    .sidebar::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .sidebar::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 10px;
-    }
-
-    .sidebar::-webkit-scrollbar-thumb {
-        background: #1e3a5f;
-        border-radius: 10px;
-    }
-
-    .sidebar::-webkit-scrollbar-thumb:hover {
-        background: #0f2847;
-    }
-
-    .sidebar-header {
-        padding: 0 20px 20px;
-        border-bottom: 2px solid #f0f0f0;
+        padding: 20px 25px;
+        border-radius: 12px;
         margin-bottom: 20px;
-    }
-
-    .sidebar-title {
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 5px;
-    }
-
-    .sidebar-subtitle {
-        color: #6c757d;
-        font-size: 0.9rem;
-    }
-
-    .menu-section {
-        margin-bottom: 25px;
-    }
-
-    .menu-section-title {
-        padding: 10px 20px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: #6c757d;
-        letter-spacing: 0.5px;
-    }
-
-    .menu-item {
-        padding: 12px 20px;
-        color: #495057;
-        text-decoration: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         display: flex;
         align-items: center;
-        transition: background 0.2s, color 0.2s;
-        border-left: 3px solid transparent;
+        justify-content: space-between;
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0;
+        color: #1e3a5f;
+        font-weight: 700;
+        font-size: 1.3rem;
+    }
+
+    .section-title i {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
+        color: white;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Tabs */
+    .content-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        background: white;
+        padding: 15px 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        overflow-x: auto;
+    }
+
+    .tab-btn {
+        padding: 10px 20px;
+        border: 2px solid #e9ecef;
+        background: white;
+        color: #6c757d;
+        border-radius: 8px;
         cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
-    .menu-item:hover {
+    .tab-btn:hover {
+        border-color: #1e3a5f;
+        color: #1e3a5f;
         background: #f8f9fa;
-        color: #1e3a5f;
-        border-left-color: #1e3a5f;
-        text-decoration: none;
     }
 
-    .menu-item.active {
-        background: linear-gradient(90deg, rgba(30,58,95,0.1) 0%, transparent 100%);
-        color: #1e3a5f;
-        border-left-color: #1e3a5f;
+    .tab-btn.active {
+        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
+        color: white;
+        border-color: #1e3a5f;
+        box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+
+    /* Cards */
+    .card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+        border: none;
+    }
+
+    .card-header {
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        padding: 15px 20px;
+        border-radius: 12px 12px 0 0;
         font-weight: 600;
+        color: #1e3a5f;
     }
 
-    .menu-item i {
-        width: 25px;
-        margin-right: 12px;
-        text-align: center;
-        font-size: 1.1rem;
+    .card-body {
+        padding: 20px;
     }
 
-    /* Dashboard Content */
-    .dashboard-content {
-        flex: 1;
-        min-width: 0; /* Prevent flex overflow */
-    }
-
-    /* Stats Cards - Simplified hover */
+    /* Stats Grid */
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 20px;
-        margin-bottom: 30px;
+        margin-bottom: 25px;
     }
 
     .stat-card {
         background: white;
-        padding: 25px;
-        border-radius: 10px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.08);
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         display: flex;
         align-items: center;
-        gap: 20px;
-        transition: transform 0.2s, box-shadow 0.2s;
+        gap: 15px;
+        transition: all 0.3s ease;
+        border: 1px solid #e9ecef;
     }
 
     .stat-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
     }
 
     .stat-icon {
-        width: 60px;
-        height: 60px;
-        border-radius: 12px;
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.8rem;
+        font-size: 1.5rem;
         color: white;
         flex-shrink: 0;
     }
@@ -238,10 +401,6 @@
         background: linear-gradient(135deg, #f59e0b 0%, #fb923c 100%);
     }
 
-    .stat-icon.info {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    }
-
     .stat-icon.danger {
         background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
     }
@@ -251,109 +410,83 @@
     }
 
     .stat-value {
-        font-size: 2rem;
+        font-size: 1.8rem;
         font-weight: 700;
         color: #1e3a5f;
-        line-height: 1;
+        margin-bottom: 3px;
     }
 
     .stat-label {
         color: #6c757d;
         font-size: 0.9rem;
-        margin-top: 5px;
     }
 
-    /* Charts - FIXED HEIGHT */
-    .charts-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-
-    .chart-card {
+    /* Table Styles */
+    .table-container {
         background: white;
-        padding: 25px;
-        border-radius: 10px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.08);
-    }
-
-    .chart-card h5 {
-        margin-bottom: 20px;
-        color: #333;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .chart-container {
-        position: relative;
-        height: 300px; /* FIXED HEIGHT */
-        width: 100%;
-    }
-
-    /* Card Components */
-    .card {
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.08);
-        margin-bottom: 20px;
+        border-radius: 12px;
         overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 
-    .card-header {
-        padding: 20px 25px;
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        border-bottom: 1px solid #dee2e6;
+    .table {
+        margin-bottom: 0;
     }
 
-    .card-body {
-        padding: 25px;
-    }
-
-    /* Activity Items */
-    .activity-item {
-        display: flex;
-        gap: 15px;
+    .table thead th {
+        background: #f8f9fa;
+        color: #1e3a5f;
+        font-weight: 600;
+        border-bottom: 2px solid #e9ecef;
         padding: 15px;
-        border-bottom: 1px solid #f0f0f0;
-        transition: background 0.2s;
     }
 
-    .activity-item:hover {
+    .table tbody td {
+        padding: 12px 15px;
+        vertical-align: middle;
+    }
+
+    .table tbody tr:hover {
         background: #f8f9fa;
     }
 
-    .activity-item:last-child {
-        border-bottom: none;
+    /* Action Buttons */
+    .action-btn {
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.9rem;
     }
 
-    .activity-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
+    .btn-primary-custom {
         background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
         color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
     }
 
-    .activity-content {
-        flex: 1;
+    .btn-primary-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
     }
 
-    .activity-text {
-        font-weight: 500;
-        color: #333;
-        margin-bottom: 5px;
+    .btn-success-custom {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
     }
 
-    .activity-time {
-        font-size: 0.85rem;
-        color: #6c757d;
+    .btn-danger-custom {
+        background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+        color: white;
+    }
+
+    .btn-warning-custom {
+        background: linear-gradient(135deg, #f59e0b 0%, #fb923c 100%);
+        color: white;
     }
 
     /* Responsive */
@@ -361,29 +494,19 @@
         .admin-container {
             flex-direction: column;
         }
-
+        
         .sidebar {
             width: 100%;
-            max-height: none;
             position: relative;
             top: 0;
-        }
-
-        .charts-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    @@media (max-width: 768px) {
-        .stats-grid {
-            grid-template-columns: 1fr;
+            max-height: none;
         }
     }
 </style>
 
-<div class="container-fluid py-4">
+<div class="container-fluid">
     <!-- Welcome Banner -->
-    <div class="welcome-banner" id="welcomeBanner">
+    <div class="welcome-banner">
         <div class="welcome-content">
             <div class="welcome-icon">
                 <i class="fas fa-user-shield"></i>
@@ -393,344 +516,250 @@
                 <p>@chucVu | Mã NV: @maNhanVien</p>
             </div>
         </div>
-        <button class="welcome-close" onclick="closeWelcome()">
-            <i class="fas fa-times"></i>
-        </button>
     </div>
 
+    <!-- Main Container -->
     <div class="admin-container">
-        <!-- Sidebar Menu -->
+        <!-- Compact Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <div class="sidebar-title">Menu Quản trị</div>
-                <div class="sidebar-subtitle">@chucVu</div>
+                <div class="sidebar-title">
+                    <i class="fas fa-th-large me-2"></i>
+                    Bảng điều khiển
+                </div>
+                <div class="sidebar-subtitle">Quản lý toàn diện</div>
             </div>
 
-            <!-- Dashboard -->
-            <div class="menu-section">
-                <div class="menu-section-title">Tổng quan</div>
-                <a href="/Admin/AdminIndex" class="menu-item active">
-                    <i class="fas fa-th-large"></i>
-                    <span>Dashboard</span>
-                </a>
-            </div>
+            <div class="menu-accordion">
+                <!-- Dashboard -->
+                <div class="menu-group">
+                    <div class="menu-group-header active" data-section="dashboard">
+                        <div class="menu-header-content">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Tổng quan</span>
+                        </div>
+                    </div>
+                </div>
 
-            @if (userRole == "Admin" || chucVu == "BacSi" || chucVu == "DuocSi" || chucVu == "Bác sĩ" || chucVu == "Dược sĩ")
-            {
-                <!-- M2: Danh mục - Thuốc, NCC, Khoa -->
-                <div class="menu-section">
-                    <div class="menu-section-title">M2: Danh mục</div>
-                    
-                    @if (userRole == "Admin")
-                    {
-                        <a href="/Thuoc/Index" class="menu-item">
-                            <i class="fas fa-pills"></i>
-                            <span>Quản lý Thuốc</span>
+                <!-- Quản lý bệnh nhân -->
+                <div class="menu-group">
+                    <div class="menu-group-header" data-section="patients">
+                        <div class="menu-header-content">
+                            <i class="fas fa-user-injured"></i>
+                            <span>Bệnh nhân</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </div>
+                    <div class="menu-submenu">
+                        <a href="#" class="submenu-item" data-tab="patient-list">
+                            <i class="fas fa-circle"></i>
+                            <span>Danh sách bệnh nhân</span>
                         </a>
-                        <a href="/NhaCungCap/Index" class="menu-item">
+                        <a href="#" class="submenu-item" data-tab="patient-add">
+                            <i class="fas fa-circle"></i>
+                            <span>Thêm bệnh nhân mới</span>
+                        </a>
+                        <a href="#" class="submenu-item" data-tab="patient-medical">
+                            <i class="fas fa-circle"></i>
+                            <span>Hồ sơ bệnh án</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quản lý thuốc -->
+                <div class="menu-group">
+                    <div class="menu-group-header" data-section="medicines">
+                        <div class="menu-header-content">
+                            <i class="fas fa-pills"></i>
+                            <span>Thuốc</span>
+                        </div>
+                        <span class="menu-badge">12</span>
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </div>
+                    <div class="menu-submenu">
+                        <a href="#" class="submenu-item" data-tab="medicine-list">
+                            <i class="fas fa-circle"></i>
+                            <span>Danh sách thuốc</span>
+                        </a>
+                        <a href="#" class="submenu-item" data-tab="medicine-inventory">
+                            <i class="fas fa-circle"></i>
+                            <span>Quản lý kho</span>
+                        </a>
+                        <a href="#" class="submenu-item" data-tab="medicine-expired">
+                            <i class="fas fa-circle"></i>
+                            <span>Thuốc hết hạn</span>
+                            <span class="menu-badge" style="font-size: 0.65rem;">12</span>
+                        </a>
+                        <a href="#" class="submenu-item" data-tab="medicine-import">
+                            <i class="fas fa-circle"></i>
+                            <span>Nhập kho</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Đơn thuốc -->
+                <div class="menu-group">
+                    <div class="menu-group-header" data-section="prescriptions">
+                        <div class="menu-header-content">
+                            <i class="fas fa-prescription"></i>
+                            <span>Đơn thuốc</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </div>
+                    <div class="menu-submenu">
+                        <a href="#" class="submenu-item" data-tab="prescription-list">
+                            <i class="fas fa-circle"></i>
+                            <span>Danh sách đơn thuốc</span>
+                        </a>
+                        <a href="#" class="submenu-item" data-tab="prescription-create">
+                            <i class="fas fa-circle"></i>
+                            <span>Tạo đơn thuốc mới</span>
+                        </a>
+                        <a href="#" class="submenu-item" data-tab="prescription-history">
+                            <i class="fas fa-circle"></i>
+                            <span>Lịch sử kê đơn</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Hóa đơn -->
+                <div class="menu-group">
+                    <div class="menu-group-header" data-section="invoices">
+                        <div class="menu-header-content">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                            <span>Hóa đơn</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </div>
+                    <div class="menu-submenu">
+                        <a href="#" class="submenu-item" data-tab="invoice-list">
+                            <i class="fas fa-circle"></i>
+                            <span>Danh sách hóa đơn</span>
+                        </a>
+                        <a href="#" class="submenu-item" data-tab="invoice-pending">
+                            <i class="fas fa-circle"></i>
+                            <span>Chờ thanh toán</span>
+                        </a>
+                        <a href="#" class="submenu-item" data-tab="invoice-paid">
+                            <i class="fas fa-circle"></i>
+                            <span>Đã thanh toán</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Nhà cung cấp -->
+                <div class="menu-group">
+                    <div class="menu-group-header" data-section="suppliers">
+                        <div class="menu-header-content">
                             <i class="fas fa-truck"></i>
                             <span>Nhà cung cấp</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </div>
+                    <div class="menu-submenu">
+                        <a href="#" class="submenu-item" data-tab="supplier-list">
+                            <i class="fas fa-circle"></i>
+                            <span>Danh sách NCC</span>
                         </a>
-                        <a href="/Khoa/Index" class="menu-item">
-                            <i class="fas fa-building"></i>
-                            <span>Khoa phòng</span>
+                        <a href="#" class="submenu-item" data-tab="supplier-orders">
+                            <i class="fas fa-circle"></i>
+                            <span>Đơn đặt hàng</span>
                         </a>
-                    }
-                    else if (chucVu == "BacSi" || chucVu == "Bác sĩ")
-                    {
-                        <a href="/Thuoc/Index" class="menu-item">
-                            <i class="fas fa-pills"></i>
-                            <span>Danh sách Thuốc</span>
-                        </a>
-                    }
-                    else if (chucVu == "DuocSi" || chucVu == "Dược sĩ")
-                    {
-                        <a href="/Thuoc/Index" class="menu-item">
-                            <i class="fas fa-pills"></i>
-                            <span>Xem & Sửa Thuốc</span>
-                        </a>
-                        <a href="/NhaCungCap/Index" class="menu-item">
-                            <i class="fas fa-truck"></i>
-                            <span>Xem & Sửa NCC</span>
-                        </a>
-                    }
-                    else if (chucVu == "ThuNgan" || chucVu == "Thu ngân")
-                    {
-                        <a href="/Thuoc/Index" class="menu-item">
-                            <i class="fas fa-pills"></i>
-                            <span>Xem Thuốc</span>
-                        </a>
-                    }
-                    else if (chucVu == "QuanKho" || chucVu == "Quản kho")
-                    {
-                        <a href="/Thuoc/Index" class="menu-item">
-                            <i class="fas fa-pills"></i>
-                            <span>Xem & Sửa Thuốc</span>
-                        </a>
-                        <a href="/NhaCungCap/Index" class="menu-item">
-                            <i class="fas fa-truck"></i>
-                            <span>Xem & Sửa NCC</span>
-                        </a>
-                    }
+                    </div>
                 </div>
-            }
 
-            @if (userRole == "Admin" || chucVu == "BacSi" || chucVu == "Bác sĩ" || chucVu == "ThuNgan" || chucVu == "Thu ngân")
-            {
-                <!-- M3: Bệnh nhân -->
-                <div class="menu-section">
-                    <div class="menu-section-title">M3: Bệnh nhân</div>
-                    
-                    @if (userRole == "Admin")
-                    {
-                        <a href="/BenhNhan/Index" class="menu-item">
-                            <i class="fas fa-users"></i>
-                            <span>Quản lý Bệnh nhân</span>
-                        </a>
-                        <a href="/BenhNhan/TiepDon" class="menu-item">
-                            <i class="fas fa-user-plus"></i>
-                            <span>Tiếp đón</span>
-                        </a>
-                        <a href="/BenhNhan/BHYT" class="menu-item">
-                            <i class="fas fa-id-card"></i>
-                            <span>Tra cứu BHYT</span>
-                        </a>
-                    }
-                    else if (chucVu == "BacSi" || chucVu == "Bác sĩ")
-                    {
-                        <a href="/BenhNhan/Index" class="menu-item">
-                            <i class="fas fa-users"></i>
-                            <span>Xem & Sửa BN</span>
-                        </a>
-                    }
-                    else if (chucVu == "ThuNgan" || chucVu == "Thu ngân")
-                    {
-                        <a href="/BenhNhan/Index" class="menu-item">
-                            <i class="fas fa-users"></i>
-                            <span>Xem Bệnh nhân</span>
-                        </a>
-                    }
-                </div>
-            }
-
-            @if (userRole == "Admin" || chucVu == "QuanKho" || chucVu == "Quản kho")
-            {
-                <!-- M4: Kho thuốc -->
-                <div class="menu-section">
-                    <div class="menu-section-title">M4: Kho thuốc</div>
-                    
-                    <a href="/Kho/Index" class="menu-item">
-                        <i class="fas fa-warehouse"></i>
-                        <span>Quản lý Kho</span>
-                    </a>
-                    <a href="/Kho/NhapKho" class="menu-item">
-                        <i class="fas fa-file-import"></i>
-                        <span>Nhập kho</span>
-                    </a>
-                    <a href="/Kho/KiemKe" class="menu-item">
-                        <i class="fas fa-clipboard-check"></i>
-                        <span>Kiểm kê</span>
-                    </a>
-                    
-                    @if (chucVu == "DuocSi" || chucVu == "Dược sĩ")
-                    {
-                        <a href="/Kho/Index" class="menu-item">
-                            <i class="fas fa-warehouse"></i>
-                            <span>Xem Kho</span>
-                        </a>
-                    }
-                </div>
-            }
-
-            @if (userRole == "Admin" || chucVu == "BacSi" || chucVu == "Bác sĩ" || chucVu == "DuocSi" || chucVu == "Dược sĩ")
-            {
-                <!-- M5: Khám bệnh -->
-                <div class="menu-section">
-                    <div class="menu-section-title">M5: Khám bệnh</div>
-                    
-                    @if (userRole == "Admin" || chucVu == "BacSi" || chucVu == "Bác sĩ")
-                    {
-                        <a href="/KhamBenh/Index" class="menu-item">
-                            <i class="fas fa-stethoscope"></i>
-                            <span>Danh sách khám</span>
-                        </a>
-                        <a href="/KhamBenh/KeDon" class="menu-item">
-                            <i class="fas fa-prescription"></i>
-                            <span>Kê đơn thuốc</span>
-                        </a>
-                        <a href="/KhamBenh/ChanDoan" class="menu-item">
-                            <i class="fas fa-notes-medical"></i>
-                            <span>Chẩn đoán</span>
-                        </a>
-                    }
-                    else if (chucVu == "DuocSi" || chucVu == "Dược sĩ")
-                    {
-                        <a href="/KhamBenh/Index" class="menu-item">
-                            <i class="fas fa-stethoscope"></i>
-                            <span>Xem khám bệnh</span>
-                        </a>
-                    }
-                </div>
-            }
-
-            @if (userRole == "Admin" || chucVu == "BacSi" || chucVu == "Bác sĩ" || chucVu == "DuocSi" || chucVu == "Dược sĩ" || chucVu == "QuanKho" || chucVu == "Quản kho")
-            {
-                <!-- M6: Cấp phát thuốc -->
-                <div class="menu-section">
-                    <div class="menu-section-title">M6: Cấp phát</div>
-                    
-                    @if (userRole == "Admin" || chucVu == "DuocSi" || chucVu == "Dược sĩ")
-                    {
-                        <a href="/CapPhat/Index" class="menu-item">
-                            <i class="fas fa-hand-holding-medical"></i>
-                            <span>Cấp phát thuốc</span>
-                        </a>
-                        <a href="/CapPhat/DonThuoc" class="menu-item">
-                            <i class="fas fa-file-medical"></i>
-                            <span>Đơn thuốc chờ</span>
-                        </a>
-                        <a href="/CapPhat/LichSu" class="menu-item">
-                            <i class="fas fa-history"></i>
-                            <span>Lịch sử cấp phát</span>
-                        </a>
-                    }
-                    else if (chucVu == "BacSi" || chucVu == "Bác sĩ")
-                    {
-                        <a href="/CapPhat/Index" class="menu-item">
-                            <i class="fas fa-hand-holding-medical"></i>
-                            <span>Xem cấp phát</span>
-                        </a>
-                    }
-                    else if (chucVu == "QuanKho" || chucVu == "Quản kho")
-                    {
-                        <a href="/CapPhat/Index" class="menu-item">
-                            <i class="fas fa-hand-holding-medical"></i>
-                            <span>Xem cấp phát</span>
-                        </a>
-                    }
-                </div>
-            }
-
-            @if (userRole == "Admin" || chucVu == "ThuNgan" || chucVu == "Thu ngân")
-            {
-                <!-- M7: Tài chính -->
-                <div class="menu-section">
-                    <div class="menu-section-title">M7: Tài chính</div>
-                    
-                    <a href="/TaiChinh/Index" class="menu-item">
-                        <i class="fas fa-dollar-sign"></i>
-                        <span>Quản lý thu chi</span>
-                    </a>
-                    <a href="/TaiChinh/HoaDon" class="menu-item">
-                        <i class="fas fa-file-invoice-dollar"></i>
-                        <span>Hóa đơn</span>
-                    </a>
-                    <a href="/TaiChinh/PhieuThu" class="menu-item">
-                        <i class="fas fa-receipt"></i>
-                        <span>Phiếu thu</span>
-                    </a>
-                </div>
-            }
-
-            @if (userRole == "Admin" || chucVu == "ThuNgan" || chucVu == "Thu ngân")
-            {
-                <!-- M8: VietQR -->
-                <div class="menu-section">
-                    <div class="menu-section-title">M8: Thanh toán</div>
-                    
-                    <a href="/ThanhToan/Index" class="menu-item">
-                        <i class="fas fa-qrcode"></i>
-                        <span>VietQR</span>
-                    </a>
-                    <a href="/ThanhToan/LichSu" class="menu-item">
-                        <i class="fas fa-history"></i>
-                        <span>Lịch sử thanh toán</span>
-                    </a>
-                </div>
-            }
-
-            @if (userRole == "Admin" || chucVu == "BacSi" || chucVu == "Bác sĩ" || chucVu == "DuocSi" || chucVu == "Dược sĩ" || chucVu == "ThuNgan" || chucVu == "Thu ngân" || chucVu == "QuanKho" || chucVu == "Quản kho")
-            {
-                <!-- M9: Báo cáo -->
-                <div class="menu-section">
-                    <div class="menu-section-title">M9: Báo cáo</div>
-                    
-                    @if (userRole == "Admin")
-                    {
-                        <a href="/BaoCao/DoanhThu" class="menu-item">
-                            <i class="fas fa-chart-line"></i>
-                            <span>Doanh thu</span>
-                        </a>
-                        <a href="/BaoCao/TonKho" class="menu-item">
-                            <i class="fas fa-boxes"></i>
-                            <span>Tồn kho</span>
-                        </a>
-                        <a href="/BaoCao/ThongKe" class="menu-item">
-                            <i class="fas fa-chart-bar"></i>
-                            <span>Thống kê tổng hợp</span>
-                        </a>
-                    }
-                    else if (chucVu == "BacSi" || chucVu == "Bác sĩ")
-                    {
-                        <a href="/BaoCao/Index" class="menu-item">
-                            <i class="fas fa-chart-line"></i>
-                            <span>Xem báo cáo</span>
-                        </a>
-                    }
-                    else if (chucVu == "DuocSi" || chucVu == "Dược sĩ")
-                    {
-                        <a href="/BaoCao/TonKho" class="menu-item">
-                            <i class="fas fa-boxes"></i>
-                            <span>Xem & Sửa Báo cáo</span>
-                        </a>
-                    }
-                    else if (chucVu == "ThuNgan" || chucVu == "Thu ngân")
-                    {
-                        <a href="/BaoCao/DoanhThu" class="menu-item">
-                            <i class="fas fa-chart-line"></i>
-                            <span>Xem & Sửa Báo cáo</span>
-                        </a>
-                    }
-                    else if (chucVu == "QuanKho" || chucVu == "Quản kho")
-                    {
-                        <a href="/BaoCao/TonKho" class="menu-item">
-                            <i class="fas fa-boxes"></i>
-                            <span>Xem & Sửa Báo cáo</span>
-                        </a>
-                    }
-                </div>
-            }
-
-            @if (userRole == "Admin")
-            {
-                <!-- Settings - Only Admin -->
-                <div class="menu-section">
-                    <div class="menu-section-title">Hệ thống</div>
-                    <a href="/Admin/Settings" class="menu-item">
-                        <i class="fas fa-cog"></i>
-                        <span>Cài đặt</span>
-                    </a>
-                    <a href="/Admin/Users" class="menu-item">
-                        <i class="fas fa-users-cog"></i>
-                        <span>Quản lý người dùng</span>
-                    </a>
-                    <a href="/Admin/Logs" class="menu-item">
-                        <i class="fas fa-file-alt"></i>
-                        <span>Nhật ký hệ thống</span>
-                    </a>
-                </div>
-            }
-        </aside>
-
-        <!-- Main Dashboard Content -->
-        <main class="dashboard-content">
-            <!-- Stats Cards -->
-            <div class="stats-grid">
                 @if (userRole == "Admin")
                 {
+                    <!-- Nhân viên (chỉ Admin) -->
+                    <div class="menu-group">
+                        <div class="menu-group-header" data-section="employees">
+                            <div class="menu-header-content">
+                                <i class="fas fa-users"></i>
+                                <span>Nhân viên</span>
+                            </div>
+                            <i class="fas fa-chevron-right menu-arrow"></i>
+                        </div>
+                        <div class="menu-submenu">
+                            <a href="#" class="submenu-item" data-tab="employee-list">
+                                <i class="fas fa-circle"></i>
+                                <span>Danh sách nhân viên</span>
+                            </a>
+                            <a href="#" class="submenu-item" data-tab="employee-add">
+                                <i class="fas fa-circle"></i>
+                                <span>Thêm nhân viên</span>
+                            </a>
+                            <a href="#" class="submenu-item" data-tab="employee-roles">
+                                <i class="fas fa-circle"></i>
+                                <span>Phân quyền</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Báo cáo -->
+                    <div class="menu-group">
+                        <div class="menu-group-header" data-section="reports">
+                            <div class="menu-header-content">
+                                <i class="fas fa-chart-bar"></i>
+                                <span>Báo cáo</span>
+                            </div>
+                            <i class="fas fa-chevron-right menu-arrow"></i>
+                        </div>
+                        <div class="menu-submenu">
+                            <a href="#" class="submenu-item" data-tab="report-revenue">
+                                <i class="fas fa-circle"></i>
+                                <span>Báo cáo doanh thu</span>
+                            </a>
+                            <a href="#" class="submenu-item" data-tab="report-inventory">
+                                <i class="fas fa-circle"></i>
+                                <span>Báo cáo tồn kho</span>
+                            </a>
+                            <a href="#" class="submenu-item" data-tab="report-usage">
+                                <i class="fas fa-circle"></i>
+                                <span>Thống kê sử dụng</span>
+                            </a>
+                        </div>
+                    </div>
+                }
+
+                <!-- Cài đặt -->
+                <div class="menu-group">
+                    <div class="menu-group-header" data-section="settings">
+                        <div class="menu-header-content">
+                            <i class="fas fa-cog"></i>
+                            <span>Cài đặt</span>
+                        </div>
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </div>
+                    <div class="menu-submenu">
+                        <a href="#" class="submenu-item" data-tab="settings-general">
+                            <i class="fas fa-circle"></i>
+                            <span>Cài đặt chung</span>
+                        </a>
+                        <a href="#" class="submenu-item" data-tab="settings-profile">
+                            <i class="fas fa-circle"></i>
+                            <span>Hồ sơ cá nhân</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-content">
+            <!-- Dashboard Section (Default) -->
+            <div id="dashboard" class="content-section active">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-chart-line"></i>
+                        Tổng quan hệ thống
+                    </h2>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-icon primary">
-                            <i class="fas fa-users"></i>
+                            <i class="fas fa-user-injured"></i>
                         </div>
                         <div class="stat-details">
                             <div class="stat-value">1,234</div>
@@ -739,20 +768,20 @@
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon success">
-                            <i class="fas fa-stethoscope"></i>
-                        </div>
-                        <div class="stat-details">
-                            <div class="stat-value">89</div>
-                            <div class="stat-label">Lượt khám hôm nay</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon warning">
                             <i class="fas fa-pills"></i>
                         </div>
                         <div class="stat-details">
                             <div class="stat-value">456</div>
-                            <div class="stat-label">Loại thuốc trong kho</div>
+                            <div class="stat-label">Loại thuốc</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon warning">
+                            <i class="fas fa-prescription"></i>
+                        </div>
+                        <div class="stat-details">
+                            <div class="stat-value">89</div>
+                            <div class="stat-label">Đơn hôm nay</div>
                         </div>
                     </div>
                     <div class="stat-card">
@@ -761,205 +790,552 @@
                         </div>
                         <div class="stat-details">
                             <div class="stat-value">12</div>
-                            <div class="stat-label">Thuốc cần nhập</div>
+                            <div class="stat-label">Thuốc hết hạn</div>
                         </div>
-                    </div>
-                }
-                else if (chucVu == "BacSi" || chucVu == "Bác sĩ")
-                {
-                    <div class="stat-card">
-                        <div class="stat-icon primary">
-                            <i class="fas fa-user-injured"></i>
-                        </div>
-                        <div class="stat-details">
-                            <div class="stat-value">23</div>
-                            <div class="stat-label">Bệnh nhân chờ khám</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon success">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div class="stat-details">
-                            <div class="stat-value">67</div>
-                            <div class="stat-label">Đã khám hôm nay</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon info">
-                            <i class="fas fa-prescription"></i>
-                        </div>
-                        <div class="stat-details">
-                            <div class="stat-value">54</div>
-                            <div class="stat-label">Đơn thuốc đã kê</div>
-                        </div>
-                    </div>
-                }
-                else if (chucVu == "DuocSi" || chucVu == "Dược sĩ")
-                {
-                    <div class="stat-card">
-                        <div class="stat-icon primary">
-                            <i class="fas fa-file-prescription"></i>
-                        </div>
-                        <div class="stat-details">
-                            <div class="stat-value">34</div>
-                            <div class="stat-label">Đơn thuốc chờ</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon success">
-                            <i class="fas fa-hand-holding-medical"></i>
-                        </div>
-                        <div class="stat-details">
-                            <div class="stat-value">78</div>
-                            <div class="stat-label">Đã cấp phát</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon warning">
-                            <i class="fas fa-exclamation-circle"></i>
-                        </div>
-                        <div class="stat-details">
-                            <div class="stat-value">9</div>
-                            <div class="stat-label">Thuốc sắp hết hạn</div>
-                        </div>
-                    </div>
-                }
-                else if (chucVu == "QuanKho" || chucVu == "Quản kho")
-                {
-                    <div class="stat-card">
-                        <div class="stat-icon primary">
-                            <i class="fas fa-warehouse"></i>
-                        </div>
-                        <div class="stat-details">
-                            <div class="stat-value">456</div>
-                            <div class="stat-label">Tổng mặt hàng</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon success">
-                            <i class="fas fa-file-import"></i>
-                        </div>
-                        <div class="stat-details">
-                            <div class="stat-value">15</div>
-                            <div class="stat-label">Phiếu nhập hôm nay</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon warning">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <div class="stat-details">
-                            <div class="stat-value">23</div>
-                            <div class="stat-label">Dưới tồn kho tối thiểu</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon danger">
-                            <i class="fas fa-calendar-times"></i>
-                        </div>
-                        <div class="stat-details">
-                            <div class="stat-value">8</div>
-                            <div class="stat-label">Hết hạn trong 30 ngày</div>
-                        </div>
-                    </div>
-                }
-                else if (chucVu == "ThuNgan" || chucVu == "Thu ngân")
-                {
-                    <div class="stat-card">
-                        <div class="stat-icon primary">
-                            <i class="fas fa-file-invoice-dollar"></i>
-                        </div>
-                        <div class="stat-details">
-                            <div class="stat-value">45</div>
-                            <div class="stat-label">Hóa đơn hôm nay</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon success">
-                            <i class="fas fa-money-bill-wave"></i>
-                        </div>
-                        <div class="stat-details">
-                            <div class="stat-value">12.5M</div>
-                            <div class="stat-label">Doanh thu hôm nay</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon warning">
-                            <i class="fas fa-hourglass-half"></i>
-                        </div>
-                        <div class="stat-details">
-                            <div class="stat-value">8</div>
-                            <div class="stat-label">Chờ thanh toán</div>
-                        </div>
-                    </div>
-                }
-            </div>
-
-            <!-- Charts Section with FIXED HEIGHT -->
-            <div class="charts-grid">
-                <div class="chart-card">
-                    <h5>
-                        <i class="fas fa-chart-line" style="color: #1e3a5f;"></i>
-                        Biểu đồ doanh thu 7 ngày
-                    </h5>
-                    <div class="chart-container">
-                        <canvas id="revenueChart"></canvas>
                     </div>
                 </div>
-                <div class="chart-card">
-                    <h5>
-                        <i class="fas fa-chart-pie" style="color: #11998e;"></i>
-                        Phân loại bệnh nhân
-                    </h5>
-                    <div class="chart-container">
-                        <canvas id="patientChart"></canvas>
+
+                <!-- Charts Grid -->
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-chart-line me-2"></i>Biểu đồ doanh thu 7 ngày
+                            </div>
+                            <div class="card-body">
+                                <div style="height: 300px; position: relative;">
+                                    <canvas id="revenueChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-chart-pie me-2"></i>Phân loại bệnh nhân
+                            </div>
+                            <div class="card-body">
+                                <div style="height: 300px; position: relative;">
+                                    <canvas id="patientChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Recent Activities -->
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">
+                <!-- Recent Activities -->
+                <div class="card">
+                    <div class="card-header">
                         <i class="fas fa-history me-2"></i>Hoạt động gần đây
-                    </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-container">
+                            <table class="table mb-0">
+                                <tbody>
+                                    <tr>
+                                        <td style="width: 50px; text-align: center;">
+                                            <div style="width: 35px; height: 35px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
+                                                <i class="fas fa-check"></i>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <strong>Đã xử lý đơn thuốc #DT20260203001</strong>
+                                            <br>
+                                            <small class="text-muted">5 phút trước</small>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 50px; text-align: center;">
+                                            <div style="width: 35px; height: 35px; background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
+                                                <i class="fas fa-user-plus"></i>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <strong>Bệnh nhân mới: Nguyễn Văn A</strong>
+                                            <br>
+                                            <small class="text-muted">15 phút trước</small>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 50px; text-align: center;">
+                                            <div style="width: 35px; height: 35px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
+                                                <i class="fas fa-file-import"></i>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <strong>Nhập kho thuốc từ NCC ABC</strong>
+                                            <br>
+                                            <small class="text-muted">1 giờ trước</small>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 50px; text-align: center;">
+                                            <div style="width: 35px; height: 35px; background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
+                                                <i class="fas fa-bell"></i>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <strong>Cảnh báo: 12 loại thuốc sắp hết hạn</strong>
+                                            <br>
+                                            <small class="text-muted">2 giờ trước</small>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body p-0">
-                    <div class="activity-item">
-                        <div class="activity-icon">
-                            <i class="fas fa-check"></i>
-                        </div>
-                        <div class="activity-content">
-                            <div class="activity-text">Đã xử lý đơn thuốc #DT20260203001</div>
-                            <div class="activity-time">5 phút trước</div>
+            </div>
+
+            <!-- Patients Section -->
+            <div id="patients" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-user-injured"></i>
+                        Quản lý bệnh nhân
+                    </h2>
+                    <button class="action-btn btn-primary-custom">
+                        <i class="fas fa-plus"></i>
+                        Thêm bệnh nhân
+                    </button>
+                </div>
+
+                <!-- Tabs -->
+                <div class="content-tabs">
+                    <button class="tab-btn active" data-target="patient-list">
+                        <i class="fas fa-list"></i>
+                        Danh sách
+                    </button>
+                    <button class="tab-btn" data-target="patient-add">
+                        <i class="fas fa-user-plus"></i>
+                        Thêm mới
+                    </button>
+                    <button class="tab-btn" data-target="patient-medical">
+                        <i class="fas fa-file-medical"></i>
+                        Hồ sơ bệnh án
+                    </button>
+                </div>
+
+                <!-- Tab Contents -->
+                <div id="patient-list" class="tab-content active">
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Mã BN</th>
+                                    <th>Họ tên</th>
+                                    <th>Ngày sinh</th>
+                                    <th>Giới tính</th>
+                                    <th>Số điện thoại</th>
+                                    <th>Email</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>BN001</td>
+                                    <td>Nguyễn Văn A</td>
+                                    <td>01/01/1990</td>
+                                    <td>Nam</td>
+                                    <td>0123456789</td>
+                                    <td>nguyenvana@email.com</td>
+                                    <td>
+                                        <button class="action-btn btn-primary-custom" style="padding: 5px 10px; font-size: 0.85rem;">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <!-- More rows... -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="patient-add" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">Thông tin bệnh nhân mới</div>
+                        <div class="card-body">
+                            <p class="text-muted">Form thêm bệnh nhân sẽ được hiển thị ở đây...</p>
                         </div>
                     </div>
-                    <div class="activity-item">
-                        <div class="activity-icon">
+                </div>
+
+                <div id="patient-medical" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">Hồ sơ bệnh án</div>
+                        <div class="card-body">
+                            <p class="text-muted">Danh sách hồ sơ bệnh án sẽ được hiển thị ở đây...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medicines Section -->
+            <div id="medicines" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-pills"></i>
+                        Quản lý thuốc
+                    </h2>
+                    <button class="action-btn btn-primary-custom">
+                        <i class="fas fa-plus"></i>
+                        Thêm thuốc
+                    </button>
+                </div>
+
+                <div class="content-tabs">
+                    <button class="tab-btn active" data-target="medicine-list">
+                        <i class="fas fa-list"></i>
+                        Danh sách thuốc
+                    </button>
+                    <button class="tab-btn" data-target="medicine-inventory">
+                        <i class="fas fa-warehouse"></i>
+                        Quản lý kho
+                    </button>
+                    <button class="tab-btn" data-target="medicine-expired">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Thuốc hết hạn
+                        <span class="menu-badge" style="font-size: 0.65rem;">12</span>
+                    </button>
+                    <button class="tab-btn" data-target="medicine-import">
+                        <i class="fas fa-file-import"></i>
+                        Nhập kho
+                    </button>
+                </div>
+
+                <div id="medicine-list" class="tab-content active">
+                    <div class="card">
+                        <div class="card-header">Danh sách thuốc</div>
+                        <div class="card-body">
+                            <p class="text-muted">Danh sách thuốc sẽ được hiển thị ở đây...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="medicine-inventory" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">Quản lý tồn kho</div>
+                        <div class="card-body">
+                            <p class="text-muted">Thông tin tồn kho sẽ được hiển thị ở đây...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="medicine-expired" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">Danh sách thuốc hết hạn</div>
+                        <div class="card-body">
+                            <p class="text-muted">Danh sách thuốc hết hạn sẽ được hiển thị ở đây...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="medicine-import" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">Nhập kho thuốc</div>
+                        <div class="card-body">
+                            <p class="text-muted">Form nhập kho sẽ được hiển thị ở đây...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prescriptions Section -->
+            <div id="prescriptions" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-prescription"></i>
+                        Quản lý đơn thuốc
+                    </h2>
+                    <button class="action-btn btn-primary-custom">
+                        <i class="fas fa-plus"></i>
+                        Tạo đơn mới
+                    </button>
+                </div>
+
+                <div class="content-tabs">
+                    <button class="tab-btn active" data-target="prescription-list">
+                        <i class="fas fa-list"></i>
+                        Danh sách đơn thuốc
+                    </button>
+                    <button class="tab-btn" data-target="prescription-create">
+                        <i class="fas fa-plus-circle"></i>
+                        Tạo đơn mới
+                    </button>
+                    <button class="tab-btn" data-target="prescription-history">
+                        <i class="fas fa-history"></i>
+                        Lịch sử kê đơn
+                    </button>
+                </div>
+
+                <div id="prescription-list" class="tab-content active">
+                    <div class="card">
+                        <div class="card-header">Danh sách đơn thuốc</div>
+                        <div class="card-body">
+                            <p class="text-muted">Danh sách đơn thuốc sẽ được hiển thị ở đây...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="prescription-create" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">Tạo đơn thuốc mới</div>
+                        <div class="card-body">
+                            <p class="text-muted">Form tạo đơn thuốc sẽ được hiển thị ở đây...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="prescription-history" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">Lịch sử kê đơn</div>
+                        <div class="card-body">
+                            <p class="text-muted">Lịch sử kê đơn sẽ được hiển thị ở đây...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Invoices Section -->
+            <div id="invoices" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        Quản lý hóa đơn
+                    </h2>
+                </div>
+
+                <div class="content-tabs">
+                    <button class="tab-btn active" data-target="invoice-list">
+                        <i class="fas fa-list"></i>
+                        Tất cả hóa đơn
+                    </button>
+                    <button class="tab-btn" data-target="invoice-pending">
+                        <i class="fas fa-hourglass-half"></i>
+                        Chờ thanh toán
+                    </button>
+                    <button class="tab-btn" data-target="invoice-paid">
+                        <i class="fas fa-check-circle"></i>
+                        Đã thanh toán
+                    </button>
+                </div>
+
+                <div id="invoice-list" class="tab-content active">
+                    <div class="card">
+                        <div class="card-header">Tất cả hóa đơn</div>
+                        <div class="card-body">
+                            <p class="text-muted">Danh sách hóa đơn sẽ được hiển thị ở đây...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="invoice-pending" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">Hóa đơn chờ thanh toán</div>
+                        <div class="card-body">
+                            <p class="text-muted">Danh sách hóa đơn chờ thanh toán sẽ được hiển thị ở đây...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="invoice-paid" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">Hóa đơn đã thanh toán</div>
+                        <div class="card-body">
+                            <p class="text-muted">Danh sách hóa đơn đã thanh toán sẽ được hiển thị ở đây...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Suppliers Section -->
+            <div id="suppliers" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-truck"></i>
+                        Quản lý nhà cung cấp
+                    </h2>
+                    <button class="action-btn btn-primary-custom">
+                        <i class="fas fa-plus"></i>
+                        Thêm NCC
+                    </button>
+                </div>
+
+                <div class="content-tabs">
+                    <button class="tab-btn active" data-target="supplier-list">
+                        <i class="fas fa-list"></i>
+                        Danh sách NCC
+                    </button>
+                    <button class="tab-btn" data-target="supplier-orders">
+                        <i class="fas fa-shopping-cart"></i>
+                        Đơn đặt hàng
+                    </button>
+                </div>
+
+                <div id="supplier-list" class="tab-content active">
+                    <div class="card">
+                        <div class="card-header">Danh sách nhà cung cấp</div>
+                        <div class="card-body">
+                            <p class="text-muted">Danh sách nhà cung cấp sẽ được hiển thị ở đây...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="supplier-orders" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">Đơn đặt hàng</div>
+                        <div class="card-body">
+                            <p class="text-muted">Danh sách đơn đặt hàng sẽ được hiển thị ở đây...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if (userRole == "Admin")
+            {
+                <!-- Employees Section -->
+                <div id="employees" class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-users"></i>
+                            Quản lý nhân viên
+                        </h2>
+                        <button class="action-btn btn-primary-custom">
                             <i class="fas fa-user-plus"></i>
-                        </div>
-                        <div class="activity-content">
-                            <div class="activity-text">Bệnh nhân mới: Nguyễn Văn A</div>
-                            <div class="activity-time">15 phút trước</div>
+                            Thêm nhân viên
+                        </button>
+                    </div>
+
+                    <div class="content-tabs">
+                        <button class="tab-btn active" data-target="employee-list">
+                            <i class="fas fa-list"></i>
+                            Danh sách nhân viên
+                        </button>
+                        <button class="tab-btn" data-target="employee-add">
+                            <i class="fas fa-user-plus"></i>
+                            Thêm nhân viên
+                        </button>
+                        <button class="tab-btn" data-target="employee-roles">
+                            <i class="fas fa-user-shield"></i>
+                            Phân quyền
+                        </button>
+                    </div>
+
+                    <div id="employee-list" class="tab-content active">
+                        <div class="card">
+                            <div class="card-header">Danh sách nhân viên</div>
+                            <div class="card-body">
+                                <p class="text-muted">Danh sách nhân viên sẽ được hiển thị ở đây...</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="activity-item">
-                        <div class="activity-icon">
-                            <i class="fas fa-file-import"></i>
-                        </div>
-                        <div class="activity-content">
-                            <div class="activity-text">Nhập kho thuốc từ NCC ABC</div>
-                            <div class="activity-time">1 giờ trước</div>
+
+                    <div id="employee-add" class="tab-content">
+                        <div class="card">
+                            <div class="card-header">Thêm nhân viên mới</div>
+                            <div class="card-body">
+                                <p class="text-muted">Form thêm nhân viên sẽ được hiển thị ở đây...</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="activity-item">
-                        <div class="activity-icon">
-                            <i class="fas fa-bell"></i>
+
+                    <div id="employee-roles" class="tab-content">
+                        <div class="card">
+                            <div class="card-header">Quản lý phân quyền</div>
+                            <div class="card-body">
+                                <p class="text-muted">Giao diện phân quyền sẽ được hiển thị ở đây...</p>
+                            </div>
                         </div>
-                        <div class="activity-content">
-                            <div class="activity-text">Cảnh báo: 5 loại thuốc sắp hết hạn</div>
-                            <div class="activity-time">2 giờ trước</div>
+                    </div>
+                </div>
+
+                <!-- Reports Section -->
+                <div id="reports" class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-chart-bar"></i>
+                            Báo cáo & Thống kê
+                        </h2>
+                    </div>
+
+                    <div class="content-tabs">
+                        <button class="tab-btn active" data-target="report-revenue">
+                            <i class="fas fa-dollar-sign"></i>
+                            Doanh thu
+                        </button>
+                        <button class="tab-btn" data-target="report-inventory">
+                            <i class="fas fa-warehouse"></i>
+                            Tồn kho
+                        </button>
+                        <button class="tab-btn" data-target="report-usage">
+                            <i class="fas fa-chart-line"></i>
+                            Sử dụng
+                        </button>
+                    </div>
+
+                    <div id="report-revenue" class="tab-content active">
+                        <div class="card">
+                            <div class="card-header">Báo cáo doanh thu</div>
+                            <div class="card-body">
+                                <p class="text-muted">Báo cáo doanh thu sẽ được hiển thị ở đây...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="report-inventory" class="tab-content">
+                        <div class="card">
+                            <div class="card-header">Báo cáo tồn kho</div>
+                            <div class="card-body">
+                                <p class="text-muted">Báo cáo tồn kho sẽ được hiển thị ở đây...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="report-usage" class="tab-content">
+                        <div class="card">
+                            <div class="card-header">Thống kê sử dụng</div>
+                            <div class="card-body">
+                                <p class="text-muted">Thống kê sử dụng sẽ được hiển thị ở đây...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Settings Section -->
+            <div id="settings" class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-cog"></i>
+                        Cài đặt
+                    </h2>
+                </div>
+
+                <div class="content-tabs">
+                    <button class="tab-btn active" data-target="settings-general">
+                        <i class="fas fa-sliders-h"></i>
+                        Cài đặt chung
+                    </button>
+                    <button class="tab-btn" data-target="settings-profile">
+                        <i class="fas fa-user-circle"></i>
+                        Hồ sơ cá nhân
+                    </button>
+                </div>
+
+                <div id="settings-general" class="tab-content active">
+                    <div class="card">
+                        <div class="card-header">Cài đặt chung</div>
+                        <div class="card-body">
+                            <p class="text-muted">Các cài đặt chung của hệ thống sẽ được hiển thị ở đây...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="settings-profile" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">Hồ sơ cá nhân</div>
+                        <div class="card-body">
+                            <p class="text-muted">Thông tin hồ sơ cá nhân sẽ được hiển thị ở đây...</p>
                         </div>
                     </div>
                 </div>
@@ -973,24 +1349,90 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
     <script>
-        // Auto-hide welcome banner after 15 seconds
-        setTimeout(function() {
-            const banner = document.getElementById('welcomeBanner');
-            if (banner) {
-                banner.classList.add('hidden');
-            }
-        }, 15000);
+        $(document).ready(function() {
+            // Menu accordion functionality
+            $('.menu-group-header').click(function() {
+                const $header = $(this);
+                const $group = $header.parent();
+                const $submenu = $group.find('.menu-submenu');
+                const section = $header.data('section');
 
-        // Close welcome banner manually
-        function closeWelcome() {
-            const banner = document.getElementById('welcomeBanner');
-            if (banner) {
-                banner.classList.add('hidden');
-            }
-        }
+                // Toggle submenu
+                if ($submenu.length > 0) {
+                    // Close other submenus
+                    $('.menu-submenu').not($submenu).removeClass('show');
+                    $('.menu-group-header').not($header).removeClass('active');
+                    
+                    // Toggle current submenu
+                    $submenu.toggleClass('show');
+                    $header.toggleClass('active');
+                } else {
+                    // If no submenu, it's a direct link (like Dashboard)
+                    $('.menu-group-header').removeClass('active');
+                    $header.addClass('active');
+                    
+                    // Show corresponding section
+                    showSection(section);
+                }
+            });
 
-        // OPTIMIZED: Create charts only once with fixed dimensions
-        document.addEventListener('DOMContentLoaded', function() {
+            // Submenu item click
+            $('.submenu-item').click(function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const $item = $(this);
+                const section = $item.closest('.menu-group').find('.menu-group-header').data('section');
+                const tab = $item.data('tab');
+                
+                // Update active states
+                $('.submenu-item').removeClass('active');
+                $item.addClass('active');
+                
+                // Show section and tab
+                showSection(section);
+                if (tab) {
+                    switchTab(tab);
+                }
+            });
+
+            // Tab switching
+            $('.tab-btn').click(function() {
+                const $btn = $(this);
+                const target = $btn.data('target');
+                const $container = $btn.closest('.content-section');
+                
+                // Update tab buttons
+                $container.find('.tab-btn').removeClass('active');
+                $btn.addClass('active');
+                
+                // Update tab contents
+                $container.find('.tab-content').removeClass('active');
+                $container.find('#' + target).addClass('active');
+            });
+
+            // Helper function to show section
+            function showSection(sectionId) {
+                $('.content-section').removeClass('active');
+                $('#' + sectionId).addClass('active');
+            }
+
+            // Helper function to switch tab within a section
+            function switchTab(tabId) {
+                const $section = $('.content-section.active');
+                $section.find('.tab-btn').removeClass('active');
+                $section.find('.tab-content').removeClass('active');
+                
+                $section.find('.tab-btn[data-target="' + tabId + '"]').addClass('active');
+                $section.find('#' + tabId).addClass('active');
+            }
+
+            // Initialize Charts
+            initializeCharts();
+        });
+
+        // Chart initialization
+        function initializeCharts() {
             // Revenue Chart
             const revenueCtx = document.getElementById('revenueChart');
             if (revenueCtx) {
@@ -1005,9 +1447,12 @@
                             backgroundColor: 'rgba(30, 58, 95, 0.1)',
                             tension: 0.4,
                             fill: true,
-                            borderWidth: 2,
-                            pointRadius: 4,
-                            pointHoverRadius: 6
+                            borderWidth: 3,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            pointBackgroundColor: '#1e3a5f',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2
                         }]
                     },
                     options: {
@@ -1019,7 +1464,19 @@
                             },
                             tooltip: {
                                 mode: 'index',
-                                intersect: false
+                                intersect: false,
+                                backgroundColor: 'rgba(30, 58, 95, 0.9)',
+                                titleColor: '#fff',
+                                bodyColor: '#fff',
+                                borderColor: '#1e3a5f',
+                                borderWidth: 1,
+                                padding: 12,
+                                displayColors: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Doanh thu: ' + context.parsed.y + ' triệu VNĐ';
+                                    }
+                                }
                             }
                         },
                         scales: {
@@ -1029,6 +1486,14 @@
                                     callback: function(value) {
                                         return value + 'M';
                                     }
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
                                 }
                             }
                         },
@@ -1055,7 +1520,8 @@
                                 '#38ef7d',
                                 '#f5576c'
                             ],
-                            borderWidth: 0
+                            borderWidth: 0,
+                            hoverOffset: 10
                         }]
                     },
                     options: {
@@ -1068,11 +1534,19 @@
                                     padding: 15,
                                     usePointStyle: true,
                                     font: {
-                                        size: 12
+                                        size: 12,
+                                        weight: '500'
                                     }
                                 }
                             },
                             tooltip: {
+                                backgroundColor: 'rgba(30, 58, 95, 0.9)',
+                                titleColor: '#fff',
+                                bodyColor: '#fff',
+                                borderColor: '#1e3a5f',
+                                borderWidth: 1,
+                                padding: 12,
+                                displayColors: true,
                                 callbacks: {
                                     label: function(context) {
                                         return context.label + ': ' + context.parsed + '%';
@@ -1083,31 +1557,6 @@
                     }
                 });
             }
-        });
-
-        // Menu item active state - Tự động active dựa trên URL hiện tại
-        $(document).ready(function() {
-            // Lấy URL hiện tại
-            const currentPath = window.location.pathname;
-            
-            // Loại bỏ active cũ và thêm active mới dựa trên URL
-            $('.menu-item').each(function() {
-                const href = $(this).attr('href');
-                if (currentPath === href || currentPath.startsWith(href + '/')) {
-                    $('.menu-item').removeClass('active');
-                    $(this).addClass('active');
-                }
-            });
-
-            // Click handler cho menu items
-            $('.menu-item').click(function(e) {
-                // Chỉ xử lý nếu không phải link thật
-                if ($(this).attr('href') === '#') {
-                    e.preventDefault();
-                    $('.menu-item').removeClass('active');
-                    $(this).addClass('active');
-                }
-            });
-        });
+        }
     </script>
 }
