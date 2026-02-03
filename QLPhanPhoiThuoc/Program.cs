@@ -109,19 +109,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Account}/{action=Login}/{id?}");
 
-// Area routes (nếu có Admin area)
-app.MapControllerRoute(
-    name: "areas",
-    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
-
-// API routes (nếu có)
-app.MapControllerRoute(
-    name: "api",
-    pattern: "api/{controller}/{action}/{id?}");
-
-// Razor Pages (nếu dùng)
-app.MapRazorPages();
-
-// ==================== RUN APP ====================
 
 app.Run();

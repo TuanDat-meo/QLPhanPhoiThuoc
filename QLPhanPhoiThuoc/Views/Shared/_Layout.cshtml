@@ -1,49 +1,575 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - QLPhanPhoiThuoc</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <title>@ViewData["Title"] - Hệ thống Quản lý Phòng khám</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/QLPhanPhoiThuoc.styles.css" asp-append-version="true" />
+    
+    <style>
+        :root {
+            /* SYNCED WITH LOGIN PAGE COLORS */
+            --primary-gradient: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
+            --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #f5576c 100%);
+            --info-gradient: linear-gradient(135deg, #38bdf8 0%, #7dd3fc 100%);
+            --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #fb7185 100%);
+            --sidebar-width: 280px;
+            --navbar-height: 70px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            
+            /* Primary Colors */
+            --primary: #1e3a5f;
+            --primary-dark: #0f2847;
+            --accent-cyan: #38bdf8;
+            --accent-pink: #fb7185;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ========== NAVBAR ========== */
+        .navbar-custom {
+            background: var(--primary-gradient);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar-custom .navbar-brand {
+            color: white;
+            font-weight: 700;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+        }
+
+        .navbar-custom .navbar-brand:hover {
+            transform: scale(1.05);
+            color: white;
+        }
+
+        .navbar-custom .navbar-brand i {
+            font-size: 1.8rem;
+            animation: pulse 2s infinite;
+        }
+
+        keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .navbar-custom .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .navbar-custom .nav-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .navbar-custom .nav-link i {
+            margin-right: 6px;
+        }
+
+        /* User Dropdown */
+        .user-dropdown {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            padding: 8px 20px;
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .user-dropdown:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        /* Notification Badge */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 7px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(251, 113, 133, 0.4);
+        }
+
+        /* Dropdown Menu */
+        .dropdown-menu {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            padding: 10px;
+            min-width: 250px;
+        }
+
+        .dropdown-item {
+            border-radius: 8px;
+            padding: 12px 16px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dropdown-item:hover {
+            background: linear-gradient(135deg, rgba(30, 58, 95, 0.1) 0%, rgba(15, 40, 71, 0.1) 100%);
+            transform: translateX(5px);
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .dropdown-header {
+            padding: 12px 16px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            min-height: calc(100vh - var(--navbar-height) - 120px);
+            padding: 30px 20px;
+        }
+
+        /* ========== CARDS ========== */
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            transition: var(--transition);
+            overflow: hidden;
+            background: white;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 20px 25px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .card-header i {
+            margin-right: 10px;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        /* ========== BUTTONS ========== */
+        .btn {
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(30, 58, 95, 0.3);
+        }
+
+        .btn-success {
+            background: var(--success-gradient);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(17, 153, 142, 0.3);
+        }
+
+        .btn-warning {
+            background: var(--warning-gradient);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-info {
+            background: var(--info-gradient);
+            color: white;
+        }
+
+        .btn-info:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(56, 189, 248, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(251, 113, 133, 0.3);
+        }
+
+        /* ========== FOOTER ========== */
+        footer {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 60px;
+        }
+
+        footer a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        footer a:hover {
+            color: white;
+        }
+
+        footer h6 {
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        /* ========== LOADING OVERLAY ========== */
+        .spinner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 40, 71, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .spinner-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* ========== SMOOTH SCROLL ========== */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+
+    @RenderSection("Styles", required: false)
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">QLPhanPhoiThuoc</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+    <!-- Loading Overlay -->
+    <div class="spinner-overlay" id="loadingOverlay">
+        <div class="spinner-border text-light" style="width: 4rem; height: 4rem;" role="status">
+            <span class="visually-hidden">Đang tải...</span>
+        </div>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-hospital-user"></i>
+                <span>Phòng khám ABC</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    style="background: rgba(255,255,255,0.2); border: none;">
+                <i class="fas fa-bars text-white"></i>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <!-- Notifications -->
+                        <li class="nav-item me-3">
+                            <a class="nav-link position-relative" href="#" title="Thông báo">
+                                <i class="fas fa-bell"></i>
+                                <span class="notification-badge">5</span>
+                            </a>
+                        </li>
+
+                        <!-- User Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle user-dropdown p-0" href="#" id="userDropdown" 
+                               role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="user-avatar">
+                                    @{
+                                        var userName = User.Identity.Name ?? "U";
+                                        @userName.Substring(0, 1).ToUpper()
+                                    }
+                                </span>
+                                <span class="user-info">
+                                    <span class="user-name">@User.Identity.Name</span>
+                                    <span class="user-role">
+                                        @(User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "User")
+                                    </span>
+                                </span>
+                                <i class="fas fa-chevron-down"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li>
+                                    <h6 class="dropdown-header">
+                                        <i class="fas fa-user-shield"></i>
+                                        @(User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "User")
+                                    </h6>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="#">
+                                        <i class="fas fa-user-circle"></i>
+                                        Hồ sơ cá nhân
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#">
+                                        <i class="fas fa-cog"></i>
+                                        Cài đặt
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#">
+                                        <i class="fas fa-question-circle"></i>
+                                        Trợ giúp
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form asp-controller="Account" asp-action="Logout" method="post" id="logoutForm">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="fas fa-sign-out-alt"></i>
+                                            Đăng xuất
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Account" asp-action="Login">
+                                <i class="fas fa-sign-in-alt"></i>Đăng nhập
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Account" asp-action="Register">
+                                <i class="fas fa-user-plus"></i>Đăng ký
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        @RenderBody()
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center">
         <div class="container">
-            &copy; 2026 - QLPhanPhoiThuoc - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h6 class="fw-bold mb-3">
+                        <i class="fas fa-hospital-user me-2"></i>Phòng khám ABC
+                    </h6>
+                    <p class="small mb-0">Hệ thống quản lý phòng khám hiện đại</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6 class="fw-bold mb-3">Liên hệ</h6>
+                    <p class="small mb-1">
+                        <i class="fas fa-phone me-2"></i>Hotline: 1900-xxxx
+                    </p>
+                    <p class="small mb-0">
+                        <i class="fas fa-envelope me-2"></i>Email: info@phongkhamabc.vn
+                    </p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6 class="fw-bold mb-3">Giờ làm việc</h6>
+                    <p class="small mb-1">Thứ 2 - Thứ 6: 7:00 - 17:00</p>
+                    <p class="small mb-0">Thứ 7 - CN: 7:00 - 12:00</p>
+                </div>
+            </div>
+            <hr style="border-color: rgba(255,255,255,0.2);">
+            <p class="mb-0 small">
+                &copy; 2026 Hệ thống Quản lý Phòng khám. All rights reserved.
+            </p>
+            <p class="mb-0 small opacity-75">
+                Phát triển bởi Nhóm CNTT | Version 1.0.0
+            </p>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Sweet Alert 2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        // Show loading overlay
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.add('show');
+        }
+
+        // Hide loading overlay
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('show');
+        }
+
+        // Auto hide loading after page load
+        window.addEventListener('load', function() {
+            hideLoading();
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Notification toast
+        function showToast(message, type = 'info') {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+
+            Toast.fire({
+                icon: type,
+                title: message
+            });
+        }
+
+        // Feature in development alert
+        function featureInDevelopment() {
+            Swal.fire({
+                icon: 'info',
+                title: 'Tính năng đang phát triển',
+                text: 'Tính năng này đang được phát triển và sẽ sớm được ra mắt.',
+                confirmButtonColor: '#1e3a5f',
+                confirmButtonText: 'Đã hiểu'
+            });
+        }
+    </script>
+
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

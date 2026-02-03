@@ -12,6 +12,7 @@ namespace QLPhanPhoiThuoc.Models.Entities
         [Key]
         [StringLength(20)]
         public string MaBenhNhan { get; set; }
+        public string? MaTaiKhoan { get; set; }
 
         [Required]
         [StringLength(100)]
@@ -62,5 +63,6 @@ namespace QLPhanPhoiThuoc.Models.Entities
         public virtual ICollection<ChanDoan> ChanDoans { get; set; }
         public virtual ICollection<DonThuoc> DonThuocs { get; set; }
         public virtual ICollection<HoaDon> HoaDons { get; set; }
+        public virtual TaiKhoan? TaiKhoan { get; set; }
     }
 }

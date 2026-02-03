@@ -11,6 +11,7 @@ namespace QLPhanPhoiThuoc.Models.Entities
         [Key]
         [StringLength(20)]
         public string MaNhanVien { get; set; }
+        public string? MaTaiKhoan { get; set; }
 
         [Required]
         [StringLength(100)]

@@ -156,26 +156,39 @@ namespace QLPhanPhoiThuoc.Models.EF
                 entity.HasIndex(e => e.ChuyenKhoa).HasDatabaseName("idx_chuyenkhoa");
             });
 
+
             // TaiKhoan
             modelBuilder.Entity<TaiKhoan>(entity =>
             {
                 entity.ToTable("TaiKhoan");
                 entity.HasKey(e => e.MaTaiKhoan);
+
                 entity.Property(e => e.MaTaiKhoan).HasMaxLength(20);
-                entity.Property(e => e.MaNhanVien).HasMaxLength(20).IsRequired();
+                entity.Property(e => e.MaNhanVien).HasMaxLength(20);  // THÊM CẤU HÌNH CHO CỘT NÀY
                 entity.Property(e => e.Username).HasMaxLength(50).IsRequired();
                 entity.Property(e => e.PasswordHash).HasMaxLength(255).IsRequired();
                 entity.Property(e => e.Role).HasMaxLength(20).IsRequired();
                 entity.Property(e => e.TrangThai).HasMaxLength(20).HasDefaultValue("KichHoat");
+                entity.Property(e => e.LanDangNhapCuoi);  // THÊM CẤU HÌNH CHO CỘT NÀY
                 entity.Property(e => e.NgayTao).HasDefaultValueSql("GETDATE()");
+                entity.Property(e => e.NgayCapNhat);
 
-                entity.HasOne(e => e.NhanVien)
+                // Cấu hình quan hệ one-to-one với NhanVien
+                entity.HasOne(t => t.NhanVien)
                     .WithOne(n => n.TaiKhoan)
-                    .HasForeignKey<TaiKhoan>(e => e.MaNhanVien)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .HasForeignKey<NhanVien>(n => n.MaTaiKhoan)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired(false);
+
+                // Cấu hình quan hệ one-to-one với BenhNhan
+                entity.HasOne(t => t.BenhNhan)
+                    .WithOne(b => b.TaiKhoan)
+                    .HasForeignKey<BenhNhan>(b => b.MaTaiKhoan)
+                    .HasForeignKey<BenhNhan>(b => b.MaTaiKhoan)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired(false);
 
                 entity.HasIndex(e => e.Username).HasDatabaseName("idx_username").IsUnique();
-                entity.HasIndex(e => e.MaNhanVien).IsUnique();
             });
 
             // LoThuoc
@@ -280,13 +293,22 @@ namespace QLPhanPhoiThuoc.Models.EF
                 entity.Property(e => e.CanNang).HasColumnType("decimal(5,2)");
                 entity.Property(e => e.ChieuCao).HasColumnType("decimal(5,2)");
                 entity.Property(e => e.TienSuDiUng).HasColumnType("nvarchar(max)");
+
+                // ✅ THÊM: MaTaiKhoan property (FK to TaiKhoan)
+                entity.Property(e => e.MaTaiKhoan).HasMaxLength(20);
+
                 entity.Property(e => e.LoaiBenhNhan).HasMaxLength(20).HasDefaultValue("NgoaiTru");
                 entity.Property(e => e.TrangThai).HasMaxLength(20).HasDefaultValue("HoatDong");
                 entity.Property(e => e.NgayTao).HasDefaultValueSql("GETDATE()");
 
+                // Indexes
                 entity.HasIndex(e => e.TenBenhNhan).HasDatabaseName("idx_tenbn");
                 entity.HasIndex(e => e.SoDienThoai).HasDatabaseName("idx_sdt");
-                entity.Property(e => e.CCCD).HasMaxLength(12);
+                entity.HasIndex(e => e.CCCD).HasDatabaseName("idx_cccd");
+                entity.HasIndex(e => e.Email).HasDatabaseName("idx_email");
+
+                // ✅ THÊM: Index cho MaTaiKhoan
+                entity.HasIndex(e => e.MaTaiKhoan).HasDatabaseName("idx_mataikhoan");
             });
 
             // TheBHYT

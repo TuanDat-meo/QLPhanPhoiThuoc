@@ -1,338 +1,906 @@
 @{
-    ViewData["Title"] = "Dashboard Bệnh nhân";
+    ViewData["Title"] = "Trang cá nhân bệnh nhân";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var tenBenhNhan = ViewBag.TenBenhNhan ?? "Bệnh nhân";
+    var maBenhNhan = ViewBag.MaBenhNhan ?? "BN001";
+    var cccd = ViewBag.CCCD ?? "";
+    var ngaySinh = ViewBag.NgaySinh;
+    var gioiTinh = ViewBag.GioiTinh ?? "";
+    var diaChi = ViewBag.DiaChi ?? "";
+    var soDienThoai = ViewBag.SoDienThoai ?? "";
+    var email = ViewBag.Email ?? "";
+    var nhomMau = ViewBag.NhomMau ?? "";
 }
 
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
-        }
-        .dashboard-header {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            padding: 40px 0;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-        .welcome-card {
-            background: white;
-            border-radius: 15px;
+<style>
+    /* ========== HERO SECTION ========== */
+    .patient-hero {
+        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
+        border-radius: 20px;
+        padding: 50px;
+        color: white;
+        margin-bottom: 40px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+    }
+
+    .patient-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+        animation: float 6s ease-in-out infinite;
+    }
+
+    keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(5deg); }
+    }
+
+    .patient-avatar-container {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .patient-avatar-large {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: white;
+        color: #1e3a5f;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        font-weight: 700;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        border: 5px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .patient-info {
+        flex: 1;
+    }
+
+    .patient-name {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .patient-id {
+        font-size: 1.1rem;
+        opacity: 0.95;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .patient-badge {
+        background: rgba(255, 255, 255, 0.25);
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    /* ========== QUICK STATS ========== */
+    .quick-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .stat-box {
+        background: white;
+        padding: 30px;
+        border-radius: 16px;
+        text-align: center;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s;
+        border-top: 4px solid transparent;
+    }
+
+    .stat-box:nth-child(1) { border-top-color: #1e3a5f; }
+    .stat-box:nth-child(2) { border-top-color: #11998e; }
+    .stat-box:nth-child(3) { border-top-color: #f093fb; }
+    .stat-box:nth-child(4) { border-top-color: #4facfe; }
+
+    .stat-box:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-box-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+    }
+
+    .stat-box:nth-child(1) .stat-box-icon { color: #1e3a5f; }
+    .stat-box:nth-child(2) .stat-box-icon { color: #11998e; }
+    .stat-box:nth-child(3) .stat-box-icon { color: #f093fb; }
+    .stat-box:nth-child(4) .stat-box-icon { color: #4facfe; }
+
+    .stat-box-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .stat-box-label {
+        color: #6c757d;
+        font-size: 1rem;
+        font-weight: 500;
+    }
+
+    /* ========== FEATURE CARDS ========== */
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s;
+        cursor: pointer;
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #1e3a5f 0%, #0f2847 100%);
+        transform: scaleX(0);
+        transition: transform 0.3s;
+    }
+
+    .feature-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .feature-card:hover {
+        border-color: #1e3a5f;
+        transform: translateY(-8px);
+        box-shadow: 0 15px 50px rgba(102, 126, 234, 0.2);
+    }
+
+    .feature-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+
+    .feature-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 12px;
+        color: #333;
+    }
+
+    .feature-description {
+        color: #6c757d;
+        font-size: 0.95rem;
+        margin-bottom: 20px;
+        line-height: 1.6;
+    }
+
+    .feature-link {
+        color: #1e3a5f;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s;
+    }
+
+    .feature-link:hover {
+        gap: 15px;
+        color: #0f2847;
+    }
+
+    .dev-badge-feature {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);
+    }
+
+    /* ========== INFO GRID ========== */
+    .info-section {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        margin-bottom: 30px;
+    }
+
+    .section-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 25px;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .section-title i {
+        color: #1e3a5f;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 20px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        border-radius: 12px;
+        border-left: 4px solid #1e3a5f;
+        transition: all 0.3s;
+    }
+
+    .info-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .info-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+    }
+
+    .info-content {
+        flex: 1;
+    }
+
+    .info-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+
+    .info-value {
+        font-weight: 700;
+        color: #333;
+        font-size: 1.05rem;
+    }
+
+    /* ========== TIMELINE ========== */
+    .timeline {
+        position: relative;
+        padding-left: 40px;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 15px;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: linear-gradient(180deg, #1e3a5f 0%, #0f2847 100%);
+        border-radius: 10px;
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-bottom: 30px;
+    }
+
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -32px;
+        top: 8px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: white;
+        border: 4px solid #1e3a5f;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    .timeline-date {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    .timeline-content {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s;
+    }
+
+    .timeline-content:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    .timeline-title {
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 8px;
+        font-size: 1.05rem;
+    }
+
+    .timeline-desc {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    /* ========== HEALTH TIPS ========== */
+    .health-tips {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .tips-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    .tip-card {
+        padding: 25px;
+        border-radius: 12px;
+        border-left: 4px solid;
+        transition: all 0.3s;
+    }
+
+    .tip-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .tip-card.info {
+        background: linear-gradient(135deg, #4facfe15 0%, #00f2fe15 100%);
+        border-left-color: #4facfe;
+    }
+
+    .tip-card.success {
+        background: linear-gradient(135deg, #11998e15 0%, #38ef7d15 100%);
+        border-left-color: #11998e;
+    }
+
+    .tip-card.warning {
+        background: linear-gradient(135deg, #f093fb15 0%, #f5576c15 100%);
+        border-left-color: #f093fb;
+    }
+
+    .tip-heading {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+    }
+
+    .tip-text {
+        color: #495057;
+        line-height: 1.6;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    media (max-width: 768px) {
+        .patient-hero {
             padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
         }
-        .welcome-card h3 {
-            color: #1e293b;
-            margin-bottom: 15px;
-        }
-        .welcome-card p {
-            color: #64748b;
-            margin-bottom: 0;
-        }
-        .stat-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-            border-left: 4px solid transparent;
-        }
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 25px rgba(0,0,0,0.15);
-        }
-        .stat-card.success {
-            border-left-color: #10b981;
-        }
-        .stat-card.warning {
-            border-left-color: #f59e0b;
-        }
-        .stat-card.info {
-            border-left-color: #06b6d4;
-        }
-        .stat-card.danger {
-            border-left-color: #ef4444;
-        }
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-        }
-        .stat-icon.success {
-            background: rgba(16, 185, 129, 0.1);
-            color: #10b981;
-        }
-        .stat-icon.warning {
-            background: rgba(245, 158, 11, 0.1);
-            color: #f59e0b;
-        }
-        .stat-icon.info {
-            background: rgba(6, 182, 212, 0.1);
-            color: #06b6d4;
-        }
-        .stat-icon.danger {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-        }
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-            color: #1e293b;
-        }
-        .stat-label {
-            color: #64748b;
-            font-size: 0.9rem;
-        }
-        .menu-card {
-            background: white;
-            border-radius: 15px;
-            padding: 35px 25px;
+
+        .patient-avatar-container {
+            flex-direction: column;
             text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
-            height: 100%;
         }
-        .menu-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+
+        .patient-name {
+            font-size: 2rem;
         }
-        .menu-card i {
-            font-size: 3.5rem;
-            margin-bottom: 20px;
-            display: block;
+
+        .quick-stats {
+            grid-template-columns: 1fr;
         }
-        .menu-card h4 {
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: #1e293b;
-            font-size: 1.3rem;
+
+        .features-grid {
+            grid-template-columns: 1fr;
         }
-        .menu-card p {
-            color: #64748b;
-            font-size: 0.95rem;
-            margin-bottom: 0;
-        }
-        .alert-custom {
-            border-left: 4px solid;
-            border-radius: 10px;
-            padding: 15px 20px;
-            margin-bottom: 15px;
-            background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        .alert-custom.info {
-            border-left-color: #06b6d4;
-        }
-        .alert-custom.success {
-            border-left-color: #10b981;
-        }
-        .alert-custom.warning {
-            border-left-color: #f59e0b;
-        }
-        .alert-custom i {
-            margin-right: 10px;
-        }
-        .btn-logout {
-            background: rgba(255,255,255,0.2);
-            border: 2px solid white;
-            color: white;
-            padding: 8px 20px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-        .btn-logout:hover {
-            background: white;
-            color: #10b981;
-        }
-    </style>
-</head>
-<body>
-    <div class="dashboard-header">
-        <div class="container">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1><i class="fas fa-user-circle"></i> Dashboard Bệnh nhân</h1>
-                    <p class="mb-0">Xin chào, <strong>@ViewBag.UserName</strong>!</p>
-                </div>
-                <div>
-                    <form method="post" asp-controller="Account" asp-action="Logout" style="display: inline;">
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-logout">
-                            <i class="fas fa-sign-out-alt"></i> Đăng xuất
-                        </button>
-                    </form>
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Hero Section -->
+    <div class="patient-hero">
+        <div class="patient-avatar-container">
+            <div class="patient-avatar-large">
+                @tenBenhNhan.Substring(0, 1).ToUpper()
+            </div>
+            <div class="patient-info">
+                <h2 class="patient-name">Xin chào, @tenBenhNhan!</h2>
+                <div class="patient-id">
+                    <i class="fas fa-id-badge"></i>
+                    Mã bệnh nhân: @maBenhNhan
+                    <span class="patient-badge">
+                        <i class="fas fa-shield-alt me-1"></i>Đã xác thực
+                    </span>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="container">
-        <!-- Welcome Card -->
-        <div class="welcome-card">
-            <h3><i class="fas fa-hand-holding-medical"></i> Chào mừng đến với Hệ thống Quản lý Thuốc</h3>
-            <p>
-                Hệ thống được tích hợp với <strong>VNeID</strong> và <strong>BHYT điện tử</strong> 
-                giúp bạn quản lý đơn thuốc, lịch sử khám bệnh và thanh toán một cách dễ dàng.
-            </p>
+    <!-- Quick Stats -->
+    <div class="quick-stats">
+        <div class="stat-box">
+            <div class="stat-box-icon">
+                <i class="fas fa-stethoscope"></i>
+            </div>
+            <div class="stat-box-value">3</div>
+            <div class="stat-box-label">Lần khám</div>
         </div>
 
-        <!-- Statistics -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="stat-card success">
-                    <div class="stat-icon success">
-                        <i class="fas fa-file-prescription"></i>
-                    </div>
-                    <div class="stat-value">@ViewBag.TongDonThuoc</div>
-                    <div class="stat-label">Đơn thuốc của tôi</div>
-                </div>
+        <div class="stat-box">
+            <div class="stat-box-icon">
+                <i class="fas fa-prescription"></i>
             </div>
-            <div class="col-md-3">
-                <div class="stat-card warning">
-                    <div class="stat-icon warning">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <div class="stat-value">@ViewBag.DonThuocChuaNhan</div>
-                    <div class="stat-label">Chờ lấy thuốc</div>
-                </div>
+            <div class="stat-box-value">5</div>
+            <div class="stat-box-label">Đơn thuốc</div>
+        </div>
+
+        <div class="stat-box">
+            <div class="stat-box-icon">
+                <i class="fas fa-calendar-check"></i>
             </div>
-            <div class="col-md-3">
-                <div class="stat-card info">
-                    <div class="stat-icon info">
-                        <i class="fas fa-file-invoice"></i>
-                    </div>
-                    <div class="stat-value">@ViewBag.TongHoaDon</div>
-                    <div class="stat-label">Hóa đơn</div>
-                </div>
+            <div class="stat-box-value">2</div>
+            <div class="stat-box-label">Lịch hẹn</div>
+        </div>
+
+        <div class="stat-box">
+            <div class="stat-box-icon">
+                <i class="fas fa-file-invoice"></i>
             </div>
-            <div class="col-md-3">
-                <div class="stat-card danger">
-                    <div class="stat-icon danger">
-                        <i class="fas fa-dollar-sign"></i>
-                    </div>
-                    <div class="stat-value">@(String.Format("{0:N0}", ViewBag.TongTienNo))đ</div>
-                    <div class="stat-label">Cần thanh toán</div>
+            <div class="stat-box-value">7</div>
+            <div class="stat-box-label">Hóa đơn</div>
+        </div>
+    </div>
+
+    <!-- Feature Cards -->
+    <div class="features-grid">
+        <div class="feature-card" onclick="featureInDevelopment()">
+            <span class="dev-badge-feature">
+                <i class="fas fa-code me-1"></i>Đang phát triển
+            </span>
+            <div class="feature-icon">
+                <i class="fas fa-calendar-plus"></i>
+            </div>
+            <div class="feature-title">Đặt lịch khám</div>
+            <div class="feature-description">
+                Đặt lịch hẹn khám bệnh trực tuyến nhanh chóng và tiện lợi
+            </div>
+            <a href="#" class="feature-link" onclick="return false;">
+                Đặt lịch ngay <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="feature-card" onclick="featureInDevelopment()">
+            <span class="dev-badge-feature">
+                <i class="fas fa-code me-1"></i>Đang phát triển
+            </span>
+            <div class="feature-icon">
+                <i class="fas fa-file-medical"></i>
+            </div>
+            <div class="feature-title">Hồ sơ bệnh án</div>
+            <div class="feature-description">
+                Xem và quản lý toàn bộ hồ sơ khám chữa bệnh của bạn
+            </div>
+            <a href="#" class="feature-link" onclick="return false;">
+                Xem hồ sơ <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="feature-card" onclick="featureInDevelopment()">
+            <span class="dev-badge-feature">
+                <i class="fas fa-code me-1"></i>Đang phát triển
+            </span>
+            <div class="feature-icon">
+                <i class="fas fa-pills"></i>
+            </div>
+            <div class="feature-title">Đơn thuốc điện tử</div>
+            <div class="feature-description">
+                Tra cứu và theo dõi đơn thuốc điện tử của bạn
+            </div>
+            <a href="#" class="feature-link" onclick="return false;">
+                Xem đơn thuốc <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="feature-card" onclick="featureInDevelopment()">
+            <span class="dev-badge-feature">
+                <i class="fas fa-code me-1"></i>Đang phát triển
+            </span>
+            <div class="feature-icon">
+                <i class="fas fa-file-invoice-dollar"></i>
+            </div>
+            <div class="feature-title">Thanh toán</div>
+            <div class="feature-description">
+                Thanh toán viện phí trực tuyến qua VietQR
+            </div>
+            <a href="#" class="feature-link" onclick="return false;">
+                Thanh toán <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="feature-card" onclick="featureInDevelopment()">
+            <span class="dev-badge-feature">
+                <i class="fas fa-code me-1"></i>Đang phát triển
+            </span>
+            <div class="feature-icon">
+                <i class="fas fa-id-card"></i>
+            </div>
+            <div class="feature-title">Thẻ BHYT</div>
+            <div class="feature-description">
+                Quản lý và tra cứu thông tin thẻ bảo hiểm y tế
+            </div>
+            <a href="#" class="feature-link" onclick="return false;">
+                Xem thẻ BHYT <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="feature-card" onclick="featureInDevelopment()">
+            <span class="dev-badge-feature">
+                <i class="fas fa-code me-1"></i>Đang phát triển
+            </span>
+            <div class="feature-icon">
+                <i class="fas fa-comments"></i>
+            </div>
+            <div class="feature-title">Tư vấn trực tuyến</div>
+            <div class="feature-description">
+                Tư vấn sức khỏe với đội ngũ y bác sĩ qua chat
+            </div>
+            <a href="#" class="feature-link" onclick="return false;">
+                Bắt đầu chat <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Personal Information & Activity -->
+    <div class="row">
+        <!-- Personal Information -->
+        <div class="col-lg-6 mb-4">
+            <div class="info-section">
+                <h3 class="section-title">
+                    <i class="fas fa-user-circle"></i>
+                    Thông tin cá nhân
+                </h3>
+                <div class="info-grid">
+                    @if (!string.IsNullOrEmpty(cccd))
+                    {
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-id-card"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Số CCCD</div>
+                                <div class="info-value">@cccd</div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (ngaySinh != null)
+                    {
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-birthday-cake"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Ngày sinh</div>
+                                <div class="info-value">@((DateTime)ngaySinh).ToString("dd/MM/yyyy")</div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(gioiTinh))
+                    {
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-venus-mars"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Giới tính</div>
+                                <div class="info-value">@gioiTinh</div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(nhomMau))
+                    {
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-tint"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Nhóm máu</div>
+                                <div class="info-value">@nhomMau</div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(soDienThoai))
+                    {
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Số điện thoại</div>
+                                <div class="info-value">@soDienThoai</div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(email))
+                    {
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Email</div>
+                                <div class="info-value">@email</div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(diaChi))
+                    {
+                        <div class="info-item" style="grid-column: 1 / -1;">
+                            <div class="info-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Địa chỉ</div>
+                                <div class="info-value">@diaChi</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="text-center mt-4">
+                    <button class="btn btn-primary" onclick="featureInDevelopment()">
+                        <i class="fas fa-edit me-2"></i>Cập nhật thông tin
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- Main Menu -->
-        <div class="row mb-4">
-            <div class="col-md-4 mb-4">
-                <a href="@Url.Action("DonThuocCuaToi", "User")" style="text-decoration: none; color: inherit;">
-                    <div class="menu-card">
-                        <i class="fas fa-prescription-bottle-alt text-primary"></i>
-                        <h4>Đơn thuốc của tôi</h4>
-                        <p>Xem và quản lý đơn thuốc được kê</p>
+        <!-- Recent Activities -->
+        <div class="col-lg-6 mb-4">
+            <div class="info-section">
+                <h3 class="section-title">
+                    <i class="fas fa-history"></i>
+                    Hoạt động gần đây
+                </h3>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-date">
+                            <i class="far fa-calendar me-1"></i>Hôm nay, 10:30 AM
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">
+                                <i class="fas fa-pills text-success me-2"></i>
+                                Lấy thuốc thành công
+                            </div>
+                            <div class="timeline-desc">
+                                Đơn thuốc #DT20260203001 - 5 loại thuốc
+                            </div>
+                        </div>
                     </div>
-                </a>
-            </div>
-            <div class="col-md-4 mb-4">
-                <a href="@Url.Action("LichSuKham", "User")" style="text-decoration: none; color: inherit;">
-                    <div class="menu-card">
-                        <i class="fas fa-history text-success"></i>
-                        <h4>Lịch sử khám bệnh</h4>
-                        <p>Xem lịch sử khám và chẩn đoán</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-4 mb-4">
-                <a href="@Url.Action("ThongTinCaNhan", "User")" style="text-decoration: none; color: inherit;">
-                    <div class="menu-card">
-                        <i class="fas fa-user-edit text-warning"></i>
-                        <h4>Thông tin cá nhân</h4>
-                        <p>Cập nhật hồ sơ và BHYT</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-4 mb-4">
-                <a href="@Url.Action("HoaDonCuaToi", "User")" style="text-decoration: none; color: inherit;">
-                    <div class="menu-card">
-                        <i class="fas fa-file-invoice-dollar text-info"></i>
-                        <h4>Hóa đơn</h4>
-                        <p>Xem và thanh toán hóa đơn</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-4 mb-4">
-                <a href="#" style="text-decoration: none; color: inherit;">
-                    <div class="menu-card">
-                        <i class="fas fa-calendar-check text-danger"></i>
-                        <h4>Đặt lịch khám</h4>
-                        <p>Đặt lịch hẹn khám bệnh</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-4 mb-4">
-                <a href="#" style="text-decoration: none; color: inherit;">
-                    <div class="menu-card">
-                        <i class="fas fa-headset text-secondary"></i>
-                        <h4>Hỗ trợ</h4>
-                        <p>Liên hệ hỗ trợ khách hàng</p>
-                    </div>
-                </a>
-            </div>
-        </div>
 
-        <!-- Notifications -->
-        <div class="row">
-            <div class="col-md-12">
-                <h4 class="mb-3"><i class="fas fa-bell"></i> Thông báo</h4>
-                
-                @if (ViewBag.DonThuocChuaNhan > 0)
-                {
-                    <div class="alert-custom info">
-                        <i class="fas fa-info-circle text-info"></i>
-                        <strong>Thông báo:</strong> Bạn có <strong>@ViewBag.DonThuocChuaNhan</strong> đơn thuốc cần nhận tại quầy thuốc.
-                        <a href="@Url.Action("DonThuocCuaToi", "User")" class="float-end">Xem chi tiết →</a>
+                    <div class="timeline-item">
+                        <div class="timeline-date">
+                            <i class="far fa-calendar me-1"></i>Hôm qua, 3:15 PM
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">
+                                <i class="fas fa-stethoscope text-primary me-2"></i>
+                                Khám bệnh
+                            </div>
+                            <div class="timeline-desc">
+                                Khoa Tim mạch - BS. Nguyễn Văn An
+                            </div>
+                        </div>
                     </div>
-                }
-                
-                @if (ViewBag.BenhNhan != null && ViewBag.BenhNhan.TheBHYT != null)
-                {
-                    <div class="alert-custom success">
-                        <i class="fas fa-check-circle text-success"></i>
-                        <strong>BHYT:</strong> Thẻ BHYT của bạn vẫn còn hiệu lực đến 
-                        <strong>@ViewBag.BenhNhan.TheBHYT.NgayHetHan.ToString("dd/MM/yyyy")</strong>.
-                    </div>
-                }
-                else
-                {
-                    <div class="alert-custom warning">
-                        <i class="fas fa-exclamation-triangle text-warning"></i>
-                        <strong>Lưu ý:</strong> Bạn chưa có thông tin thẻ BHYT. Vui lòng cập nhật để được hỗ trợ chi phí.
-                        <a href="@Url.Action("ThongTinCaNhan", "User")" class="float-end">Cập nhật →</a>
-                    </div>
-                }
 
-                @if (ViewBag.TongTienNo > 0)
-                {
-                    <div class="alert-custom warning">
-                        <i class="fas fa-exclamation-circle text-warning"></i>
-                        <strong>Thanh toán:</strong> Bạn có <strong>@String.Format("{0:N0}", ViewBag.TongTienNo)đ</strong> cần thanh toán.
-                        <a href="@Url.Action("HoaDonCuaToi", "User")" class="float-end">Thanh toán ngay →</a>
+                    <div class="timeline-item">
+                        <div class="timeline-date">
+                            <i class="far fa-calendar me-1"></i>3 ngày trước
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">
+                                <i class="fas fa-money-bill-wave text-success me-2"></i>
+                                Thanh toán hóa đơn
+                            </div>
+                            <div class="timeline-desc">
+                                Hóa đơn #HD20260201001 - 450.000đ
+                            </div>
+                        </div>
                     </div>
-                }
+
+                    <div class="timeline-item">
+                        <div class="timeline-date">
+                            <i class="far fa-calendar me-1"></i>1 tuần trước
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">
+                                <i class="fas fa-calendar-check text-info me-2"></i>
+                                Đặt lịch khám
+                            </div>
+                            <div class="timeline-desc">
+                                Khám định kỳ - Khoa Nội tổng hợp
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    <!-- Health Tips -->
+    <div class="health-tips">
+        <h3 class="section-title">
+            <i class="fas fa-lightbulb"></i>
+            Mẹo sức khỏe
+        </h3>
+        <div class="tips-grid">
+            <div class="tip-card info">
+                <div class="tip-heading">
+                    <i class="fas fa-water"></i>
+                    Uống đủ nước
+                </div>
+                <p class="tip-text mb-0">
+                    Uống ít nhất 2 lít nước mỗi ngày để duy trì sức khỏe tốt và hỗ trợ các chức năng cơ thể hoạt động hiệu quả.
+                </p>
+            </div>
+
+            <div class="tip-card success">
+                <div class="tip-heading">
+                    <i class="fas fa-running"></i>
+                    Vận động thường xuyên
+                </div>
+                <p class="tip-text mb-0">
+                    Tập thể dục ít nhất 30 phút mỗi ngày giúp tăng cường sức khỏe tim mạch, cải thiện tinh thần và nâng cao chất lượng cuộc sống.
+                </p>
+            </div>
+
+            <div class="tip-card warning">
+                <div class="tip-heading">
+                    <i class="fas fa-pills"></i>
+                    Uống thuốc đúng giờ
+                </div>
+                <p class="tip-text mb-0">
+                    Tuân thủ đúng liều lượng và thời gian uống thuốc theo chỉ định của bác sĩ để đạt hiệu quả điều trị tốt nhất.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Smooth scroll for all anchor links
+            $('a[href^="#"]').on('click', function(e) {
+                e.preventDefault();
+                var target = $(this).attr('href');
+                if ($(target).length) {
+                    $('html, body').animate({
+                        scrollTop: $(target).offset().top - 100
+                    }, 600);
+                }
+            });
+
+            // Animate stats on scroll
+            function animateStats() {
+                $('.stat-box').each(function(index) {
+                    $(this).css({
+                        'opacity': '0',
+                        'transform': 'translateY(30px)'
+                    }).delay(index * 100).animate({
+                        opacity: 1
+                    }, 600, function() {
+                        $(this).css('transform', 'translateY(0)');
+                    });
+                });
+            }
+
+            // Trigger animation on page load
+            setTimeout(animateStats, 200);
+
+            // Feature cards hover effect
+            $('.feature-card').hover(
+                function() {
+                    $(this).find('.feature-icon').css('transform', 'scale(1.1) rotate(5deg)');
+                },
+                function() {
+                    $(this).find('.feature-icon').css('transform', 'scale(1) rotate(0deg)');
+                }
+            );
+
+            // Timeline item animation on scroll
+            $(window).on('scroll', function() {
+                $('.timeline-item').each(function() {
+                    var itemTop = $(this).offset().top;
+                    var windowBottom = $(window).scrollTop() + $(window).height();
+                    
+                    if (itemTop < windowBottom - 100) {
+                        $(this).css({
+                            'opacity': '1',
+                            'transform': 'translateX(0)'
+                        });
+                    }
+                });
+            });
+
+            // Initial state for timeline items
+            $('.timeline-item').css({
+                'opacity': '0',
+                'transform': 'translateX(-30px)',
+                'transition': 'all 0.6s ease'
+            });
+        });
+    </script>
+}
