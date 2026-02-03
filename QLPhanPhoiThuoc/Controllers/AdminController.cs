@@ -20,7 +20,7 @@ namespace QLPhanPhoiThuoc.Controllers
         // GET: /Admin/AdminIndex
         public IActionResult AdminIndex()
         {
-            // Lấy thông tin admin từ claims
+            // Láº¥y thÃ´ng tin admin tá»« claims
             var maNhanVien = User.FindFirstValue("MaNhanVien");
             var tenNhanVien = User.FindFirstValue("TenNhanVien");
             var chucVu = User.FindFirstValue("ChucVu");
