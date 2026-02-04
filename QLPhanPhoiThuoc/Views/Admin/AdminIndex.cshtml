@@ -934,6 +934,7 @@
             // Load content nếu có URL
             if (url) {
                 loadThuocContent(url);
+                loadPatientsContent(url);
             }
         });
 
@@ -978,6 +979,54 @@
         });
     }
 
+<<<<<<< HEAD
+=======
+    // Load Thuoc Content (Index, TonKho, ThongKe, CanhBao) - GLOBAL FUNCTION
+    function loadThuocContent(url) {
+        showLoading();
+        showSection('medicines');
+        
+        $.ajax({
+            url: url,
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(data) {
+                $('#medicineContent').html(data);
+                hideLoading();
+            },
+            error: function(xhr, status, error) {
+                console.error('Error loading content:', error);
+                $('#medicineContent').html('<div class="alert alert-danger">Lỗi khi tải nội dung: ' + error + '</div>');
+                hideLoading();
+            }
+        });
+    }
+
+        function loadPatientsContent(url) {
+            showLoading();
+                showSection('patients');
+
+            $.ajax({
+                url: url,
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function(data) {
+                    $('#patientsContent').html(data);
+                    hideLoading();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading content:', error);
+                    $('#patientsContent').html('<div class="alert alert-danger">Lỗi khi tải nội dung: ' + error + '</div>');
+                    hideLoading();
+                }
+            });
+        }
+
+>>>>>>> origin/main
     // Loading functions
     function showLoading() {
         $('#loadingOverlay').addClass('show');
