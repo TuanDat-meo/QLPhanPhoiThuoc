@@ -1,0 +1,255 @@
+﻿@model QLPhanPhoiThuoc.Models.Entities.NhaCungCap
+
+@{
+    ViewData["Title"] = "Thêm nhà cung cấp mới";
+    if (Context.Request.Headers["X-Requested-With"] != "XMLHttpRequest")
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+
+    // CRITICAL: Generate unique ID để tránh conflict
+    var formId = "formCreateNCC_" + Guid.NewGuid().ToString("N").Substring(0, 8);
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">
+                <i class="fas fa-plus-circle text-primary"></i> Thêm nhà cung cấp mới
+            </h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="javascript:void(0)" onclick="loadThuocContent('/Admin/NhaCungCap/Index')">Nhà cung cấp</a></li>
+                    <li class="breadcrumb-item active">Thêm mới</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="javascript:void(0)" onclick="closePanel(panelStack[panelStack.length - 1].level)" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+
+    <!-- Form -->
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Thông tin nhà cung cấp</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post" id="@formId">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <!-- Mã NCC & Tên NCC -->
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label asp-for="MaNCC" class="form-label">
+                                    Mã nhà cung cấp <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="MaNCC" class="form-control" placeholder="VD: NCC001" />
+                                <span asp-validation-for="MaNCC" class="text-danger"></span>
+                                <small class="form-text text-muted">Tối đa 20 ký tự</small>
+                            </div>
+                            <div class="col-md-8">
+                                <label asp-for="TenNCC" class="form-label">
+                                    Tên nhà cung cấp <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="TenNCC" class="form-control" placeholder="VD: Công ty TNHH Dược phẩm ABC" />
+                                <span asp-validation-for="TenNCC" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Địa chỉ -->
+                        <div class="mb-3">
+                            <label asp-for="DiaChi" class="form-label">
+                                <i class="fas fa-map-marker-alt"></i> Địa chỉ <span class="text-danger">*</span>
+                            </label>
+                            <textarea asp-for="DiaChi" class="form-control" rows="2"
+                                      placeholder="VD: Số 123, Đường ABC, Quận XYZ, Hà Nội"></textarea>
+                            <span asp-validation-for="DiaChi" class="text-danger"></span>
+                        </div>
+
+                        <!-- Số điện thoại & Email -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="SoDienThoai" class="form-label">
+                                    <i class="fas fa-phone-alt"></i> Số điện thoại
+                                </label>
+                                <input asp-for="SoDienThoai" class="form-control" placeholder="VD: 0243456789" />
+                                <span asp-validation-for="SoDienThoai" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label">
+                                    <i class="fas fa-envelope"></i> Email
+                                </label>
+                                <input asp-for="Email" type="email" class="form-control" placeholder="VD: contact@company.com" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Mã số thuế -->
+                        <div class="mb-3">
+                            <label asp-for="MaSoThue" class="form-label">
+                                <i class="fas fa-file-invoice"></i> Mã số thuế
+                            </label>
+                            <input asp-for="MaSoThue" class="form-control" placeholder="VD: 0123456789" />
+                            <span asp-validation-for="MaSoThue" class="text-danger"></span>
+                            <small class="form-text text-muted">Mã số thuế duy nhất của doanh nghiệp</small>
+                        </div>
+
+                        <!-- Trạng thái -->
+                        <div class="mb-3">
+                            <label asp-for="TrangThai" class="form-label">
+                                <i class="fas fa-toggle-on"></i> Trạng thái
+                            </label>
+                            <select asp-for="TrangThai" class="form-select">
+                                <option value="HoatDong">Đang hoạt động</option>
+                                <option value="TamNgung">Tạm ngừng</option>
+                                <option value="NgungHopTac">Ngừng hợp tác</option>
+                            </select>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                            <button type="button" onclick="closePanel(panelStack[panelStack.length - 1].level)" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Hủy
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-submit">
+                                <i class="fas fa-save"></i> Lưu thông tin
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Hướng dẫn -->
+            <div class="card shadow-sm mt-3">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0"><i class="fas fa-info-circle"></i> Lưu ý khi thêm nhà cung cấp</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>Mã nhà cung cấp phải là duy nhất trong hệ thống</li>
+                        <li>Mã số thuế (nếu có) phải là duy nhất</li>
+                        <li>Thông tin liên hệ (số điện thoại, email) rất quan trọng để giao dịch</li>
+                        <li>Có thể thay đổi trạng thái nhà cung cấp sau này nếu cần</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        (function() {
+            var formId = '@formId';
+            var form = $('#' + formId);
+            var submitBtn = form.find('.btn-submit');
+
+            console.log('🟢 [CREATE] Initializing form:', formId);
+
+            // CRITICAL: Check if this specific form is already initialized
+            var initKey = 'form-init-' + formId;
+            if (window[initKey]) {
+                console.log('⚠️ [CREATE] Form already initialized:', formId);
+                return;
+            }
+            window[initKey] = true;
+
+            // Remove any existing handlers on THIS form only
+            form.off('submit');
+            submitBtn.off('click');
+
+            // SINGLE submit handler
+            form.on('submit', function(e) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+
+                console.log('🔵 [CREATE] Submit triggered for:', formId);
+
+                // Check if already submitting
+                if (submitBtn.prop('disabled')) {
+                    console.log('⚠️ [CREATE] Already submitting');
+                    return false;
+                }
+
+                // Disable immediately
+                var originalHtml = submitBtn.html();
+                submitBtn.prop('disabled', true)
+                         .html('<i class="fas fa-spinner fa-spin"></i> Đang xử lý...');
+
+                console.log('📤 [CREATE] Sending AJAX');
+
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: new FormData(this),
+                    processData: false,
+                    contentType: false,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    success: function(response) {
+                        console.log('✅ [CREATE] Success:', response);
+
+                        if (response.success) {
+                            alert(response.message || 'Thêm nhà cung cấp thành công!');
+
+                            // Close panel
+                            if (typeof closePanel === 'function' && typeof panelStack !== 'undefined' && panelStack.length > 0) {
+                                closePanel(panelStack[panelStack.length - 1].level);
+                            }
+
+                            // Reload list
+                            if (typeof loadThuocContent === 'function') {
+                                loadThuocContent('/Admin/NhaCungCap/Index');
+                            }
+                        } else {
+                            alert(response.message || 'Có lỗi xảy ra!');
+                            submitBtn.prop('disabled', false).html(originalHtml);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('❌ [CREATE] Error:', xhr.status, error);
+
+                        // Validation errors - reload form
+                        if (xhr.status === 400) {
+                            console.log('🔄 [CREATE] Reloading with validation errors');
+                            var panelBody = form.closest('.panel-body');
+                            if (panelBody.length > 0) {
+                                // CRITICAL: Clear init flag before reload
+                                delete window[initKey];
+                                panelBody.html(xhr.responseText);
+                            }
+                        } else {
+                            alert('Lỗi kết nối: ' + xhr.status);
+                            submitBtn.prop('disabled', false).html(originalHtml);
+                        }
+                    }
+                });
+
+                return false;
+            });
+
+            // Input formatters
+            form.find('input[name="MaNCC"]').on('input', function() {
+                this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            });
+
+            form.find('input[name="SoDienThoai"]').on('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+
+            form.find('input[name="MaSoThue"]').on('input', function() {
+                this.value = this.value.replace(/[^0-9-]/g, '');
+            });
+
+            console.log('✅ [CREATE] Initialized:', formId);
+        })();
+    </script>
+}

@@ -1,38 +1,40 @@
-﻿using QLPhanPhoiThuoc.Models.Entities;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QLPhanPhoiThuoc.Models.Entities
 {
-    [Table("NhaCungCap")]
     public class NhaCungCap
     {
         [Key]
         [StringLength(20)]
-        public string MaNCC { get; set; }
+        public string MaNCC { get; set; } = null!;
 
-        [Required]
+        [Required(ErrorMessage = "Tên nhà cung cấp là bắt buộc")]
         [StringLength(200)]
-        public string TenNCC { get; set; }
+        public string TenNCC { get; set; } = null!;
 
+        [Required(ErrorMessage = "Địa chỉ là bắt buộc")]
         [StringLength(300)]
-        public string DiaChi { get; set; }
+        public string DiaChi { get; set; } = string.Empty;
 
         [StringLength(15)]
-        public string SoDienThoai { get; set; }
+        [Phone(ErrorMessage = "Số điện thoại không hợp lệ")]
+        public string SoDienThoai { get; set; } = string.Empty;
 
         [StringLength(100)]
-        public string Email { get; set; }
+        [EmailAddress(ErrorMessage = "Email không hợp lệ")]
+        public string Email { get; set; } = string.Empty;
 
         [StringLength(20)]
-        public string MaSoThue { get; set; }
+        public string MaSoThue { get; set; } = string.Empty;
 
         [StringLength(20)]
-        public string TrangThai { get; set; } = "HoatDong"; // HoatDong, TamDung
+        public string TrangThai { get; set; } = "HoatDong";
 
         public DateTime NgayTao { get; set; } = DateTime.Now;
 
-        // Navigation Properties
-        public virtual ICollection<PhieuNhap> PhieuNhaps { get; set; }
+        // CRITICAL: Navigation property phải nullable để không bị validation error
+        public virtual ICollection<PhieuNhap>? PhieuNhaps { get; set; }
     }
 }

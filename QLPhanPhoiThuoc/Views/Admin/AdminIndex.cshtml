@@ -1,3 +1,4 @@
+/* file này có đầy đủ code cho nhà cung cấp và kho*/
 @{
     ViewData["Title"] = "Trang quản trị";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -251,9 +252,6 @@
         flex-direction: column;
     }
 
-        .panel-container.show {
-        }
-
     .panel-header {
         display: flex;
         align-items: center;
@@ -321,7 +319,7 @@
                 background: #0f2847;
             }
 
-    /* Panel Stacking - để có thể mở nhiều panel cùng lúc */
+    /* Panel Stacking */
     .panel-overlay[data-level="1"] {
         z-index: 1000;
     }
@@ -383,22 +381,6 @@
         100% {
             transform: rotate(360deg);
         }
-    }
-
-    /* CSS từ Index.cshtml cho phần quản lý thuốc */
-    .medicine-container {
-        padding: 25px;
-        background: #f8f9fa;
-        min-height: calc(100vh - 200px);
-    }
-
-    .page-header {
-        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
-        color: white;
-        padding: 25px 30px;
-        border-radius: 12px;
-        margin-bottom: 25px;
-        box-shadow: 0 4px 15px rgba(30, 58, 95, 0.3);
     }
 
     /* Responsive */
@@ -496,17 +478,17 @@
                     <i class="fas fa-chevron-right menu-arrow"></i>
                 </div>
                 <div class="menu-submenu">
-                    <a class="submenu-item" data-url="/BenhNhan/_DSBenhNhan">
+                    <a class="submenu-item" data-url="/Admin/BenhNhan/_DSBenhNhan">
                         <i class="fas fa-circle"></i>
                         Danh sách bệnh nhân
                     </a>
-                    <a class="submenu-item" data-url="/BenhNhan/_BenhNhan">
+                    <a class="submenu-item" data-url="/Admin/BenhNhan/Create">
                         <i class="fas fa-circle"></i>
                         Quản lý bệnh nhân
                     </a>
-                    <a class="submenu-item" data-url="/BenhNhan/_BenhAnBenhNhan">
+                    <a class="submenu-item" data-url="/Admin/TheBHYT/_DSTheBHYT">
                         <i class="fas fa-circle"></i>
-                        Hồ sơ bệnh án
+                        BHYT
                     </a>
                 </div>
             </div>
@@ -563,15 +545,15 @@
                     <i class="fas fa-chevron-right menu-arrow"></i>
                 </div>
                 <div class="menu-submenu">
-                    <a href="#" class="submenu-item" data-tab="invoice-list">
+                    <a href="#" class="submenu-item" data-url="/Admin/HoaDon/_DSHoaDon">
                         <i class="fas fa-circle"></i>
                         <span>Danh sách hóa đơn</span>
                     </a>
-                    <a href="#" class="submenu-item" data-tab="invoice-pending">
+                    <a href="#" class="submenu-item" data-url="/Admin/HoaDon/_HoaDonChoThanhToan">
                         <i class="fas fa-circle"></i>
                         <span>Chờ thanh toán</span>
                     </a>
-                    <a href="#" class="submenu-item" data-tab="invoice-paid">
+                    <a href="#" class="submenu-item" data-url="/Admin/HoaDon/_HoaDonDaThanhToan">
                         <i class="fas fa-circle"></i>
                         <span>Đã thanh toán</span>
                     </a>
@@ -588,13 +570,9 @@
                     <i class="fas fa-chevron-right menu-arrow"></i>
                 </div>
                 <div class="menu-submenu">
-                    <a href="#" class="submenu-item" data-tab="supplier-list">
+                    <a href="javascript:void(0)" class="submenu-item" data-url="/Admin/NhaCungCap/Index">
                         <i class="fas fa-circle"></i>
                         <span>Danh sách NCC</span>
-                    </a>
-                    <a href="#" class="submenu-item" data-tab="supplier-orders">
-                        <i class="fas fa-circle"></i>
-                        <span>Đơn đặt hàng</span>
                     </a>
                 </div>
             </div>
@@ -611,15 +589,15 @@
                         <i class="fas fa-chevron-right menu-arrow"></i>
                     </div>
                     <div class="menu-submenu">
-                        <a href="#" class="submenu-item" data-tab="employee-list">
+                        <a href="#" class="submenu-item" data-url="/Admin/NhanVien/_DSNhanVien">
                             <i class="fas fa-circle"></i>
                             <span>Danh sách nhân viên</span>
                         </a>
-                        <a href="#" class="submenu-item" data-tab="employee-add">
+                        <a href="#" class="submenu-item" data-url="/Admin/NhanVien/Create">
                             <i class="fas fa-circle"></i>
                             <span>Thêm nhân viên</span>
                         </a>
-                        <a href="#" class="submenu-item" data-tab="employee-roles">
+                        <a href="#" class="submenu-item" data-url="/Admin/NhanVien/PhanQuyen">
                             <i class="fas fa-circle"></i>
                             <span>Phân quyền</span>
                         </a>
@@ -682,40 +660,12 @@
             <h2>Đang tải...</h2>
         </div>
 
-        <!-- Medicine Management Section -->
-        <div id="medicines" class="content-section">
-            <div class="medicine-container">
-                <div class="page-header">
-                    <h2 style="margin: 0; font-size: 1.8rem; font-weight: 700;">Quản lý thuốc</h2>
-                    <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 0.95rem;">Quản lý thông tin thuốc trong hệ thống</p>
-                </div>
-                <div id="medicineContent">
-                    <p style="text-align: center; padding: 50px; color: #6c757d;">Chọn một mục từ menu bên trái</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Bệnh nhân Section -->
-        <div id="patients" class="content-section">
-            <div id="patientContent">
-                <div class="text-center py-5">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Đang tải...</span>
-                    </div>
-                    <p class="mt-3 text-muted">Đang tải danh sách bệnh nhân...</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Warehouse Section - PHẦN NÀY QUAN TRỌNG -->
-        <div id="warehouse" class="content-section">
-            <div id="warehouseContent">
-                <p style="text-align: center; padding: 50px; color: #6c757d;">
-                    <i class="fas fa-warehouse" style="font-size: 3rem; opacity: 0.3; display: block; margin-bottom: 15px;"></i>
-                    Đang tải dữ liệu kho...
-                </p>
-            </div>
-        </div>
+        <!-- Dynamic Content Sections -->
+        <div id="medicines" class="content-section"></div>
+        <div id="patients" class="content-section"></div>
+        <div id="warehouse" class="content-section"></div>
+        <div id="invoices" class="content-section"></div>
+        <div id="employees" class="content-section"></div>
     </main>
 </div>
 
@@ -723,32 +673,79 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="~/js/BenhNhan/BenhNhan.js"></script>
     <script>
-        // ==================== PANEL MANAGEMENT SYSTEM ====================
+        // ==================== GLOBAL VARIABLES & UTILS ====================
         let panelStack = [];
         let currentPanelLevel = 0;
 
-        // Mở panel mới
+        function showLoading() {
+            $('#loadingOverlay').addClass('show');
+        }
+
+        function hideLoading() {
+            $('#loadingOverlay').removeClass('show');
+        }
+
+        function showSection(sectionId) {
+            console.log('🔄 Switching to section:', sectionId);
+            $('.content-section').removeClass('active');
+            $('#' + sectionId).addClass('active');
+        }
+
+        // ==================== EXECUTE INLINE SCRIPTS ====================
+        // Hàm này sẽ execute các <script> tag trong HTML được load qua AJAX
+        function executeScripts(container) {
+            const scripts = container.find('script');
+            scripts.each(function() {
+                const script = $(this);
+                const scriptContent = script.html();
+                const scriptSrc = script.attr('src');
+
+                if (scriptSrc) {
+                    // Load external script
+                    $.getScript(scriptSrc);
+                } else if (scriptContent) {
+                    // Execute inline script
+                    try {
+                        eval(scriptContent);
+                    } catch (e) {
+                        console.error('Error executing script:', e);
+                    }
+                }
+            });
+        }
+
+        // ==================== APPLY INLINE STYLES ====================
+        // Hàm này sẽ apply các <style> tag trong HTML được load qua AJAX
+        function applyInlineStyles(container) {
+            const styles = container.find('style');
+            styles.each(function() {
+                const style = $(this);
+                // Move style to head or keep in container
+                if (!$('head').find(`style:contains("${style.html().substring(0, 50)}")`).length) {
+                    $('head').append(style.clone());
+                }
+            });
+        }
+
+        // ==================== PANEL MANAGEMENT SYSTEM ====================
         function openPanel(url, title, icon = 'fas fa-file') {
             currentPanelLevel++;
 
             const panelId = 'panel-' + currentPanelLevel;
             const overlayId = 'overlay-' + currentPanelLevel;
 
-            // Tạo overlay
             const overlay = $('<div>', {
                 id: overlayId,
                 class: 'panel-overlay',
                 'data-level': currentPanelLevel
             });
 
-            // Tạo panel container
             const panel = $('<div>', {
                 id: panelId,
                 class: 'panel-container',
                 'data-level': currentPanelLevel
             });
 
-            // Tạo panel header
             const header = $(`
                 <div class="panel-header">
                     <h4 class="panel-title">
@@ -761,28 +758,22 @@
                 </div>
             `);
 
-            // Tạo panel body
             const body = $('<div>', {
                 class: 'panel-body'
             }).html('<div style="text-align: center; padding: 50px;"><div class="spinner"></div></div>');
 
             panel.append(header).append(body);
-
-            // Thêm vào DOM
             $('body').append(overlay).append(panel);
 
-            // Đóng panel khi click overlay
             overlay.on('click', function () {
                 closePanel(currentPanelLevel);
             });
 
-            // Hiển thị panel với animation
             setTimeout(() => {
                 overlay.addClass('show');
                 panel.addClass('show');
             }, 10);
 
-            // Load nội dung
             $.ajax({
                 url: url,
                 method: 'GET',
@@ -791,13 +782,16 @@
                 },
                 success: function (data) {
                     body.html(data);
+
+                    // QUAN TRỌNG: Apply styles và execute scripts
+                    applyInlineStyles(body);
+                    executeScripts(body);
                 },
                 error: function (xhr, status, error) {
                     body.html(`<div class="alert alert-danger">Lỗi khi tải nội dung: ${error}</div>`);
                 }
             });
 
-            // Thêm vào stack
             panelStack.push({
                 id: panelId,
                 overlayId: overlayId,
@@ -807,7 +801,6 @@
             return currentPanelLevel;
         }
 
-        // Đóng panel
         function closePanel(level) {
             const panelData = panelStack.find(p => p.level === level);
 
@@ -816,20 +809,16 @@
             const panel = $('#' + panelData.id);
             const overlay = $('#' + panelData.overlayId);
 
-            // Ẩn với animation
             panel.removeClass('show');
             overlay.removeClass('show');
 
-            // Xóa khỏi DOM sau animation
             setTimeout(() => {
                 panel.remove();
                 overlay.remove();
             }, 400);
 
-            // Xóa khỏi stack
             panelStack = panelStack.filter(p => p.level !== level);
 
-            // Cập nhật current level
             if (panelStack.length > 0) {
                 currentPanelLevel = Math.max(...panelStack.map(p => p.level));
             } else {
@@ -837,115 +826,65 @@
             }
         }
 
-        // Đóng tất cả panel
         function closeAllPanels() {
             while (panelStack.length > 0) {
                 closePanel(panelStack[panelStack.length - 1].level);
             }
         }
 
-        // ==================== GLOBAL FUNCTIONS FOR VIEWS ====================
+        // ==================== CONTENT LOADERS ====================
 
-         // Hàm load Details trong panel
-         function loadThuocDetailsPanel(maThuoc) {
-             openPanel(`/Thuoc/Details/${maThuoc}`, 'Chi tiết thuốc', 'fas fa-pills');
-         }
+        function loadContent(url, sectionId) {
+            console.log(`🚀 Loading content: ${url} into section: ${sectionId}`);
 
-         // Hàm load Edit trong panel
-         function loadThuocEditPanel(maThuoc) {
-             openPanel(`/Thuoc/Edit/${maThuoc}`, 'Chỉnh sửa thuốc', 'fas fa-edit');
-         }
+            // Kiểm tra nếu là Details/Edit/Create -> Mở Panel
+            if (url.includes('/Details/') || url.includes('/Edit/') || url.includes('/Create')) {
+                let title = "Thông tin";
+                let icon = "fas fa-file";
 
-         // --- CÁC HÀM CHO QUẢN LÝ KHO (SỬA TẠI ĐÂY) ---
+                if (url.includes('NhaCungCap')) {
+                    title = "Nhà cung cấp";
+                    icon = "fas fa-truck";
+                } else if (url.includes('Thuoc')) {
+                    title = "Thuốc";
+                    icon = "fas fa-pills";
+                } else if (url.includes('BenhNhan')) {
+                    title = "Bệnh nhân";
+                    icon = "fas fa-user-injured";
+                } else if (url.includes('NhanVien')) {
+                    title = "Nhân viên";
+                    icon = "fas fa-users";
+                }
 
-         // Hàm mở Phiếu Nhập trong panel
-         function openPhieuNhapPanel() {
-             // Gọi hàm openPanel đã có sẵn của bạn, trỏ tới đúng Controller/Action
-             openPanel('/PhieuNhap/Create', 'Tạo phiếu nhập kho', 'fas fa-file-import');
-         }
-
-         // Hàm mở Phiếu Xuất (Phiếu Cấp) trong panel
-         function openPhieuXuatPanel() {
-             // Trỏ tới Controller PhieuCap
-             openPanel('/PhieuCap/Create', 'Tạo phiếu xuất kho', 'fas fa-file-export');
-         }
-
-         // Hàm xem chi tiết Kho trong panel (nếu cần)
-         function viewWarehouse(maKho) {
-             openPanel(`/Kho/Details/${maKho}`, 'Chi tiết kho', 'fas fa-warehouse');
-         }
-
-         // Hàm sửa Kho trong panel (nếu cần)
-         function editWarehouse(maKho) {
-             openPanel(`/Kho/Edit/${maKho}`, 'Chỉnh sửa kho', 'fas fa-edit');
-         }
-
-        // Hàm tương thích ngược - redirect sang panel
-        function loadThuocContent(url) {
-            // Nếu là Details hoặc Edit, mở trong panel
-            if (url.includes('/Details/')) {
-                const maThuoc = url.split('/Details/')[1];
-                loadThuocDetailsPanel(maThuoc);
-            } else if (url.includes('/Edit/')) {
-                const maThuoc = url.split('/Edit/')[1];
-                loadThuocEditPanel(maThuoc);
-            } else if (url.includes('/PhieuNhap/')) {
-                loadPhieuNhapPanel();
-            } else {
-                // Các trang khác load bình thường
-                showLoading();
-                showSection('medicines');
-
-                $.ajax({
-                    url: url,
-                    method: 'GET',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    success: function (data) {
-                        $('#medicineContent').html(data);
-                        hideLoading();
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('Error loading content:', error);
-                        $('#medicineContent').html('<div class="alert alert-danger">Lỗi khi tải nội dung: ' + error + '</div>');
-                        hideLoading();
-                    }
-                });
+                openPanel(url, title, icon);
+                return;
             }
-        }
 
-        // ==================== WAREHOUSE CONTENT LOADER ====================
-        // Hàm load riêng cho nội dung Kho - ĐÃ SỬA
-        function loadWarehouseContent(url) {
-            console.log('🔵 Loading warehouse from:', url); // Debug log
-
+            // Nếu không phải panel, load vào section
             showLoading();
-            showSection('warehouse'); // Chuyển sang section warehouse
+            showSection(sectionId);
 
             $.ajax({
                 url: url,
                 method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
                 success: function (data) {
-                    console.log('✅ Warehouse data loaded successfully'); // Debug log
-                    $('#warehouseContent').html(data);
+                    const $section = $('#' + sectionId);
+                    $section.html(data);
+
+                    // QUAN TRỌNG: Apply styles và execute scripts
+                    applyInlineStyles($section);
+                    executeScripts($section);
+
                     hideLoading();
                 },
                 error: function (xhr, status, error) {
-                    console.error('❌ Error loading warehouse:', error);
-                    console.error('Status:', status);
-                    console.error('Response:', xhr.responseText);
-
-                    $('#warehouseContent').html(
+                    console.error(`❌ Error loading ${url}:`, error);
+                    $('#' + sectionId).html(
                         '<div class="alert alert-danger" style="margin: 20px;">' +
-                        '<h4><i class="fas fa-exclamation-triangle"></i> Lỗi tải dữ liệu kho</h4>' +
-                        '<p><strong>Chi tiết lỗi:</strong> ' + error + '</p>' +
-                        '<p><strong>Status:</strong> ' + status + '</p>' +
-                        '<p><strong>URL:</strong> ' + url + '</p>' +
-                        '<button class="btn btn-primary" onclick="loadWarehouseContent(\'' + url + '\')">Thử lại</button>' +
+                        '<h4><i class="fas fa-exclamation-triangle"></i> Lỗi tải dữ liệu</h4>' +
+                        '<p><strong>Chi tiết:</strong> ' + error + '</p>' +
+                        '<button class="btn btn-primary" onclick="loadContent(\'' + url + '\', \'' + sectionId + '\')">Thử lại</button>' +
                         '</div>'
                     );
                     hideLoading();
@@ -953,137 +892,85 @@
             });
         }
 
-        // ==================== PATIENT CONTENT LOADER ====================
+        // Wrapper functions for specific modules
+        function loadThuocContent(url) {
+            loadContent(url, 'medicines');
+        }
+
         function loadPatientContent(url) {
-            console.log('🔵 Loading patient from:', url);
+            loadContent(url, 'patients');
+        }
 
-            showLoading();
-            showSection('patients');
+        function loadWarehouseContent(url) {
+            loadContent(url, 'warehouse');
+        }
 
-            $.ajax({
-                url: url,
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                success: function (data) {
-                    console.log('✅ Patient data loaded successfully');
-                    $('#patientContent').html(data);
-                    hideLoading();
-                },
-                error: function (xhr, status, error) {
-                    console.error('❌ Error loading patient:', error);
-                    $('#patientContent').html(
-                        '<div class="alert alert-danger" style="margin: 20px;">Lỗi tải dữ liệu bệnh nhân: ' + error + '</div>'
-                    );
-                    hideLoading();
-                }
+        function loadInvoiceContent(url) {
+            loadContent(url, 'invoices');
+        }
+
+        function loadEmployeeContent(url) {
+            loadContent(url, 'employees');
+        }
+
+        // ==================== WAREHOUSE PANEL FUNCTIONS ====================
+        function openPhieuNhapPanel() {
+            openPanel('/PhieuNhap/Create', 'Tạo phiếu nhập kho', 'fas fa-file-import');
+        }
+
+        function openPhieuXuatPanel() {
+            openPanel('/PhieuCap/Create', 'Tạo phiếu xuất kho', 'fas fa-file-export');
+        }
+
+        function viewWarehouse(maKho) {
+            openPanel(`/Kho/Details/${maKho}`, 'Chi tiết kho', 'fas fa-warehouse');
+        }
+
+        function editWarehouse(maKho) {
+            openPanel(`/Kho/Edit/${maKho}`, 'Chỉnh sửa kho', 'fas fa-edit');
+        }
+
+        // ==================== BHYT FUNCTIONS ====================
+        function searchBHYT() {
+            var val = $('#bhytSearch').val();
+            loadPatientContent('/Admin/TheBHYT/_DSTheBHYT?search=' + encodeURIComponent(val));
+        }
+
+        function viewBHYTDetail(id) {
+            $.get('/Admin/TheBHYT/Detail/' + id, function (data) {
+                $('#commonModalBody').html(data);
+                $('#commonModalTitle').html('<i class="fas fa-info-circle me-2"></i>Chi tiết thẻ BHYT');
+                new bootstrap.Modal(document.getElementById('commonModal')).show();
+            }).fail(function () {
+                alert('Lỗi: Không thể tải thông tin chi tiết. Kiểm tra Controller.');
             });
         }
 
-        // ==================== MENU & NAVIGATION ====================
-        $(document).ready(function () {
-            // Load dashboard khi trang được tải
-            loadDashboard();
-
-            // Menu accordion functionality
-            $('.menu-group-header').click(function () {
-                const $header = $(this);
-                const $group = $header.parent();
-                const $submenu = $group.find('.menu-submenu');
-                const section = $header.data('section');
-
-                // Toggle submenu nếu có
-                if ($submenu.length > 0) {
-                    // Close other submenus
-                    $('.menu-submenu').not($submenu).removeClass('show');
-                    $('.menu-group-header').not($header).removeClass('active');
-
-                    // Toggle current submenu
-                    $submenu.toggleClass('show');
-                    $header.toggleClass('active');
-                } else {
-                    // If no submenu, it's a direct link (like Dashboard)
-                    $('.menu-group-header').removeClass('active');
-                    $('.submenu-item').removeClass('active');
-                    $header.addClass('active');
-
-                    // Show corresponding section
-                    if (section === 'dashboard') {
-                        loadDashboard();
-                    }
-                }
-            });
-
-            // Submenu item click - ĐÃ SỬA
-            $('.submenu-item').click(function (e) {
-                e.preventDefault();
-
-                const $item = $(this);
-                const url = $item.attr('data-url'); // Dùng .attr() không phải .data()
-
-                console.log('📌 Menu clicked, URL:', url); // Debug log
-
-                // Update active states
-                $('.submenu-item').removeClass('active');
-                $item.addClass('active');
-
-                // Ensure parent section is active
-                const $header = $item.closest('.menu-group').find('.menu-group-header');
-                $('.menu-group-header').removeClass('active');
-                $header.addClass('active');
-
-                // Load content based on URL
-                if (url) {
-                    if (url.includes('/BenhNhan/')) {
-                        loadPatientContent(url);
-                    } else if (url.includes('/Thuoc/')) {
-                        loadThuocContent(url);
-                    } else if (url.includes('/Kho/')) {
-                        // Load warehouse content
-                        loadWarehouseContent(url);
-                    } else {
-                        // Default load
-                        loadThuocContent(url);
-                    }
-                } else {
-                    console.warn('⚠️ No URL found for this menu item');
-                }
-            });
-
-            // Đóng panel khi nhấn ESC
-            $(document).keydown(function (e) {
-                if (e.key === 'Escape' && panelStack.length > 0) {
-                    closePanel(panelStack[panelStack.length - 1].level);
-                }
-            });
-        });
-
-        // Helper function to show section
-        function showSection(sectionId) {
-            console.log('🔄 Switching to section:', sectionId); // Debug log
-            $('.content-section').removeClass('active');
-            $('#' + sectionId).addClass('active');
+        function jumpToBHYT() {
+            var soThe = $('#txtSoTheBHYT_Edit').val();
+            if (!soThe) return;
+            $('#commonModal').modal('hide');
+            loadPatientContent('/Admin/TheBHYT/_DSTheBHYT?search=' + encodeURIComponent(soThe));
         }
 
-        // Load Dashboard
+        // ==================== LOAD DASHBOARD ====================
         function loadDashboard() {
             showLoading();
             showSection('dashboard');
-            closeAllPanels(); // Đóng tất cả panels khi chuyển về dashboard
+            closeAllPanels();
 
             $.ajax({
                 url: '/Admin/Dashboard',
                 method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
                 success: function (data) {
                     $('#dashboard').html(data);
-                    hideLoading();
 
-                    // Re-initialize charts after loading dashboard
-                    setTimeout(initializeCharts, 100);
+                    // Apply styles và execute scripts cho dashboard
+                    applyInlineStyles($('#dashboard'));
+                    executeScripts($('#dashboard'));
+
+                    hideLoading();
                 },
                 error: function (xhr, status, error) {
                     console.error('Error loading dashboard:', error);
@@ -1093,18 +980,75 @@
             });
         }
 
-        // Loading functions
-        function showLoading() {
-            $('#loadingOverlay').addClass('show');
-        }
+        // ==================== DOCUMENT READY (INIT) ====================
+        $(document).ready(function () {
+            // 1. Load Dashboard mặc định
+            loadDashboard();
 
-        function hideLoading() {
-            $('#loadingOverlay').removeClass('show');
-        }
+            // 2. Menu accordion functionality
+            $('.menu-group-header').click(function () {
+                const $header = $(this);
+                const $group = $header.parent();
+                const $submenu = $group.find('.menu-submenu');
+                const section = $header.data('section');
 
-        // Chart initialization
-        function initializeCharts() {
-            console.log('Charts initialized');
-        }
+                if ($submenu.length > 0) {
+                    $('.menu-submenu').not($submenu).removeClass('show');
+                    $('.menu-group-header').not($header).removeClass('active');
+                    $submenu.toggleClass('show');
+                    $header.toggleClass('active');
+                } else {
+                    $('.menu-group-header').removeClass('active');
+                    $('.submenu-item').removeClass('active');
+                    $header.addClass('active');
+
+                    if (section === 'dashboard') {
+                        loadDashboard();
+                    }
+                }
+            });
+
+            // 3. Submenu item click
+            $('.submenu-item').click(function (e) {
+                e.preventDefault();
+
+                const $item = $(this);
+                const url = $item.attr('data-url');
+
+                console.log('📌 Menu clicked, URL:', url);
+
+                $('.submenu-item').removeClass('active');
+                $item.addClass('active');
+
+                const $header = $item.closest('.menu-group').find('.menu-group-header');
+                $('.menu-group-header').removeClass('active');
+                $header.addClass('active');
+
+                if (url) {
+                    if (url.includes('/BenhNhan/') || url.includes('/TheBHYT/')) {
+                        loadPatientContent(url);
+                    } else if (url.includes('/Thuoc/') || url.includes('/NhaCungCap/')) {
+                        loadThuocContent(url);
+                    } else if (url.includes('/Kho/')) {
+                        loadWarehouseContent(url);
+                    } else if (url.includes('/HoaDon/')) {
+                        loadInvoiceContent(url);
+                    } else if (url.includes('/NhanVien/')) {
+                        loadEmployeeContent(url);
+                    } else {
+                        loadThuocContent(url);
+                    }
+                } else {
+                    console.warn('⚠️ No URL found for this menu item');
+                }
+            });
+
+            // 4. Đóng panel khi nhấn ESC
+            $(document).keydown(function (e) {
+                if (e.key === 'Escape' && panelStack.length > 0) {
+                    closePanel(panelStack[panelStack.length - 1].level);
+                }
+            });
+        });
     </script>
 }

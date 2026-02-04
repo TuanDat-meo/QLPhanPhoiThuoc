@@ -1,0 +1,233 @@
+﻿@model QLPhanPhoiThuoc.Models.Entities.NhaCungCap
+
+@{
+    ViewData["Title"] = "Xóa nhà cung cấp";
+    // KHÔNG có Layout khi load qua AJAX
+    if (Context.Request.Headers["X-Requested-With"] != "XMLHttpRequest")
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+    var coPhieuNhap = ViewData["CoPhieuNhap"] as bool? ?? false;
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">
+                <i class="fas fa-trash-alt text-danger"></i> Xóa nhà cung cấp
+            </h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a asp-action="Index">Nhà cung cấp</a></li>
+                    <li class="breadcrumb-item active">Xóa: @Model.TenNCC</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="javascript:void(0)" onclick="closePanel(panelStack[panelStack.length - 1].level)" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <!-- Cảnh báo -->
+            @if (coPhieuNhap)
+            {
+                <div class="alert alert-danger border-danger" role="alert">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-triangle fa-3x"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="alert-heading">
+                                <i class="fas fa-ban"></i> Không thể xóa nhà cung cấp này!
+                            </h5>
+                            <p class="mb-0">
+                                Nhà cung cấp <strong>@Model.TenNCC</strong> đã có
+                                <strong>@(Model.PhieuNhaps?.Count ?? 0) phiếu nhập</strong> liên quan trong hệ thống.
+                                <br />
+                                Việc xóa có thể làm mất dữ liệu lịch sử giao dịch quan trọng.
+                            </p>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="mb-0">
+                        <strong>Giải pháp thay thế:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Chuyển trạng thái sang <span class="badge bg-warning">"Tạm ngừng"</span> để tạm thời không sử dụng</li>
+                            <li>Hoặc chuyển sang <span class="badge bg-danger">"Ngừng hợp tác"</span> nếu không còn làm việc với nhà cung cấp này</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Nút thay đổi trạng thái -->
+                <div class="card shadow-sm">
+                    <div class="card-body text-center py-4">
+                        <h5 class="mb-3">Thay đổi trạng thái nhà cung cấp</h5>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <a asp-action="Edit" asp-route-id="@Model.MaNCC" class="btn btn-warning">
+                                <i class="fas fa-edit"></i> Chỉnh sửa & Đổi trạng thái
+                            </a>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <!-- Xác nhận xóa -->
+                <div class="card shadow-sm border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-exclamation-triangle"></i> Xác nhận xóa nhà cung cấp
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <strong>Cảnh báo:</strong> Bạn đang thực hiện thao tác xóa nhà cung cấp.
+                            Hành động này không thể hoàn tác!
+                        </div>
+
+                        <h5 class="mb-3">Thông tin nhà cung cấp sẽ bị xóa:</h5>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="text-muted small">Mã nhà cung cấp</label>
+                                <p class="mb-0">
+                                    <span class="badge bg-secondary fs-6">@Model.MaNCC</span>
+                                </p>
+                            </div>
+                            <div class="col-md-8">
+                                <label class="text-muted small">Tên nhà cung cấp</label>
+                                <p class="mb-0 fw-bold">@Model.TenNCC</p>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="text-muted small">Số điện thoại</label>
+                                <p class="mb-0">@(string.IsNullOrEmpty(Model.SoDienThoai) ? "Chưa có" : Model.SoDienThoai)</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-muted small">Email</label>
+                                <p class="mb-0">@(string.IsNullOrEmpty(Model.Email) ? "Chưa có" : Model.Email)</p>
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.MaSoThue))
+                        {
+                            <div class="mb-3">
+                                <label class="text-muted small">Mã số thuế</label>
+                                <p class="mb-0">
+                                    <span class="badge bg-info">@Model.MaSoThue</span>
+                                </p>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.DiaChi))
+                        {
+                            <div class="mb-3">
+                                <label class="text-muted small">Địa chỉ</label>
+                                <p class="mb-0">@Model.DiaChi</p>
+                            </div>
+                        }
+
+                        <div class="mb-3">
+                            <label class="text-muted small">Trạng thái hiện tại</label>
+                            <p class="mb-0">
+                                @switch (Model.TrangThai)
+                                {
+                                    case "HoatDong":
+                                        <span class="badge bg-success">Đang hoạt động</span>
+                                        break;
+                                    case "NgungHopTac":
+                                        <span class="badge bg-danger">Ngừng hợp tác</span>
+                                        break;
+                                    case "TamNgung":
+                                        <span class="badge bg-warning text-dark">Tạm ngừng</span>
+                                        break;
+                                }
+                            </p>
+                        </div>
+
+                        <div class="pt-3 border-top">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar-alt"></i>
+                                Ngày tạo: <strong>@Model.NgayTao.ToString("dd/MM/yyyy HH:mm")</strong>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form xác nhận xóa -->
+                <div class="card shadow-sm mt-3">
+                    <div class="card-body">
+                        <form asp-action="Delete" method="post">
+                            <input type="hidden" asp-for="MaNCC" />
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="confirmDelete" required>
+                                <label class="form-check-label" for="confirmDelete">
+                                    Tôi hiểu rằng việc xóa nhà cung cấp này là <strong>không thể hoàn tác</strong>
+                                    và đồng ý thực hiện thao tác này.
+                                </label>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <a asp-action="Index" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Hủy bỏ
+                                </a>
+                                <button type="submit" class="btn btn-danger" id="btnDelete" disabled>
+                                    <i class="fas fa-trash-alt"></i> Xác nhận xóa
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Lưu ý -->
+                <div class="card shadow-sm mt-3">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-info-circle"></i> Lưu ý quan trọng
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li>Nhà cung cấp này <strong class="text-success">chưa có phiếu nhập nào</strong>, có thể xóa an toàn</li>
+                            <li>Sau khi xóa, mã nhà cung cấp <strong>@Model.MaNCC</strong> có thể được sử dụng lại</li>
+                            <li>Tất cả thông tin liên quan đến nhà cung cấp này sẽ bị xóa vĩnh viễn</li>
+                            <li>Nếu không chắc chắn, hãy chọn <strong>"Hủy bỏ"</strong> và cân nhắc lại</li>
+                        </ul>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Enable/disable nút Delete khi checkbox được check
+        document.getElementById('confirmDelete')?.addEventListener('change', function() {
+            document.getElementById('btnDelete').disabled = !this.checked;
+        });
+
+        // Xác nhận lần cuối trước khi submit
+        @if (!coPhieuNhap)
+        {
+                <text>
+                document.querySelector('form')?.addEventListener('submit', function(e) {
+                    if (!confirm('BẠN CÓ CHẮC CHẮN MUỐN XÓA NHÀ CUNG CẤP "@Model.TenNCC"?\n\nHành động này KHÔNG THỂ HOÀN TÁC!')) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+                </text>
+        }
+    </script>
+}

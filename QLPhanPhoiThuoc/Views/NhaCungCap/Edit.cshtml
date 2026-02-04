@@ -1,0 +1,284 @@
+﻿@model QLPhanPhoiThuoc.Models.Entities.NhaCungCap
+
+@{
+    ViewData["Title"] = "Chỉnh sửa nhà cung cấp";
+    // KHÔNG có Layout khi load qua AJAX (trong panel)
+    if (Context.Request.Headers["X-Requested-With"] != "XMLHttpRequest")
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">
+                <i class="fas fa-edit text-warning"></i> Chỉnh sửa nhà cung cấp
+            </h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="javascript:void(0)" onclick="loadThuocContent('/Admin/NhaCungCap/Index')">Nhà cung cấp</a></li>
+                    <li class="breadcrumb-item active">Chỉnh sửa: @Model.TenNCC</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a href="javascript:void(0)" onclick="loadThuocContent('/Admin/NhaCungCap/Details/@Model.MaNCC')" class="btn btn-info">
+                <i class="fas fa-eye"></i> Chi tiết
+            </a>
+            <a href="javascript:void(0)" onclick="closePanel(panelStack[panelStack.length - 1].level)" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Thông tin nhà cung cấp</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post" id="formEdit">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <input type="hidden" asp-for="NgayTao" />
+
+                        <!-- Mã NCC (readonly) & Tên NCC -->
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label asp-for="MaNCC" class="form-label">
+                                    Mã nhà cung cấp
+                                </label>
+                                <input asp-for="MaNCC" class="form-control" readonly style="background-color: #e9ecef;" />
+                                <small class="form-text text-muted">Không thể thay đổi mã</small>
+                            </div>
+                            <div class="col-md-8">
+                                <label asp-for="TenNCC" class="form-label">
+                                    Tên nhà cung cấp <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="TenNCC" class="form-control" />
+                                <span asp-validation-for="TenNCC" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Số điện thoại & Email -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="SoDienThoai" class="form-label">
+                                    <i class="fas fa-phone-alt"></i> Số điện thoại
+                                </label>
+                                <input asp-for="SoDienThoai" class="form-control" />
+                                <span asp-validation-for="SoDienThoai" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label">
+                                    <i class="fas fa-envelope"></i> Email
+                                </label>
+                                <input asp-for="Email" type="email" class="form-control" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Mã số thuế -->
+                        <div class="mb-3">
+                            <label asp-for="MaSoThue" class="form-label">
+                                <i class="fas fa-file-invoice"></i> Mã số thuế
+                            </label>
+                            <input asp-for="MaSoThue" class="form-control" />
+                            <span asp-validation-for="MaSoThue" class="text-danger"></span>
+                            <small class="form-text text-muted">Mã số thuế duy nhất của doanh nghiệp</small>
+                        </div>
+
+                        <!-- Địa chỉ -->
+                        <div class="mb-3">
+                            <label asp-for="DiaChi" class="form-label">
+                                <i class="fas fa-map-marker-alt"></i> Địa chỉ
+                            </label>
+                            <textarea asp-for="DiaChi" class="form-control" rows="2"></textarea>
+                            <span asp-validation-for="DiaChi" class="text-danger"></span>
+                        </div>
+
+                        <!-- Trạng thái -->
+                        <div class="mb-3">
+                            <label asp-for="TrangThai" class="form-label">
+                                <i class="fas fa-toggle-on"></i> Trạng thái
+                            </label>
+                            <select asp-for="TrangThai" class="form-select">
+                                <option value="HoatDong">Đang hoạt động</option>
+                                <option value="TamNgung">Tạm ngừng</option>
+                                <option value="NgungHopTac">Ngừng hợp tác</option>
+                            </select>
+                            <span asp-validation-for="TrangThai" class="text-danger"></span>
+                        </div>
+
+                        <!-- Thông tin metadata -->
+                        <div class="alert alert-info">
+                            <small>
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Ngày tạo:</strong> @Model.NgayTao.ToString("dd/MM/yyyy HH:mm")
+                            </small>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                            <button type="button" onclick="closePanel(panelStack[panelStack.length - 1].level)" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Hủy
+                            </button>
+                            <button type="submit" class="btn btn-warning" id="btnSubmit">
+                                <i class="fas fa-save"></i> Cập nhật
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Cảnh báo -->
+            <div class="card shadow-sm mt-3">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Lưu ý khi chỉnh sửa</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>Không thể thay đổi mã nhà cung cấp sau khi đã tạo</li>
+                        <li>Mã số thuế phải là duy nhất trong hệ thống</li>
+                        <li>Thay đổi trạng thái sẽ ảnh hưởng đến khả năng nhập hàng từ nhà cung cấp này</li>
+                        <li>Nếu có phiếu nhập liên quan, nên "Tạm ngừng" thay vì "Ngừng hợp tác"</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        (function() {
+            console.log('🟡 [EDIT] Script initialized');
+
+            var form = $('#formEdit');
+            var submitBtn = $('#btnSubmit');
+
+            // ============ CRITICAL: Kiểm tra đã init chưa ============
+            if (form.data('form-initialized') === true) {
+                console.log('⚠️ [EDIT] Already initialized, skipping');
+                return;
+            }
+
+            form.data('form-initialized', true);
+            console.log('✅ [EDIT] Marking as initialized');
+
+            // ============ XÓA TẤT CẢ EVENT HANDLER CŨ ============
+            form.off('submit');
+            submitBtn.off('click');
+
+            // ============ GẮN EVENT HANDLER MỚI ============
+            form.on('submit', function(e) {
+                console.log('🔵 [EDIT] Form submit triggered');
+
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+
+                // Kiểm tra button đã disabled chưa
+                if (submitBtn.prop('disabled')) {
+                    console.log('⚠️ [EDIT] Already submitting, ignoring');
+                    return false;
+                }
+
+                // Disable button ngay lập tức
+                submitBtn.prop('disabled', true)
+                         .html('<i class="fas fa-spinner fa-spin"></i> Đang xử lý...');
+
+                console.log('📤 [EDIT] Sending AJAX request');
+
+                var formData = new FormData(this);
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    success: function(response) {
+                        console.log('✅ [EDIT] Success response:', response);
+
+                        if (response.success) {
+                            alert(response.message || 'Cập nhật thành công!');
+
+                            // Đóng panel
+                            if (typeof closePanel === 'function' && typeof panelStack !== 'undefined' && panelStack.length > 0) {
+                                closePanel(panelStack[panelStack.length - 1].level);
+                            }
+
+                            // Reload danh sách
+                            if (typeof loadThuocContent === 'function') {
+                                loadThuocContent('/Admin/NhaCungCap/Index');
+                            }
+                        } else {
+                            console.log('❌ [EDIT] Server returned success=false');
+                            alert(response.message || 'Có lỗi xảy ra!');
+                            submitBtn.prop('disabled', false)
+                                     .html('<i class="fas fa-save"></i> Cập nhật');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('❌ [EDIT] AJAX Error');
+                        console.log('Status:', xhr.status);
+                        console.log('Error:', error);
+                        console.log('Response:', xhr.responseText?.substring(0, 500));
+
+                        // Nếu là validation error (400) hoặc server trả về HTML
+                        if (xhr.status === 400 || xhr.responseText?.includes('<!DOCTYPE') || xhr.responseText?.includes('<html')) {
+                            console.log('🔄 [EDIT] Reloading form with validation errors');
+
+                            var panelBody = form.closest('.panel-body');
+                            if (panelBody.length > 0) {
+                                panelBody.html(xhr.responseText);
+                            } else {
+                                $('.container-fluid').html(xhr.responseText);
+                            }
+                        } else {
+                            alert('Lỗi kết nối: ' + xhr.status + '\n' + error);
+                            submitBtn.prop('disabled', false)
+                                     .html('<i class="fas fa-save"></i> Cập nhật');
+                        }
+                    }
+                });
+
+                return false;
+            });
+
+            // ============ INPUT FORMATTERS ============
+            $('#SoDienThoai').off('input').on('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+
+            $('#MaSoThue').off('input').on('input', function() {
+                this.value = this.value.replace(/[^0-9-]/g, '');
+            });
+
+            // ============ CẢNH BÁO TRẠNG THÁI ============
+            var originalStatus = $('#TrangThai').val();
+            $('#TrangThai').off('change').on('change', function() {
+                if (this.value === 'NgungHopTac') {
+                    if (!confirm('Bạn có chắc muốn chuyển sang "Ngừng hợp tác"? Hành động này có thể ảnh hưởng đến các giao dịch trong tương lai.')) {
+                        this.value = originalStatus;
+                    }
+                }
+            });
+
+            console.log('✅ [EDIT] All event handlers attached');
+        })();
+    </script>
+}
