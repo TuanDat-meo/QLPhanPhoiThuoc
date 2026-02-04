@@ -8,427 +8,65 @@
 }
 
 <style>
-    /* ==================== MODERN COMPACT SIDEBAR LAYOUT ==================== */
+    /* ==================== STYLES CƠ BẢN ==================== */
+    .admin-container { display: flex; gap: 25px; min-height: calc(100vh - 200px); padding: 20px; }
+    .sidebar { width: 260px; background: white; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 0; height: fit-content; max-height: calc(100vh - 140px); overflow-y: auto; position: sticky; top: 90px; }
+    .sidebar::-webkit-scrollbar { width: 5px; }
+    .sidebar::-webkit-scrollbar-track { background: #f1f1f1; }
+    .sidebar::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 10px; }
+    .sidebar-header { padding: 20px; border-bottom: 1px solid #e9ecef; background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%); border-radius: 12px 12px 0 0; color: white; }
+    .sidebar-title { font-size: 1.1rem; font-weight: 700; margin: 0; }
+    .sidebar-subtitle { font-size: 0.85rem; opacity: 0.9; margin-top: 3px; }
 
-    .admin-container {
-        display: flex;
-        gap: 25px;
-        min-height: calc(100vh - 200px);
-        padding: 20px;
-    }
+    /* Menu Styles */
+    .menu-accordion { padding: 10px 0; }
+    .menu-group { margin-bottom: 5px; }
+    .menu-group-header { padding: 12px 20px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.3s ease; border-left: 3px solid transparent; color: #495057; font-weight: 500; user-select: none; }
+    .menu-group-header:hover { background: #f8f9fa; color: #1e3a5f; border-left-color: #1e3a5f; }
+    .menu-group-header.active { background: linear-gradient(90deg, rgba(30,58,95,0.1) 0%, transparent 100%); color: #1e3a5f; border-left-color: #1e3a5f; font-weight: 600; }
+    .menu-header-content { display: flex; align-items: center; gap: 12px; flex: 1; }
+    .menu-header-content i { width: 22px; text-align: center; font-size: 1.1rem; }
+    .menu-arrow { transition: transform 0.3s ease; font-size: 0.85rem; color: #6c757d; }
+    .menu-group-header.active .menu-arrow { transform: rotate(90deg); color: #1e3a5f; }
+    .menu-submenu { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; background: #f8f9fa; }
+    .menu-submenu.show { max-height: 500px; }
+    .submenu-item { padding: 10px 20px 10px 54px; color: #6c757d; text-decoration: none; display: flex; align-items: center; gap: 10px; transition: all 0.2s ease; border-left: 3px solid transparent; font-size: 0.9rem; cursor: pointer; }
+    .submenu-item:hover { background: white; color: #1e3a5f; border-left-color: #38bdf8; text-decoration: none; padding-left: 58px; }
+    .submenu-item.active { background: white; color: #1e3a5f; border-left-color: #1e3a5f; font-weight: 600; }
+    .submenu-item i { font-size: 0.75rem; width: 12px; }
 
-    /* ==================== COMPACT SIDEBAR ==================== */
-    .sidebar {
-        width: 260px;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-        padding: 0;
-        height: fit-content;
-        max-height: calc(100vh - 140px);
-        overflow-y: auto;
-        position: sticky;
-        top: 90px;
-    }
+    /* Content Area */
+    .dashboard-content { flex: 1; min-width: 0; position: relative; }
+    .content-section { display: none; }
+    .content-section.active { display: block; animation: fadeIn 0.3s ease; }
 
-        .sidebar::-webkit-scrollbar {
-            width: 5px;
-        }
+    /* [QUAN TRỌNG] Dùng @@ để tránh lỗi Razor khi viết CSS Keyframes */
+    @@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .sidebar::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
+    /* Panel System */
+    .panel-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 1000; display: none; animation: fadeInOverlay 0.3s ease; }
+    .panel-overlay.show { display: block; }
+    @@keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
 
-        .sidebar::-webkit-scrollbar-thumb {
-            background: #1e3a5f;
-            border-radius: 10px;
-        }
+    .panel-container { position: fixed; top: 0; left: 0; right: 0; bottom: 0; margin: auto; width: 85%; max-width: 1200px; height: 90vh; background: white; box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); z-index: 1001; display: flex; flex-direction: column; }
+    .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%); color: white; border-bottom: 3px solid #38bdf8; }
+    .panel-title { display: flex; align-items: center; gap: 15px; margin: 0; font-size: 1.5rem; font-weight: 700; }
+    .panel-close-btn { background: rgba(255, 255, 255, 0.2); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; font-size: 1.2rem; }
+    .panel-close-btn:hover { background: rgba(255, 255, 255, 0.3); transform: rotate(90deg); }
+    .panel-body { flex: 1; overflow-y: auto; padding: 10px; background: #f8f9fa; }
 
-    .sidebar-header {
-        padding: 20px;
-        border-bottom: 1px solid #e9ecef;
-        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
-        border-radius: 12px 12px 0 0;
-        color: white;
-    }
+    /* Common Styles */
+    .medicine-container { padding: 25px; background: #f8f9fa; min-height: calc(100vh - 200px); }
+    .page-header { background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%); color: white; padding: 25px 30px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(30, 58, 95, 0.3); }
 
-    .sidebar-title {
-        font-size: 1.1rem;
-        font-weight: 700;
-        margin: 0;
-    }
+    /* Loading */
+    .loading-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.9); z-index: 9999; justify-content: center; align-items: center; }
+    .loading-overlay.show { display: flex; }
+    .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #1e3a5f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
+    @@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    .sidebar-subtitle {
-        font-size: 0.85rem;
-        opacity: 0.9;
-        margin-top: 3px;
-    }
-
-    /* Menu Accordion */
-    .menu-accordion {
-        padding: 10px 0;
-    }
-
-    .menu-group {
-        margin-bottom: 5px;
-    }
-
-    .menu-group-header {
-        padding: 12px 20px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        transition: all 0.3s ease;
-        border-left: 3px solid transparent;
-        color: #495057;
-        font-weight: 500;
-        user-select: none;
-    }
-
-        .menu-group-header:hover {
-            background: #f8f9fa;
-            color: #1e3a5f;
-            border-left-color: #1e3a5f;
-        }
-
-        .menu-group-header.active {
-            background: linear-gradient(90deg, rgba(30,58,95,0.1) 0%, transparent 100%);
-            color: #1e3a5f;
-            border-left-color: #1e3a5f;
-            font-weight: 600;
-        }
-
-    .menu-header-content {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        flex: 1;
-    }
-
-        .menu-header-content i {
-            width: 22px;
-            text-align: center;
-            font-size: 1.1rem;
-        }
-
-    .menu-arrow {
-        transition: transform 0.3s ease;
-        font-size: 0.85rem;
-        color: #6c757d;
-    }
-
-    .menu-group-header.active .menu-arrow {
-        transform: rotate(90deg);
-        color: #1e3a5f;
-    }
-
-    /* Submenu */
-    .menu-submenu {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.3s ease;
-        background: #f8f9fa;
-    }
-
-        .menu-submenu.show {
-            max-height: 500px;
-        }
-
-    .submenu-item {
-        padding: 10px 20px 10px 54px;
-        color: #6c757d;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        transition: all 0.2s ease;
-        border-left: 3px solid transparent;
-        font-size: 0.9rem;
-        cursor: pointer;
-    }
-
-        .submenu-item:hover {
-            background: white;
-            color: #1e3a5f;
-            border-left-color: #38bdf8;
-            text-decoration: none;
-            padding-left: 58px;
-        }
-
-        .submenu-item.active {
-            background: white;
-            color: #1e3a5f;
-            border-left-color: #1e3a5f;
-            font-weight: 600;
-        }
-
-        .submenu-item i {
-            font-size: 0.75rem;
-            width: 12px;
-        }
-
-    .menu-badge {
-        background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
-        color: white;
-        font-size: 0.7rem;
-        padding: 2px 8px;
-        border-radius: 12px;
-        font-weight: 600;
-        margin-left: auto;
-    }
-
-    /* ==================== MAIN CONTENT AREA ==================== */
-    .dashboard-content {
-        flex: 1;
-        min-width: 0;
-        position: relative;
-    }
-
-    /* Content Section */
-    .content-section {
-        display: none;
-    }
-
-        .content-section.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-    @@keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    /* ==================== PANEL SYSTEM ==================== */
-    .panel-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-        display: none;
-        animation: fadeInOverlay 0.3s ease;
-    }
-
-        .panel-overlay.show {
-            display: block;
-        }
-
-    @@keyframes fadeInOverlay {
-        from {
-            opacity: 0;
-        }
-
-        to {
-            opacity: 1;
-        }
-    }
-
-    .panel-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        margin: auto;
-        width: 85%;
-        max-width: 1200px;
-        height: 90vh;
-        background: white;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-        z-index: 1001;
-        display: flex;
-        flex-direction: column;
-    }
-
-        .panel-container.show {
-        }
-
-    .panel-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 10px 20px;
-        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
-        color: white;
-        border-bottom: 3px solid #38bdf8;
-    }
-
-    .panel-title {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        margin: 0;
-        font-size: 1.5rem;
-        font-weight: 700;
-    }
-
-        .panel-title i {
-            font-size: 1.8rem;
-        }
-
-    .panel-close-btn {
-        background: rgba(255, 255, 255, 0.2);
-        border: none;
-        color: white;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-        font-size: 1.2rem;
-    }
-
-        .panel-close-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: rotate(90deg);
-        }
-
-    .panel-body {
-        flex: 1;
-        overflow-y: auto;
-        padding: 10px;
-        background: #f8f9fa;
-    }
-
-        .panel-body::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .panel-body::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        .panel-body::-webkit-scrollbar-thumb {
-            background: #1e3a5f;
-            border-radius: 10px;
-        }
-
-            .panel-body::-webkit-scrollbar-thumb:hover {
-                background: #0f2847;
-            }
-
-    /* Panel Stacking - để có thể mở nhiều panel cùng lúc */
-    .panel-overlay[data-level="1"] {
-        z-index: 1000;
-    }
-
-    .panel-container[data-level="1"] {
-        z-index: 1001;
-    }
-
-    .panel-overlay[data-level="2"] {
-        z-index: 1002;
-    }
-
-    .panel-container[data-level="2"] {
-        z-index: 1003;
-        width: 80%;
-    }
-
-    .panel-overlay[data-level="3"] {
-        z-index: 1004;
-    }
-
-    .panel-container[data-level="3"] {
-        z-index: 1005;
-        width: 75%;
-    }
-
-    /* Loading Spinner */
-    .loading-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(255, 255, 255, 0.9);
-        z-index: 9999;
-        justify-content: center;
-        align-items: center;
-    }
-
-        .loading-overlay.show {
-            display: flex;
-        }
-
-    .spinner {
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid #1e3a5f;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        animation: spin 1s linear infinite;
-    }
-
-    @@keyframes spin {
-        0% {
-            transform: rotate(0deg);
-        }
-
-        100% {
-            transform: rotate(360deg);
-        }
-    }
-
-    /* CSS từ Index.cshtml cho phần quản lý thuốc */
-    .medicine-container {
-        padding: 25px;
-        background: #f8f9fa;
-        min-height: calc(100vh - 200px);
-    }
-
-    .page-header {
-        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
-        color: white;
-        padding: 25px 30px;
-        border-radius: 12px;
-        margin-bottom: 25px;
-        box-shadow: 0 4px 15px rgba(30, 58, 95, 0.3);
-    }
-
-    /* Responsive */
-    @@media (max-width: 1200px) {
-        .panel-container {
-            width: 90%;
-        }
-    }
-
-    @@media (max-width: 768px) {
-        .admin-container {
-            flex-direction: column;
-        }
-
-        .sidebar {
-            width: 100%;
-            position: relative;
-            top: 0;
-        }
-
-        .panel-container {
-            width: 100%;
-            max-width: 100%;
-        }
-
-            .panel-container[data-level="2"],
-            .panel-container[data-level="3"] {
-                width: 100%;
-            }
-    }
+    /* Media Query cũng cần dùng @@ */
+    @@media (max-width: 768px) { .admin-container { flex-direction: column; } .sidebar { width: 100%; position: relative; top: 0; } .panel-container { width: 100%; max-width: 100%; } }
 </style>
 
 <!-- Loading Overlay -->
@@ -743,509 +381,210 @@
 </div>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="~/js/BenhNhan/BenhNhan.js"></script>
-    <script>
-        // ==================== PANEL MANAGEMENT SYSTEM ====================
-        let panelStack = [];
-        let currentPanelLevel = 0;
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="~/js/BenhNhan/BenhNhan.js"></script>
+        <script>
+            // ==================== GLOBAL VARIABLES & UTILS ====================
+            let panelStack = [];
+            let currentPanelLevel = 0;
 
-        // Mở panel mới
-        function openPanel(url, title, icon = 'fas fa-file') {
-            currentPanelLevel++;
+            function showLoading() { $('#loadingOverlay').addClass('show'); }
+            function hideLoading() { $('#loadingOverlay').removeClass('show'); }
 
-            const panelId = 'panel-' + currentPanelLevel;
-            const overlayId = 'overlay-' + currentPanelLevel;
-
-            // Tạo overlay
-            const overlay = $('<div>', {
-                id: overlayId,
-                class: 'panel-overlay',
-                'data-level': currentPanelLevel
-            });
-
-            // Tạo panel container
-            const panel = $('<div>', {
-                id: panelId,
-                class: 'panel-container',
-                'data-level': currentPanelLevel
-            });
-
-            // Tạo panel header
-            const header = $(`
-                <div class="panel-header">
-                    <h4 class="panel-title">
-                        <i class="${icon}"></i>
-                        <span>${title}</span>
-                    </h4>
-                    <button class="panel-close-btn" onclick="closePanel(${currentPanelLevel})">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            `);
-
-            // Tạo panel body
-            const body = $('<div>', {
-                class: 'panel-body'
-            }).html('<div style="text-align: center; padding: 50px;"><div class="spinner"></div></div>');
-
-            panel.append(header).append(body);
-
-            // Thêm vào DOM
-            $('body').append(overlay).append(panel);
-
-            // Đóng panel khi click overlay
-            overlay.on('click', function () {
-                closePanel(currentPanelLevel);
-            });
-
-            // Hiển thị panel với animation
-            setTimeout(() => {
-                overlay.addClass('show');
-                panel.addClass('show');
-            }, 10);
-
-            // Load nội dung
-            $.ajax({
-                url: url,
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                success: function (data) {
-                    body.html(data);
-                },
-                error: function (xhr, status, error) {
-                    body.html(`<div class="alert alert-danger">Lỗi khi tải nội dung: ${error}</div>`);
-                }
-            });
-
-        // Submenu item click - CẢI TIẾN ĐỂ HỖ TRỢ AJAX LOADING
-        $('.submenu-item').click(function(e) {
-            e.preventDefault();
-            
-            const $item = $(this);
-            const url = $item.data('url');
-            
-            // Update active states
-            $('.submenu-item').removeClass('active');
-            $item.addClass('active');
-            
-            // Ensure parent section is active
-            const $header = $item.closest('.menu-group').find('.menu-group-header');
-            $('.menu-group-header').removeClass('active');
-            $header.addClass('active');
-
-            // Load content nếu có URL
-            if (url) {
-                    // Kiểm tra URL để gọi hàm tương ứng
-                    if (url.includes('/HoaDon/')) {
-                        loadInvoiceContent(url);
-                    } else if (url.includes('/BenhNhan/')) {
-                        loadPatientsContent(url);
-                    } else {
-                        loadThuocContent(url); // Mặc định hoặc cho Thuốc
-                    }
-                }
-        });
-    });
-
-    // Helper function to show section
-    function showSection(sectionId) {
-        $('.content-section').removeClass('active');
-        $('#' + sectionId).addClass('active');
-    }
-
-    // Load Dashboard
-    function loadDashboard() {
-        showLoading();
-        showSection('dashboard');
-        
-        $.ajax({
-            url: '/Admin/Dashboard',
-            method: 'GET',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            success: function(data) {
-                $('#dashboard').html(data);
-                hideLoading();
-                
-                // Re-initialize charts after loading dashboard
-                setTimeout(initializeCharts, 100);
-            },
-            error: function(xhr, status, error) {
-                console.error('Error loading dashboard:', error);
-                $('#dashboard').html('<div class="alert alert-danger">Lỗi khi tải dashboard</div>');
-                hideLoading();
-            // Thêm vào stack
-            panelStack.push({
-                id: panelId,
-                overlayId: overlayId,
-                level: currentPanelLevel
-            });
-
-            return currentPanelLevel;
-        }
-
-        // Đóng panel
-        function closePanel(level) {
-            const panelData = panelStack.find(p => p.level === level);
-
-            if (!panelData) return;
-
-            const panel = $('#' + panelData.id);
-            const overlay = $('#' + panelData.overlayId);
-
-            // Ẩn với animation
-            panel.removeClass('show');
-            overlay.removeClass('show');
-
-            // Xóa khỏi DOM sau animation
-            setTimeout(() => {
-                panel.remove();
-                overlay.remove();
-            }, 400);
-
-            // Xóa khỏi stack
-            panelStack = panelStack.filter(p => p.level !== level);
-
-            // Cập nhật current level
-            if (panelStack.length > 0) {
-                currentPanelLevel = Math.max(...panelStack.map(p => p.level));
-            } else {
-                currentPanelLevel = 0;
+            // Hàm chuyển đổi Tab chính (Section)
+            function showSection(sectionId) {
+                $('.content-section').removeClass('active');
+                $('#' + sectionId).addClass('active');
             }
-        }
 
-        // Đóng tất cả panel
-        function closeAllPanels() {
-            while (panelStack.length > 0) {
-                closePanel(panelStack[panelStack.length - 1].level);
+            // ==================== PANEL SYSTEM ====================
+            function openPanel(url, title, icon = 'fas fa-file') {
+                currentPanelLevel++;
+                const panelId = 'panel-' + currentPanelLevel;
+                const overlayId = 'overlay-' + currentPanelLevel;
+                const overlay = $('<div>', { id: overlayId, class: 'panel-overlay', 'data-level': currentPanelLevel });
+                const panel = $('<div>', { id: panelId, class: 'panel-container', 'data-level': currentPanelLevel });
+
+                const header = `<div class="panel-header">
+                                    <h4 class="panel-title"><i class="${icon}"></i><span>${title}</span></h4>
+                                    <button class="panel-close-btn" onclick="closePanel(${currentPanelLevel})"><i class="fas fa-times"></i></button>
+                                </div>`;
+                const body = $('<div>', { class: 'panel-body' }).html('<div style="text-align: center; padding: 50px;"><div class="spinner"></div></div>');
+
+                panel.append(header).append(body);
+                $('body').append(overlay).append(panel);
+
+                overlay.on('click', function () { closePanel(currentPanelLevel); });
+                setTimeout(() => { overlay.addClass('show'); panel.addClass('show'); }, 10);
+
+                $.ajax({
+                    url: url, method: 'GET', headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    success: function (data) { body.html(data); },
+                    error: function (xhr) { body.html(`<div class="alert alert-danger">Lỗi: ${xhr.statusText}</div>`); }
+                });
+                panelStack.push({ id: panelId, overlayId: overlayId, level: currentPanelLevel });
             }
-        }
 
-        // ==================== GLOBAL FUNCTIONS FOR VIEWS ====================
+            function closePanel(level) {
+                const panelData = panelStack.find(p => p.level === level);
+                if (!panelData) return;
+                $('#' + panelData.id).removeClass('show');
+                $('#' + panelData.overlayId).removeClass('show');
+                setTimeout(() => { $('#' + panelData.id).remove(); $('#' + panelData.overlayId).remove(); }, 400);
+                panelStack = panelStack.filter(p => p.level !== level);
+                currentPanelLevel = panelStack.length > 0 ? Math.max(...panelStack.map(p => p.level)) : 0;
+            }
 
-         // Hàm load Details trong panel
-         function loadThuocDetailsPanel(maThuoc) {
-             openPanel(`/Thuoc/Details/${maThuoc}`, 'Chi tiết thuốc', 'fas fa-pills');
-         }
+            // ==================== CONTENT LOADERS ====================
 
-         // Hàm load Edit trong panel
-         function loadThuocEditPanel(maThuoc) {
-             openPanel(`/Thuoc/Edit/${maThuoc}`, 'Chỉnh sửa thuốc', 'fas fa-edit');
-         }
-
-         // --- CÁC HÀM CHO QUẢN LÝ KHO (SỬA TẠI ĐÂY) ---
-
-         // Hàm mở Phiếu Nhập trong panel
-         function openPhieuNhapPanel() {
-             // Gọi hàm openPanel đã có sẵn của bạn, trỏ tới đúng Controller/Action
-             openPanel('/PhieuNhap/Create', 'Tạo phiếu nhập kho', 'fas fa-file-import');
-         }
-
-         // Hàm mở Phiếu Xuất (Phiếu Cấp) trong panel
-         function openPhieuXuatPanel() {
-             // Trỏ tới Controller PhieuCap
-             openPanel('/PhieuCap/Create', 'Tạo phiếu xuất kho', 'fas fa-file-export');
-         }
-
-         // Hàm xem chi tiết Kho trong panel (nếu cần)
-         function viewWarehouse(maKho) {
-             openPanel(`/Kho/Details/${maKho}`, 'Chi tiết kho', 'fas fa-warehouse');
-         }
-
-         // Hàm sửa Kho trong panel (nếu cần)
-         function editWarehouse(maKho) {
-             openPanel(`/Kho/Edit/${maKho}`, 'Chỉnh sửa kho', 'fas fa-edit');
-         }
-
-        // Hàm tương thích ngược - redirect sang panel
-        function loadThuocContent(url) {
-            // Nếu là Details hoặc Edit, mở trong panel
-            if (url.includes('/Details/')) {
-                const maThuoc = url.split('/Details/')[1];
-                loadThuocDetailsPanel(maThuoc);
-            } else if (url.includes('/Edit/')) {
-                const maThuoc = url.split('/Edit/')[1];
-                loadThuocEditPanel(maThuoc);
-            } else if (url.includes('/PhieuNhap/')) {
-                loadPhieuNhapPanel();
-            } else {
-                // Các trang khác load bình thường
+            // 1. Load Bệnh nhân & BHYT
+            function loadPatientsContent(url) {
                 showLoading();
-                showSection('medicines');
+                showSection('patients'); // Hiện section Bệnh nhân
 
                 $.ajax({
                     url: url,
                     method: 'GET',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
                     success: function (data) {
-                        $('#medicineContent').html(data);
+                        $('#patientContent').html(data);
                         hideLoading();
                     },
                     error: function (xhr, status, error) {
-                        console.error('Error loading content:', error);
-                        $('#medicineContent').html('<div class="alert alert-danger">Lỗi khi tải nội dung: ' + error + '</div>');
+                        console.error('Lỗi tải bệnh nhân:', error);
+                        $('#patientContent').html('<div class="alert alert-danger">Lỗi tải dữ liệu bệnh nhân</div>');
                         hideLoading();
                     }
                 });
             }
-        });
-    }
-    // Load Hoa Don Content
-    function loadInvoiceContent(url) {
-        showLoading();
-        showSection('invoices'); // Chuyển sang tab Hóa đơn
 
-        $.ajax({
-            url: url,
-            method: 'GET',
-            headers: { 'X-Requested-With': 'XMLHttpRequest' },
-            success: function(data) {
-                $('#invoiceContent').html(data);
-                hideLoading();
-            },
-            error: function(xhr, status, error) {
-                console.error('Error loading invoices:', error);
-                $('#invoiceContent').html('<div class="alert alert-danger">Lỗi tải dữ liệu hóa đơn</div>');
-                hideLoading();
+            // 2. Load Kho
+            function loadWarehouseContent(url) {
+                showLoading(); showSection('warehouse');
+                $.ajax({
+                    url: url, method: 'GET', headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    success: function (data) { $('#warehouseContent').html(data); hideLoading(); },
+                    error: function () { $('#warehouseContent').html('<div class="alert alert-danger">Lỗi tải kho</div>'); hideLoading(); }
+                });
             }
-        });
-    }
 
-    // Load Nhan Vien Content
-    function loadEmployeeContent(url) {
-        showLoading();
-        showSection('employees');
-        $.ajax({
-            url: url,
-            method: 'GET',
-            headers: { 'X-Requested-With': 'XMLHttpRequest' },
-            success: function(data) {
-                $('#employeeContent').html(data);
-                hideLoading();
-            },
-            error: function() {
-                $('#employeeContent').html('<div class="alert alert-danger">Lỗi tải dữ liệu nhân viên</div>');
-                hideLoading();
+            // 3. Load Nhân viên
+            function loadEmployeeContent(url) {
+                showLoading(); showSection('employees');
+                $.ajax({
+                    url: url, method: 'GET', headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    success: function (data) { $('#employeeContent').html(data); hideLoading(); },
+                    error: function () { $('#employeeContent').html('<div class="alert alert-danger">Lỗi tải nhân viên</div>'); hideLoading(); }
+                });
             }
-        });
-    }
 
-    // Cập nhật logic click submenu [cite: 342-344]
-    if (url.includes('/NhanVien/')) {
-        loadEmployeeContent(url);
-    }
+            // 4. Load Hóa đơn
+            function loadInvoiceContent(url) {
+                showLoading(); showSection('invoices');
+                $.ajax({
+                    url: url, method: 'GET', headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    success: function (data) { $('#invoiceContent').html(data); hideLoading(); },
+                    error: function () { $('#invoiceContent').html('<div class="alert alert-danger">Lỗi tải hóa đơn</div>'); hideLoading(); }
+                });
+            }
 
-    // Load Bệnh nhân
-     // Load Patient Content
-        function loadPatientsContent(url) {
-            showLoading();
-            // Trước đó, trong AdminIndex bạn cần tạo 1 div có id="patients" giống id="employees"
-            // Nếu chưa có, hãy thêm <div id="patients" class="content-section">...</div> vào phần Main Content
-            showSection('patients'); 
-        }
+            // 5. Load Thuốc (Mặc định cho các link data-url khác)
+            function loadThuocContent(url) {
+                 // Logic đặc biệt: Mở Panel nếu là Edit/Details
+                 if (url.includes('/Details/')) { openPanel(url, 'Chi tiết', 'fas fa-info-circle'); return; }
+                 if (url.includes('/Edit/')) { openPanel(url, 'Chỉnh sửa', 'fas fa-edit'); return; }
 
-        // ==================== WAREHOUSE CONTENT LOADER ====================
-        // Hàm load riêng cho nội dung Kho - ĐÃ SỬA
-        function loadWarehouseContent(url) {
-            console.log('🔵 Loading warehouse from:', url); // Debug log
+                 showLoading(); showSection('medicines');
+                 $.ajax({
+                    url: url, method: 'GET', headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    success: function (data) { $('#medicineContent').html(data); hideLoading(); },
+                    error: function () { $('#medicineContent').html('<div class="alert alert-danger">Lỗi tải dữ liệu thuốc</div>'); hideLoading(); }
+                 });
+            }
 
-            showLoading();
-            showSection('warehouse'); // Chuyển sang section warehouse
+            // ==================== BHYT FUNCTIONS (QUAN TRỌNG) ====================
+            // Được gọi từ View _DSTheBHYT.cshtml và _EditBenhNhan.cshtml
 
-            $.ajax({
-                url: url,
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                success: function (data) {
-                    console.log('✅ Warehouse data loaded successfully'); // Debug log
-                    $('#warehouseContent').html(data);
-                    hideLoading();
-                },
-                error: function (xhr, status, error) {
-                    console.error('❌ Error loading warehouse:', error);
-                    console.error('Status:', status);
-                    console.error('Response:', xhr.responseText);
+            function searchBHYT() {
+                var val = $('#bhytSearch').val();
+                loadPatientsContent('/Admin/TheBHYT/_DSTheBHYT?search=' + encodeURIComponent(val));
+            }
 
-                    $('#warehouseContent').html(
-                        '<div class="alert alert-danger" style="margin: 20px;">' +
-                        '<h4><i class="fas fa-exclamation-triangle"></i> Lỗi tải dữ liệu kho</h4>' +
-                        '<p><strong>Chi tiết lỗi:</strong> ' + error + '</p>' +
-                        '<p><strong>Status:</strong> ' + status + '</p>' +
-                        '<p><strong>URL:</strong> ' + url + '</p>' +
-                        '<button class="btn btn-primary" onclick="loadWarehouseContent(\'' + url + '\')">Thử lại</button>' +
-                        '</div>'
-                    );
-                    hideLoading();
-                }
-            });
-        }
+            function viewBHYTDetail(id) {
+                $.get('/Admin/TheBHYT/Detail/' + id, function(data) {
+                    // Đổ data vào Common Modal
+                    $('#commonModalBody').html(data);
+                    $('#commonModalTitle').html('<i class="fas fa-info-circle me-2"></i>Chi tiết thẻ BHYT');
+                    new bootstrap.Modal(document.getElementById('commonModal')).show();
+                }).fail(function() {
+                    alert('Lỗi: Không thể tải thông tin chi tiết. Kiểm tra Controller.');
+                });
+            }
 
-        // Cập nhật logic điều hướng
-        if (url.includes('/BenhNhan/')) {
-            loadPatientsContent(url);
-        }
+            // Hàm nhảy từ Form Sửa BN sang Tra cứu BHYT
+            function jumpToBHYT() {
+                var soThe = $('#txtSoTheBHYT_Edit').val();
+                if(!soThe) return;
+                $('#commonModal').modal('hide'); // Đóng form sửa
+                loadPatientsContent('/Admin/TheBHYT/_DSTheBHYT?search=' + encodeURIComponent(soThe));
+            }
 
-    // Loading functions
-    function showLoading() {
-        $('#loadingOverlay').addClass('show');
-    }
+            // ==================== DOCUMENT READY (INIT) ====================
+            $(document).ready(function () {
+                // 1. Load Dashboard mặc định
+                $.ajax({
+                    url: '/Admin/Dashboard', method: 'GET',
+                    success: function(data) { $('#dashboard').html(data); },
+                    error: function() { $('#dashboard').html('<div class="p-5 text-center">Lỗi tải Dashboard</div>'); }
+                });
 
-            showLoading();
-            showSection('patients');
+                // 2. Xử lý Accordion Menu
+                $('.menu-group-header').click(function () {
+                    const $header = $(this);
+                    const $submenu = $header.parent().find('.menu-submenu');
 
-            $.ajax({
-                url: url,
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                success: function (data) {
-                    console.log('✅ Patient data loaded successfully');
-                    $('#patientContent').html(data);
-                    hideLoading();
-                },
-                error: function (xhr, status, error) {
-                    console.error('❌ Error loading patient:', error);
-                    $('#patientContent').html(
-                        '<div class="alert alert-danger" style="margin: 20px;">Lỗi tải dữ liệu bệnh nhân: ' + error + '</div>'
-                    );
-                    hideLoading();
-                }
-            });
-        }
-
-        // ==================== MENU & NAVIGATION ====================
-        $(document).ready(function () {
-            // Load dashboard khi trang được tải
-            loadDashboard();
-
-            // Menu accordion functionality
-            $('.menu-group-header').click(function () {
-                const $header = $(this);
-                const $group = $header.parent();
-                const $submenu = $group.find('.menu-submenu');
-                const section = $header.data('section');
-
-                // Toggle submenu nếu có
-                if ($submenu.length > 0) {
-                    // Close other submenus
-                    $('.menu-submenu').not($submenu).removeClass('show');
-                    $('.menu-group-header').not($header).removeClass('active');
-
-                    // Toggle current submenu
-                    $submenu.toggleClass('show');
-                    $header.toggleClass('active');
-                } else {
-                    // If no submenu, it's a direct link (like Dashboard)
-                    $('.menu-group-header').removeClass('active');
-                    $('.submenu-item').removeClass('active');
-                    $header.addClass('active');
-
-                    // Show corresponding section
-                    if (section === 'dashboard') {
-                        loadDashboard();
-                    }
-                }
-            });
-
-            // Submenu item click - ĐÃ SỬA
-            $('.submenu-item').click(function (e) {
-                e.preventDefault();
-
-                const $item = $(this);
-                const url = $item.attr('data-url'); // Dùng .attr() không phải .data()
-
-                console.log('📌 Menu clicked, URL:', url); // Debug log
-
-                // Update active states
-                $('.submenu-item').removeClass('active');
-                $item.addClass('active');
-
-                // Ensure parent section is active
-                const $header = $item.closest('.menu-group').find('.menu-group-header');
-                $('.menu-group-header').removeClass('active');
-                $header.addClass('active');
-
-                // Load content based on URL
-                if (url) {
-                    if (url.includes('/BenhNhan/')) {
-                        loadPatientContent(url);
-                    } else if (url.includes('/Thuoc/')) {
-                        loadThuocContent(url);
-                    } else if (url.includes('/Kho/')) {
-                        // Load warehouse content
-                        loadWarehouseContent(url);
+                    if ($submenu.length > 0) {
+                        $('.menu-submenu').not($submenu).removeClass('show');
+                        $('.menu-group-header').not($header).removeClass('active');
+                        $submenu.toggleClass('show');
+                        $header.toggleClass('active');
                     } else {
-                        // Default load
-                        loadThuocContent(url);
+                        // Link trực tiếp (Ví dụ Dashboard)
+                        $('.menu-group-header').removeClass('active');
+                        $('.submenu-item').removeClass('active');
+                        $header.addClass('active');
+                        showSection($header.data('section'));
                     }
-                } else {
-                    console.warn('⚠️ No URL found for this menu item');
-                }
+                });
+
+                // 3. Xử lý Click Submenu Item
+                $('.submenu-item').click(function (e) {
+                    // Chỉ xử lý UI Active state tại đây
+                    const $item = $(this);
+                    $('.submenu-item').removeClass('active');
+                    $item.addClass('active');
+                    $item.closest('.menu-group').find('.menu-group-header').addClass('active');
+
+                    // Lấy URL từ data-url (nếu có)
+                    const url = $item.attr('data-url');
+
+                    // Nếu có data-url thì gọi AJAX (Menu Thuốc, Kho, Hóa đơn)
+                    // Nếu KHÔNG có data-url (Menu Bệnh nhân dùng onclick="...") thì bỏ qua, để onclick tự chạy
+                    if (url) {
+                        e.preventDefault(); // Chặn link mặc định
+                        if (url.includes('/NhanVien/')) loadEmployeeContent(url);
+                        else if (url.includes('/HoaDon/')) loadInvoiceContent(url);
+                        else if (url.includes('/Kho/')) loadWarehouseContent(url);
+                        else loadThuocContent(url);
+                    }
+                });
+
+                // 4. Đóng Panel khi nhấn ESC
+                $(document).keydown(function (e) {
+                    if (e.key === 'Escape' && panelStack.length > 0) {
+                        closePanel(panelStack[panelStack.length - 1].level);
+                    }
+                });
             });
-
-            // Đóng panel khi nhấn ESC
-            $(document).keydown(function (e) {
-                if (e.key === 'Escape' && panelStack.length > 0) {
-                    closePanel(panelStack[panelStack.length - 1].level);
-                }
-            });
-        });
-
-        // Helper function to show section
-        function showSection(sectionId) {
-            console.log('🔄 Switching to section:', sectionId); // Debug log
-            $('.content-section').removeClass('active');
-            $('#' + sectionId).addClass('active');
-        }
-
-        // Load Dashboard
-        function loadDashboard() {
-            showLoading();
-            showSection('dashboard');
-            closeAllPanels(); // Đóng tất cả panels khi chuyển về dashboard
-
-            $.ajax({
-                url: '/Admin/Dashboard',
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                success: function (data) {
-                    $('#dashboard').html(data);
-                    hideLoading();
-
-                    // Re-initialize charts after loading dashboard
-                    setTimeout(initializeCharts, 100);
-                },
-                error: function (xhr, status, error) {
-                    console.error('Error loading dashboard:', error);
-                    $('#dashboard').html('<div class="alert alert-danger">Lỗi khi tải dashboard</div>');
-                    hideLoading();
-                }
-            });
-        }
-
-        // Loading functions
-        function showLoading() {
-            $('#loadingOverlay').addClass('show');
-        }
-
-        function hideLoading() {
-            $('#loadingOverlay').removeClass('show');
-        }
-
-        // Chart initialization
-        function initializeCharts() {
-            console.log('Charts initialized');
-        }
-    </script>
+        </script>
 }
