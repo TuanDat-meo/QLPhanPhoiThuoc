@@ -8,65 +8,539 @@
 }
 
 <style>
-    /* ==================== STYLES CƠ BẢN ==================== */
-    .admin-container { display: flex; gap: 25px; min-height: calc(100vh - 200px); padding: 20px; }
-    .sidebar { width: 260px; background: white; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 0; height: fit-content; max-height: calc(100vh - 140px); overflow-y: auto; position: sticky; top: 90px; }
-    .sidebar::-webkit-scrollbar { width: 5px; }
-    .sidebar::-webkit-scrollbar-track { background: #f1f1f1; }
-    .sidebar::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 10px; }
-    .sidebar-header { padding: 20px; border-bottom: 1px solid #e9ecef; background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%); border-radius: 12px 12px 0 0; color: white; }
-    .sidebar-title { font-size: 1.1rem; font-weight: 700; margin: 0; }
-    .sidebar-subtitle { font-size: 0.85rem; opacity: 0.9; margin-top: 3px; }
+     .admin-container {
+        display: flex;
+        gap: 25px;
+        min-height: calc(100vh - 200px);
+        padding: 20px;
+    }
 
-    /* Menu Styles */
-    .menu-accordion { padding: 10px 0; }
-    .menu-group { margin-bottom: 5px; }
-    .menu-group-header { padding: 12px 20px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.3s ease; border-left: 3px solid transparent; color: #495057; font-weight: 500; user-select: none; }
-    .menu-group-header:hover { background: #f8f9fa; color: #1e3a5f; border-left-color: #1e3a5f; }
-    .menu-group-header.active { background: linear-gradient(90deg, rgba(30,58,95,0.1) 0%, transparent 100%); color: #1e3a5f; border-left-color: #1e3a5f; font-weight: 600; }
-    .menu-header-content { display: flex; align-items: center; gap: 12px; flex: 1; }
-    .menu-header-content i { width: 22px; text-align: center; font-size: 1.1rem; }
-    .menu-arrow { transition: transform 0.3s ease; font-size: 0.85rem; color: #6c757d; }
-    .menu-group-header.active .menu-arrow { transform: rotate(90deg); color: #1e3a5f; }
-    .menu-submenu { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; background: #f8f9fa; }
-    .menu-submenu.show { max-height: 500px; }
-    .submenu-item { padding: 10px 20px 10px 54px; color: #6c757d; text-decoration: none; display: flex; align-items: center; gap: 10px; transition: all 0.2s ease; border-left: 3px solid transparent; font-size: 0.9rem; cursor: pointer; }
-    .submenu-item:hover { background: white; color: #1e3a5f; border-left-color: #38bdf8; text-decoration: none; padding-left: 58px; }
-    .submenu-item.active { background: white; color: #1e3a5f; border-left-color: #1e3a5f; font-weight: 600; }
-    .submenu-item i { font-size: 0.75rem; width: 12px; }
+    /* ==================== COMPACT SIDEBAR ==================== */
+    .sidebar {
+        width: 260px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        padding: 0;
+        height: fit-content;
+        max-height: calc(100vh - 140px);
+        overflow-y: auto;
+        position: sticky;
+        top: 90px;
+    }
 
-    /* Content Area */
-    .dashboard-content { flex: 1; min-width: 0; position: relative; }
-    .content-section { display: none; }
-    .content-section.active { display: block; animation: fadeIn 0.3s ease; }
+    .sidebar::-webkit-scrollbar {
+        width: 5px;
+    }
 
-    /* [QUAN TRỌNG] Dùng @@ để tránh lỗi Razor khi viết CSS Keyframes */
-    @@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .sidebar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
 
-    /* Panel System */
-    .panel-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 1000; display: none; animation: fadeInOverlay 0.3s ease; }
-    .panel-overlay.show { display: block; }
-    @@keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
+    .sidebar::-webkit-scrollbar-thumb {
+        background: #1e3a5f;
+        border-radius: 10px;
+    }
 
-    .panel-container { position: fixed; top: 0; left: 0; right: 0; bottom: 0; margin: auto; width: 85%; max-width: 1200px; height: 90vh; background: white; box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); z-index: 1001; display: flex; flex-direction: column; }
-    .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%); color: white; border-bottom: 3px solid #38bdf8; }
-    .panel-title { display: flex; align-items: center; gap: 15px; margin: 0; font-size: 1.5rem; font-weight: 700; }
-    .panel-close-btn { background: rgba(255, 255, 255, 0.2); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; font-size: 1.2rem; }
-    .panel-close-btn:hover { background: rgba(255, 255, 255, 0.3); transform: rotate(90deg); }
-    .panel-body { flex: 1; overflow-y: auto; padding: 10px; background: #f8f9fa; }
+    .sidebar-header {
+        padding: 20px;
+        border-bottom: 1px solid #e9ecef;
+        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
+        border-radius: 12px 12px 0 0;
+        color: white;
+    }
 
-    /* Common Styles */
-    .medicine-container { padding: 25px; background: #f8f9fa; min-height: calc(100vh - 200px); }
-    .page-header { background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%); color: white; padding: 25px 30px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(30, 58, 95, 0.3); }
+    .sidebar-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin: 0;
+    }
 
-    /* Loading */
-    .loading-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.9); z-index: 9999; justify-content: center; align-items: center; }
-    .loading-overlay.show { display: flex; }
-    .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #1e3a5f; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
-    @@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .sidebar-subtitle {
+        font-size: 0.85rem;
+        opacity: 0.9;
+        margin-top: 3px;
+    }
 
-    /* Media Query cũng cần dùng @@ */
-    @@media (max-width: 768px) { .admin-container { flex-direction: column; } .sidebar { width: 100%; position: relative; top: 0; } .panel-container { width: 100%; max-width: 100%; } }
+    /* Menu Accordion */
+    .menu-accordion {
+        padding: 10px 0;
+    }
+
+    .menu-group {
+        margin-bottom: 5px;
+    }
+
+    .menu-group-header {
+        padding: 12px 20px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+        color: #495057;
+        font-weight: 500;
+        user-select: none;
+    }
+
+    .menu-group-header:hover {
+        background: #f8f9fa;
+        color: #1e3a5f;
+        border-left-color: #1e3a5f;
+    }
+
+    .menu-group-header.active {
+        background: linear-gradient(90deg, rgba(30,58,95,0.1) 0%, transparent 100%);
+        color: #1e3a5f;
+        border-left-color: #1e3a5f;
+        font-weight: 600;
+    }
+
+    .menu-header-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+    }
+
+    .menu-header-content i {
+        width: 22px;
+        text-align: center;
+        font-size: 1.1rem;
+    }
+
+    .menu-arrow {
+        transition: transform 0.3s ease;
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    .menu-group-header.active .menu-arrow {
+        transform: rotate(90deg);
+        color: #1e3a5f;
+    }
+
+    /* Submenu */
+    .menu-submenu {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+        background: #f8f9fa;
+    }
+
+    .menu-submenu.show {
+        max-height: 500px;
+    }
+
+    .submenu-item {
+        padding: 10px 20px 10px 54px;
+        color: #6c757d;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.2s ease;
+        border-left: 3px solid transparent;
+        font-size: 0.9rem;
+        cursor: pointer;
+    }
+
+    .submenu-item:hover {
+        background: white;
+        color: #1e3a5f;
+        border-left-color: #38bdf8;
+        text-decoration: none;
+        padding-left: 58px;
+    }
+
+    .submenu-item.active {
+        background: white;
+        color: #1e3a5f;
+        border-left-color: #1e3a5f;
+        font-weight: 600;
+    }
+
+    .submenu-item i {
+        font-size: 0.75rem;
+        width: 12px;
+    }
+
+    .menu-badge {
+        background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+        color: white;
+        font-size: 0.7rem;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-weight: 600;
+        margin-left: auto;
+    }
+
+    /* ==================== MAIN CONTENT AREA ==================== */
+    .dashboard-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* Content Section */
+    .content-section {
+        display: none;
+    }
+
+    .content-section.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Loading Spinner */
+    .loading-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.9);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .loading-overlay.show {
+        display: flex;
+    }
+
+    .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #1e3a5f;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* CSS từ Index.cshtml cho phần quản lý thuốc */
+    .medicine-container {
+        padding: 25px;
+        background: #f8f9fa;
+        min-height: calc(100vh - 200px);
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
+        color: white;
+        padding: 25px 30px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(30, 58, 95, 0.3);
+    }
+
+    .filter-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .filter-row {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+    }
+
+    .filter-group {
+        flex: 1;
+        min-width: 200px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .filter-group label {
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .filter-group input,
+    .filter-group select {
+        padding: 10px 14px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        transition: all 0.3s;
+    }
+
+    .filter-group input:focus,
+    .filter-group select:focus {
+        border-color: #1e3a5f;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+    }
+
+    .btn-filter,
+    .btn-reset {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.95rem;
+    }
+
+    .btn-filter {
+        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
+        color: white;
+    }
+
+    .btn-filter:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
+    }
+
+    .btn-reset {
+        background: #6c757d;
+        color: white;
+    }
+
+    .btn-reset:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+    }
+
+    .action-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .result-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+
+    .btn-add {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s;
+    }
+
+    .btn-add:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(17, 153, 142, 0.3);
+        text-decoration: none;
+        color: white;
+    }
+
+    .medicine-table-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+
+    .medicine-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .medicine-table thead {
+        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
+        color: white;
+    }
+
+    .medicine-table th {
+        padding: 16px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .medicine-table th.sortable {
+        cursor: pointer;
+        user-select: none;
+        position: relative;
+        padding-right: 30px;
+    }
+
+    .medicine-table th.sortable:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .medicine-table th.sortable::after {
+        content: "⇅";
+        position: absolute;
+        right: 10px;
+        opacity: 0.5;
+    }
+
+    .medicine-table th.sorted-asc::after {
+        content: "↑";
+        opacity: 1;
+    }
+
+    .medicine-table th.sorted-desc::after {
+        content: "↓";
+        opacity: 1;
+    }
+
+    .medicine-table tbody tr {
+        border-bottom: 1px solid #e9ecef;
+        transition: background 0.2s;
+    }
+
+    .medicine-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+
+    .medicine-table td {
+        padding: 14px 16px;
+        font-size: 0.95rem;
+    }
+
+    .price-cell {
+        font-weight: 600;
+        color: #11998e;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .badge-success {
+        background: rgba(17, 153, 142, 0.15);
+        color: #11998e;
+        border: 1px solid rgba(17, 153, 142, 0.3);
+    }
+
+    .badge-danger {
+        background: rgba(251, 113, 133, 0.15);
+        color: #f43f5e;
+        border: 1px solid rgba(251, 113, 133, 0.3);
+    }
+
+    .btn-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: all 0.3s;
+        margin: 0 3px;
+    }
+
+    .btn-view {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-view:hover {
+        background: #5568d3;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-edit {
+        background: #f59e0b;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: #d97706;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
+    }
+
+    .pagination-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .pagination-info {
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+
+    .pagination {
+        display: flex;
+        gap: 5px;
+    }
+
+    .pagination a,
+    .pagination span {
+        min-width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        color: #495057;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s;
+        border: 1px solid #dee2e6;
+        background: white;
+    }
+
+    .pagination a:hover {
+        background: #1e3a5f;
+        color: white;
+        border-color: #1e3a5f;
+        transform: translateY(-2px);
+    }
+
+    .pagination span.active {
+        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
+        color: white;
+        border-color: transparent;
+    }
 </style>
 
 <!-- Loading Overlay -->
