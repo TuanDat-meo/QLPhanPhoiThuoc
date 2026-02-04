@@ -850,6 +850,7 @@
             // Load content nếu có URL
             if (url) {
                 loadThuocContent(url);
+                loadPatientsContent(url);
             }
         });
     });
@@ -908,6 +909,28 @@
             }
         });
     }
+
+        function loadPatientsContent(url) {
+            showLoading();
+                showSection('patients');
+
+            $.ajax({
+                url: url,
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function(data) {
+                    $('#patientsContent').html(data);
+                    hideLoading();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading content:', error);
+                    $('#patientsContent').html('<div class="alert alert-danger">Lỗi khi tải nội dung: ' + error + '</div>');
+                    hideLoading();
+                }
+            });
+        }
 
     // Loading functions
     function showLoading() {
