@@ -593,7 +593,7 @@ namespace QLPhanPhoiThuoc.Controllers
                     MaDonThuoc = model.MaDonThuoc,
                     MaBenhNhan = donThuoc.MaBenhNhan,
                     MaKho = kho.MaKho,
-                    NgayCapPhat = DateTime.Now,
+                    NgayCap = DateTime.Now,
                     NhanVienCap = maNhanVien,
                     TongTien = 0, // Sẽ cập nhật sau
                     GhiChu = model.GhiChu,
@@ -607,7 +607,7 @@ namespace QLPhanPhoiThuoc.Controllers
                 foreach (var chiTiet in donThuoc.ChiTietDonThuocs)
                 {
                     var thuoc = chiTiet.Thuoc;
-                    var donGia = thuoc.GiaXuat.HasValue ? thuoc.GiaXuat.Value : 0m;
+                    var donGia = thuoc.GiaXuat;
                     var thanhTien = chiTiet.SoLuong * donGia;
                     tongTien += thanhTien;
 
@@ -615,10 +615,12 @@ namespace QLPhanPhoiThuoc.Controllers
 
                     // Lấy danh sách lô theo FIFO (lô cũ nhất trước)
                     // Tính số lượng còn lại của mỗi lô = Nhập - Cấp
-                    var loThuocIds = await _benhVienContext.LoThuocs
-                        .Where(l => l.MaThuoc == chiTiet.MaThuoc && l.TrangThai == "ConHang")
-                        .OrderBy(l => l.NgayNhap)
-                        .Select(l => l.MaLo)
+                    var loThuocIds = await _benhVienContext.ChiTietPhieuNhaps
+                        .Include(ct => ct.PhieuNhap)
+                        .Where(ct => ct.LoThuoc.MaThuoc == chiTiet.MaThuoc && ct.LoThuoc.TrangThai == "ConHang")
+                        .OrderBy(ct => ct.PhieuNhap.NgayNhap) // Sắp xếp theo ngày nhập của phiếu nhập
+                        .Select(ct => ct.MaLo)
+                        .Distinct() // Tránh lấy trùng mã lô nếu một lô có nhiều dòng chi tiết
                         .ToListAsync();
 
                     foreach (var maLo in loThuocIds)
@@ -763,8 +765,8 @@ namespace QLPhanPhoiThuoc.Controllers
                         ct.MaThuoc,
                         TenThuoc = ct.Thuoc.TenThuoc,
                         ct.SoLuong,
-                        DonGia = ct.Thuoc.GiaXuat.HasValue ? ct.Thuoc.GiaXuat.Value : 0m,
-                        ThanhTien = ct.SoLuong * (ct.Thuoc.GiaXuat.HasValue ? ct.Thuoc.GiaXuat.Value : 0m)
+                        DonGia = ct.Thuoc.GiaXuat, // SỬA: Bỏ .HasValue và .Value
+                        ThanhTien = ct.SoLuong * ct.Thuoc.GiaXuat
                     }).ToList()
                 };
 
