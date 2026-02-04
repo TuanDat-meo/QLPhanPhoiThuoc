@@ -459,10 +459,91 @@ namespace QLPhanPhoiThuoc.Controllers.Admin
         {
             return _context.Thuocs.Any(e => e.MaThuoc == id);
         }// ==================== CHI TIẾT LÔ THUỐC ====================
+        [HttpGet("LoThuoc")]
+        public async Task<IActionResult> LoThuoc(string search = "", string filter = "all",
+                                         string kho = "", string trangThai = "",
+                                         int page = 1, int pageSize = 20)
+        {
+            var query = _context.LoThuocs
+                .Include(l => l.Thuoc)
+                .Include(l => l.Kho)
+                .AsQueryable();
 
-        /// <summary>
-        /// GET: Admin/Thuoc/LoThuocDetail/{id} - Chi tiết một lô thuốc
-        /// </summary>
+            var now = DateTime.Now;
+
+            // Search filter
+            if (!string.IsNullOrEmpty(search))
+            {
+                search = search.Trim();
+                query = query.Where(l => l.MaLo.Contains(search) ||
+                                         l.SoLo.Contains(search) ||
+                                         l.Thuoc.TenThuoc.Contains(search) ||
+                                         l.Thuoc.MaThuoc.Contains(search));
+            }
+
+            // Quick filter
+            switch (filter)
+            {
+                case "active":
+                    query = query.Where(l => l.TrangThai == "ConHang");
+                    break;
+                case "expiring":
+                    query = query.Where(l => l.HanSuDung <= now.AddDays(30) &&
+                                             l.HanSuDung >= now &&
+                                             l.TrangThai == "ConHang");
+                    break;
+                case "expired":
+                    query = query.Where(l => l.HanSuDung < now);
+                    break;
+                case "outofstock":
+                    query = query.Where(l => l.SoLuongCon == 0);
+                    break;
+            }
+
+            // Kho filter
+            if (!string.IsNullOrEmpty(kho))
+            {
+                query = query.Where(l => l.MaKho == kho);
+            }
+
+            // Trạng thái filter
+            if (!string.IsNullOrEmpty(trangThai))
+            {
+                query = query.Where(l => l.TrangThai == trangThai);
+            }
+
+            // Sắp xếp mặc định: ưu tiên lô sắp hết hạn
+            query = query.OrderBy(l => l.HanSuDung).ThenBy(l => l.Thuoc.TenThuoc);
+
+            var totalItems = await query.CountAsync();
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            // Danh sách kho cho dropdown
+            ViewBag.Khos = await _context.Khos
+                .OrderBy(k => k.TenKho)
+                .ToListAsync();
+
+            // Pass filter values to view
+            ViewBag.Search = search;
+            ViewBag.Filter = filter;
+            ViewBag.KhoSelected = kho;
+            ViewBag.TrangThaiSelected = trangThai;
+            ViewBag.CurrentPage = page;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            ViewBag.TotalItems = totalItems;
+            ViewBag.TenNhanVien = User.FindFirstValue("TenNhanVien") ?? "Admin";
+
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("_TonKho", items);
+            }
+
+            return View("_TonKho", items);
+        }
         [HttpGet("LoThuocDetail/{id}")]
         public async Task<IActionResult> LoThuocDetail(string id)
         {
@@ -477,127 +558,141 @@ namespace QLPhanPhoiThuoc.Controllers.Admin
 
             ViewBag.TenNhanVien = User.FindFirstValue("TenNhanVien") ?? "Admin";
 
-            // Nếu là AJAX request, trả về PartialView
-            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-            {
-                return PartialView("_TonKhoDetail", loThuoc);
-            }
-
-            return View("_TonKhoDetail", loThuoc);
+            return PartialView("_TonKhoDetail", loThuoc);
         }
 
         // ==================== XUẤT BÁO CÁO TỒN KHO ====================
-
-        /// <summary>
-        /// GET: Admin/Thuoc/ExportTonKho - Xuất Excel tồn kho
-        /// </summary>
         [HttpGet("ExportTonKho")]
-        public async Task<IActionResult> ExportTonKho(string search = "", string filter = "all")
+        public async Task<IActionResult> ExportTonKho(string search = "", string filter = "all",
+                                              string kho = "", string trangThai = "")
         {
-            // Join với ChiTietPhieuNhap và PhieuNhap để lấy NgayNhap
-            var query = from loThuoc in _context.LoThuocs.Include(l => l.Thuoc).Include(l => l.Kho)
-                        join chiTiet in _context.ChiTietPhieuNhaps on loThuoc.MaLo equals chiTiet.MaLo into chiTietGroup
-                        from chiTiet in chiTietGroup.DefaultIfEmpty()
-                        join phieuNhap in _context.PhieuNhaps on chiTiet.MaPhieuNhap equals phieuNhap.MaPhieuNhap into phieuNhapGroup
-                        from phieuNhap in phieuNhapGroup.DefaultIfEmpty()
-                        select new
-                        {
-                            LoThuoc = loThuoc,
-                            NgayNhap = phieuNhap != null ? phieuNhap.NgayNhap : (DateTime?)null
-                        };
+            var query = _context.LoThuocs
+                .Include(l => l.Thuoc)
+                .Include(l => l.Kho)
+                .AsQueryable();
 
-            // Search filter
+            var now = DateTime.Now;
+
+            // Apply same filters as LoThuoc action
             if (!string.IsNullOrEmpty(search))
             {
                 search = search.Trim();
-                query = query.Where(l => l.LoThuoc.SoLo.Contains(search) ||
-                                        l.LoThuoc.Thuoc.TenThuoc.Contains(search) ||
-                                        l.LoThuoc.MaLo.Contains(search) ||
-                                        l.LoThuoc.Kho.TenKho.Contains(search));
+                query = query.Where(l => l.MaLo.Contains(search) ||
+                                         l.SoLo.Contains(search) ||
+                                         l.Thuoc.TenThuoc.Contains(search) ||
+                                         l.Thuoc.MaThuoc.Contains(search));
             }
 
-            // Status filter
-            var now = DateTime.Now;
-            query = filter switch
+            switch (filter)
             {
-                "expiring" => query.Where(l => l.LoThuoc.HanSuDung <= now.AddDays(30) &&
-                                              l.LoThuoc.HanSuDung >= now &&
-                                              l.LoThuoc.TrangThai == "ConHang"),
-                "expired" => query.Where(l => l.LoThuoc.HanSuDung < now),
-                "active" => query.Where(l => l.LoThuoc.TrangThai == "ConHang"),
-                "outofstock" => query.Where(l => l.LoThuoc.SoLuongCon == 0),
-                _ => query
-            };
+                case "active":
+                    query = query.Where(l => l.TrangThai == "ConHang");
+                    break;
+                case "expiring":
+                    query = query.Where(l => l.HanSuDung <= now.AddDays(30) &&
+                                             l.HanSuDung >= now &&
+                                             l.TrangThai == "ConHang");
+                    break;
+                case "expired":
+                    query = query.Where(l => l.HanSuDung < now);
+                    break;
+                case "outofstock":
+                    query = query.Where(l => l.SoLuongCon == 0);
+                    break;
+            }
+
+            if (!string.IsNullOrEmpty(kho))
+            {
+                query = query.Where(l => l.MaKho == kho);
+            }
+
+            if (!string.IsNullOrEmpty(trangThai))
+            {
+                query = query.Where(l => l.TrangThai == trangThai);
+            }
 
             var data = await query
-                .OrderBy(l => l.LoThuoc.HanSuDung)
+                .OrderBy(l => l.HanSuDung)
+                .Select(l => new
+                {
+                    LoThuoc = l,
+                    TenThuoc = l.Thuoc.TenThuoc,
+                    TenKho = l.Kho.TenKho,
+                    DonViTinh = l.Thuoc.DonViTinh,
+                    NhaSanXuat = l.Thuoc.NhaSanXuat,
+                    DaysUntilExpiry = (l.HanSuDung - now).Days
+                })
                 .ToListAsync();
 
             // Tạo file Excel
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
             using var package = new ExcelPackage();
-            var worksheet = package.Workbook.Worksheets.Add("Tồn Kho");
+            var worksheet = package.Workbook.Worksheets.Add("Tồn kho");
 
             // Header
-            worksheet.Cells["A1"].Value = "BÁO CÁO TỒN KHO THUỐC";
-            worksheet.Cells["A1:K1"].Merge = true;
-            worksheet.Cells["A1"].Style.Font.Size = 16;
-            worksheet.Cells["A1"].Style.Font.Bold = true;
-            worksheet.Cells["A1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            worksheet.Cells[1, 1].Value = "BÁO CÁO TỒN KHO THUỐC";
+            worksheet.Cells[1, 1, 1, 11].Merge = true;
+            worksheet.Cells[1, 1].Style.Font.Bold = true;
+            worksheet.Cells[1, 1].Style.Font.Size = 16;
+            worksheet.Cells[1, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
-            worksheet.Cells["A2"].Value = $"Ngày xuất: {DateTime.Now:dd/MM/yyyy HH:mm}";
-            worksheet.Cells["A2:K2"].Merge = true;
-            worksheet.Cells["A2"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            worksheet.Cells[2, 1].Value = $"Ngày xuất: {DateTime.Now:dd/MM/yyyy HH:mm}";
+            worksheet.Cells[2, 1, 2, 11].Merge = true;
+            worksheet.Cells[2, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
             // Column headers
-            var headers = new[] {
-                "STT", "Mã lô", "Số lô", "Tên thuốc", "Hoạt chất",
-                "Kho", "Ngày nhập", "Hạn SD", "SL nhập", "SL còn", "Trạng thái"
-            };
+            var headerRow = 4;
+            worksheet.Cells[headerRow, 1].Value = "STT";
+            worksheet.Cells[headerRow, 2].Value = "Mã lô";
+            worksheet.Cells[headerRow, 3].Value = "Số lô";
+            worksheet.Cells[headerRow, 4].Value = "Tên thuốc";
+            worksheet.Cells[headerRow, 5].Value = "Kho";
+            worksheet.Cells[headerRow, 6].Value = "NSX";
+            worksheet.Cells[headerRow, 7].Value = "Hạn SD";
+            worksheet.Cells[headerRow, 8].Value = "SL nhập";
+            worksheet.Cells[headerRow, 9].Value = "SL còn";
+            worksheet.Cells[headerRow, 10].Value = "ĐVT";
+            worksheet.Cells[headerRow, 11].Value = "Trạng thái";
 
-            for (int i = 0; i < headers.Length; i++)
+            // Style header
+            using (var range = worksheet.Cells[headerRow, 1, headerRow, 11])
             {
-                worksheet.Cells[4, i + 1].Value = headers[i];
-                worksheet.Cells[4, i + 1].Style.Font.Bold = true;
-                worksheet.Cells[4, i + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                worksheet.Cells[4, i + 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightBlue);
-                worksheet.Cells[4, i + 1].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                range.Style.Font.Bold = true;
+                range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(79, 129, 189));
+                range.Style.Font.Color.SetColor(System.Drawing.Color.White);
+                range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                range.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                range.Style.Border.BorderAround(ExcelBorderStyle.Thick);
             }
 
             // Data rows
-            int row = 5;
-            int stt = 1;
+            var row = headerRow + 1;
+            var stt = 1;
             foreach (var item in data)
             {
-                var daysUntilExpiry = (item.LoThuoc.HanSuDung - now).Days;
-                var isExpired = item.LoThuoc.HanSuDung < now;
-                var isExpiring = !isExpired && daysUntilExpiry <= 30;
-
-                var status = isExpired ? "Đã hết hạn" :
-                            (isExpiring ? $"Sắp hết hạn ({daysUntilExpiry} ngày)" :
-                            (item.LoThuoc.SoLuongCon == 0 ? "Hết hàng" : "Bình thường"));
-
                 worksheet.Cells[row, 1].Value = stt++;
                 worksheet.Cells[row, 2].Value = item.LoThuoc.MaLo;
                 worksheet.Cells[row, 3].Value = item.LoThuoc.SoLo;
-                worksheet.Cells[row, 4].Value = item.LoThuoc.Thuoc.TenThuoc;
-                worksheet.Cells[row, 5].Value = item.LoThuoc.Thuoc.HoatChat ?? "";
-                worksheet.Cells[row, 6].Value = item.LoThuoc.Kho.TenKho;
-                worksheet.Cells[row, 7].Value = item.NgayNhap.HasValue ? item.NgayNhap.Value.ToString("dd/MM/yyyy") : "N/A";
-                worksheet.Cells[row, 8].Value = item.LoThuoc.HanSuDung.ToString("dd/MM/yyyy");
-                worksheet.Cells[row, 9].Value = item.LoThuoc.SoLuongNhap;
-                worksheet.Cells[row, 10].Value = item.LoThuoc.SoLuongCon;
-                worksheet.Cells[row, 11].Value = status;
+                worksheet.Cells[row, 4].Value = item.TenThuoc;
+                worksheet.Cells[row, 5].Value = item.TenKho;
+                worksheet.Cells[row, 6].Value = item.LoThuoc.NgaySanXuat?.ToString("dd/MM/yyyy") ?? "";
+                worksheet.Cells[row, 7].Value = item.LoThuoc.HanSuDung.ToString("dd/MM/yyyy");
+                worksheet.Cells[row, 8].Value = item.LoThuoc.SoLuongNhap;
+                worksheet.Cells[row, 9].Value = item.LoThuoc.SoLuongCon;
+                worksheet.Cells[row, 10].Value = item.DonViTinh;
+                worksheet.Cells[row, 11].Value = item.LoThuoc.TrangThai;
 
-                // Highlight expired/expiring rows
-                if (isExpired)
+                // Highlight rows
+                if (item.LoThuoc.HanSuDung < now)
                 {
+                    // Expired - Red
                     worksheet.Cells[row, 1, row, 11].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     worksheet.Cells[row, 1, row, 11].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightPink);
                 }
-                else if (isExpiring)
+                else if (item.DaysUntilExpiry <= 30)
                 {
+                    // Expiring soon - Yellow
                     worksheet.Cells[row, 1, row, 11].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     worksheet.Cells[row, 1, row, 11].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightYellow);
                 }
@@ -610,6 +705,7 @@ namespace QLPhanPhoiThuoc.Controllers.Admin
 
                 row++;
             }
+
             // Auto-fit columns
             worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
 
@@ -629,10 +725,6 @@ namespace QLPhanPhoiThuoc.Controllers.Admin
             var fileName = $"TonKho_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
             return File(package.GetAsByteArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
-
-        /// <summary>
-        /// GET: Admin/Thuoc/ExportSelectedLots - Xuất Excel các lô được chọn
-        /// </summary>
         [HttpGet("ExportSelectedLots")]
         public async Task<IActionResult> ExportSelectedLots(string ids)
         {
@@ -640,28 +732,200 @@ namespace QLPhanPhoiThuoc.Controllers.Admin
                 return BadRequest("Không có lô nào được chọn");
 
             var lotIds = ids.Split(',').ToList();
+            var now = DateTime.Now;
+
             var data = await _context.LoThuocs
                 .Include(l => l.Thuoc)
                 .Include(l => l.Kho)
                 .Where(l => lotIds.Contains(l.MaLo))
                 .OrderBy(l => l.HanSuDung)
+                .Select(l => new
+                {
+                    LoThuoc = l,
+                    TenThuoc = l.Thuoc.TenThuoc,
+                    TenKho = l.Kho.TenKho,
+                    DonViTinh = l.Thuoc.DonViTinh,
+                    DaysUntilExpiry = (l.HanSuDung - now).Days
+                })
                 .ToListAsync();
 
             if (!data.Any())
                 return NotFound("Không tìm thấy lô thuốc");
 
-            // Create Excel file (similar to ExportTonKho)
+            // Create Excel file (tương tự ExportTonKho)
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using var package = new ExcelPackage();
             var worksheet = package.Workbook.Worksheets.Add("Lô thuốc đã chọn");
 
-            // Similar Excel generation code...
-            // (Code tương tự như ExportTonKho nhưng chỉ với các lô được chọn)
+            // Header
+            worksheet.Cells[1, 1].Value = "LÔ THUỐC ĐÃ CHỌN";
+            worksheet.Cells[1, 1, 1, 11].Merge = true;
+            worksheet.Cells[1, 1].Style.Font.Bold = true;
+            worksheet.Cells[1, 1].Style.Font.Size = 16;
+            worksheet.Cells[1, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            worksheet.Cells[2, 1].Value = $"Ngày xuất: {DateTime.Now:dd/MM/yyyy HH:mm}";
+            worksheet.Cells[2, 1, 2, 11].Merge = true;
+            worksheet.Cells[2, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            // Column headers
+            var headerRow = 4;
+            worksheet.Cells[headerRow, 1].Value = "STT";
+            worksheet.Cells[headerRow, 2].Value = "Mã lô";
+            worksheet.Cells[headerRow, 3].Value = "Số lô";
+            worksheet.Cells[headerRow, 4].Value = "Tên thuốc";
+            worksheet.Cells[headerRow, 5].Value = "Kho";
+            worksheet.Cells[headerRow, 6].Value = "NSX";
+            worksheet.Cells[headerRow, 7].Value = "Hạn SD";
+            worksheet.Cells[headerRow, 8].Value = "SL nhập";
+            worksheet.Cells[headerRow, 9].Value = "SL còn";
+            worksheet.Cells[headerRow, 10].Value = "ĐVT";
+            worksheet.Cells[headerRow, 11].Value = "Trạng thái";
+
+            // Style header
+            using (var range = worksheet.Cells[headerRow, 1, headerRow, 11])
+            {
+                range.Style.Font.Bold = true;
+                range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.FromArgb(79, 129, 189));
+                range.Style.Font.Color.SetColor(System.Drawing.Color.White);
+                range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                range.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            }
+
+            // Data rows
+            var row = headerRow + 1;
+            var stt = 1;
+            foreach (var item in data)
+            {
+                worksheet.Cells[row, 1].Value = stt++;
+                worksheet.Cells[row, 2].Value = item.LoThuoc.MaLo;
+                worksheet.Cells[row, 3].Value = item.LoThuoc.SoLo;
+                worksheet.Cells[row, 4].Value = item.TenThuoc;
+                worksheet.Cells[row, 5].Value = item.TenKho;
+                worksheet.Cells[row, 6].Value = item.LoThuoc.NgaySanXuat?.ToString("dd/MM/yyyy") ?? "";
+                worksheet.Cells[row, 7].Value = item.LoThuoc.HanSuDung.ToString("dd/MM/yyyy");
+                worksheet.Cells[row, 8].Value = item.LoThuoc.SoLuongNhap;
+                worksheet.Cells[row, 9].Value = item.LoThuoc.SoLuongCon;
+                worksheet.Cells[row, 10].Value = item.DonViTinh;
+                worksheet.Cells[row, 11].Value = item.LoThuoc.TrangThai;
+
+                // Highlight rows
+                if (item.LoThuoc.HanSuDung < now)
+                {
+                    worksheet.Cells[row, 1, row, 11].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    worksheet.Cells[row, 1, row, 11].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightPink);
+                }
+                else if (item.DaysUntilExpiry <= 30)
+                {
+                    worksheet.Cells[row, 1, row, 11].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    worksheet.Cells[row, 1, row, 11].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightYellow);
+                }
+
+                for (int col = 1; col <= 11; col++)
+                {
+                    worksheet.Cells[row, col].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                }
+
+                row++;
+            }
+
+            worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
 
             var fileName = $"LoThuoc_DaChon_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
             return File(package.GetAsByteArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
+        [HttpGet("ExportLotDetail/{id}")]
+        public async Task<IActionResult> ExportLotDetail(string id)
+        {
+            var loThuoc = await _context.LoThuocs
+                .Include(l => l.Thuoc)
+                .Include(l => l.Kho)
+                .FirstOrDefaultAsync(l => l.MaLo == id);
 
+            if (loThuoc == null)
+                return NotFound();
+
+            var now = DateTime.Now;
+            var daysUntilExpiry = (loThuoc.HanSuDung - now).Days;
+
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            using var package = new ExcelPackage();
+            var worksheet = package.Workbook.Worksheets.Add("Chi tiết lô thuốc");
+
+            // Header
+            worksheet.Cells[1, 1].Value = "CHI TIẾT LÔ THUỐC";
+            worksheet.Cells[1, 1, 1, 2].Merge = true;
+            worksheet.Cells[1, 1].Style.Font.Bold = true;
+            worksheet.Cells[1, 1].Style.Font.Size = 16;
+            worksheet.Cells[1, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            var row = 3;
+
+            // Thông tin lô
+            worksheet.Cells[row, 1].Value = "THÔNG TIN LÔ HÀNG";
+            worksheet.Cells[row, 1].Style.Font.Bold = true;
+            worksheet.Cells[row, 1, row, 2].Merge = true;
+            worksheet.Cells[row, 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+            worksheet.Cells[row, 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+            row++;
+
+            worksheet.Cells[row, 1].Value = "Mã lô:";
+            worksheet.Cells[row, 2].Value = loThuoc.MaLo;
+            row++;
+
+            worksheet.Cells[row, 1].Value = "Số lô:";
+            worksheet.Cells[row, 2].Value = loThuoc.SoLo;
+            row++;
+
+            worksheet.Cells[row, 1].Value = "Tên thuốc:";
+            worksheet.Cells[row, 2].Value = loThuoc.Thuoc.TenThuoc;
+            row++;
+
+            worksheet.Cells[row, 1].Value = "Kho:";
+            worksheet.Cells[row, 2].Value = loThuoc.Kho.TenKho;
+            row++;
+
+            worksheet.Cells[row, 1].Value = "Ngày sản xuất:";
+            worksheet.Cells[row, 2].Value = loThuoc.NgaySanXuat?.ToString("dd/MM/yyyy") ?? "N/A";
+            row++;
+
+            worksheet.Cells[row, 1].Value = "Hạn sử dụng:";
+            worksheet.Cells[row, 2].Value = loThuoc.HanSuDung.ToString("dd/MM/yyyy");
+            row++;
+
+            worksheet.Cells[row, 1].Value = "Số lượng nhập:";
+            worksheet.Cells[row, 2].Value = $"{loThuoc.SoLuongNhap} {loThuoc.Thuoc.DonViTinh}";
+            row++;
+
+            worksheet.Cells[row, 1].Value = "Số lượng còn:";
+            worksheet.Cells[row, 2].Value = $"{loThuoc.SoLuongCon} {loThuoc.Thuoc.DonViTinh}";
+            row++;
+
+            worksheet.Cells[row, 1].Value = "Trạng thái:";
+            worksheet.Cells[row, 2].Value = loThuoc.TrangThai;
+            row++;
+
+            if (daysUntilExpiry < 0)
+            {
+                worksheet.Cells[row, 1].Value = "Cảnh báo:";
+                worksheet.Cells[row, 2].Value = $"ĐÃ QUÁ HẠN {Math.Abs(daysUntilExpiry)} NGÀY";
+                worksheet.Cells[row, 2].Style.Font.Color.SetColor(System.Drawing.Color.Red);
+                worksheet.Cells[row, 2].Style.Font.Bold = true;
+            }
+            else if (daysUntilExpiry <= 30)
+            {
+                worksheet.Cells[row, 1].Value = "Cảnh báo:";
+                worksheet.Cells[row, 2].Value = $"SẮP HẾT HẠN - CÒN {daysUntilExpiry} NGÀY";
+                worksheet.Cells[row, 2].Style.Font.Color.SetColor(System.Drawing.Color.Orange);
+                worksheet.Cells[row, 2].Style.Font.Bold = true;
+            }
+
+            worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+            var fileName = $"ChiTiet_{loThuoc.MaLo}_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+            return File(package.GetAsByteArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
         // ==================== IN NHÃN ====================
 
         /// <summary>
@@ -700,10 +964,6 @@ namespace QLPhanPhoiThuoc.Controllers.Admin
         }
 
         // ==================== XỬ LÝ LÔ HẾT HẠN ====================
-
-        /// <summary>
-        /// POST: Admin/Thuoc/HandleExpiredLot/{id} - Xử lý lô thuốc hết hạn
-        /// </summary>
         [HttpPost("HandleExpiredLot/{id}")]
         public async Task<IActionResult> HandleExpiredLot(string id)
         {
@@ -736,12 +996,7 @@ namespace QLPhanPhoiThuoc.Controllers.Admin
                 });
             }
         }
-
         // ==================== THỐNG KÊ TỒN KHO ====================
-
-        /// <summary>
-        /// GET: Admin/Thuoc/TonKhoStats - Thống kê tồn kho chi tiết
-        /// </summary>
         [HttpGet("TonKhoStats")]
         public async Task<IActionResult> TonKhoStats()
         {
@@ -817,9 +1072,6 @@ namespace QLPhanPhoiThuoc.Controllers.Admin
 
         // ==================== API ENDPOINTS ====================
 
-        /// <summary>
-        /// API: Lấy thông tin nhanh về tồn kho
-        /// </summary>
         [HttpGet("Api/TonKhoSummary")]
         public async Task<IActionResult> GetTonKhoSummary()
         {

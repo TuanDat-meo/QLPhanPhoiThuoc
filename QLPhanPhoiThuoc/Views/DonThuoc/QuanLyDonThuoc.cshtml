@@ -1,0 +1,666 @@
+@{
+    ViewData["Title"] = "Quản Lý Đơn Thuốc";
+}
+
+<!-- ==================== HEADER SECTION ==================== -->
+<div class="page-header mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="text-gradient-primary mb-2">
+                <i class="fas fa-prescription-bottle-alt me-2"></i>Quản Lý Đơn Thuốc
+            </h2>
+            <p class="text-muted mb-0">Quản lý và theo dõi đơn thuốc của bệnh nhân</p>
+        </div>
+        <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#modalTaoDonThuoc">
+            <i class="fas fa-plus me-2"></i>Tạo Đơn Thuốc Mới
+        </button>
+    </div>
+</div>
+
+<!-- ==================== STATISTICS CARDS ==================== -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card card-hover">
+            <div class="stat-icon bg-gradient-primary">
+                <i class="fas fa-file-prescription"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value" id="tongDon">@ViewBag.TongDon</h3>
+                <p class="stat-label">Tổng Đơn Thuốc</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="stat-card card-hover">
+            <div class="stat-icon bg-gradient-warning">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value" id="donChoCapPhat">@ViewBag.DonChoCapPhat</h3>
+                <p class="stat-label">Chờ Cấp Phát</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="stat-card card-hover">
+            <div class="stat-icon bg-gradient-success">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value" id="donDaCapPhat">@ViewBag.DonDaCapPhat</h3>
+                <p class="stat-label">Đã Cấp Phát</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== FILTERS ==================== -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Loại Đơn</label>
+                <select class="form-select" id="filterLoaiDon">
+                    <option value="">Tất cả</option>
+                    <option value="NoiTru">Nội trú</option>
+                    <option value="NgoaiTru">Ngoại trú</option>
+                    <option value="ChanKhoa">Chẩn khoa</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Trạng Thái</label>
+                <select class="form-select" id="filterTrangThai">
+                    <option value="">Tất cả</option>
+                    <option value="ChoCapPhat">Chờ cấp phát</option>
+                    <option value="DaCapPhat">Đã cấp phát</option>
+                    <option value="DaHuy">Đã hủy</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">Từ Ngày</label>
+                <input type="date" class="form-control" id="filterTuNgay">
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">Đến Ngày</label>
+                <input type="date" class="form-control" id="filterDenNgay">
+            </div>
+
+            <div class="col-md-2 d-flex align-items-end">
+                <button class="btn btn-outline-primary w-100" onclick="loadDanhSachDonThuoc()">
+                    <i class="fas fa-filter me-2"></i>Lọc
+                </button>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" class="form-control" id="searchInput" 
+                       placeholder="Tìm kiếm theo mã đơn, bệnh nhân, bác sĩ...">
+                <button class="btn btn-primary" onclick="loadDanhSachDonThuoc()">Tìm Kiếm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== TABLE ==================== -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-list me-2"></i>Danh Sách Đơn Thuốc
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" id="tableDonThuoc">
+                <thead>
+                    <tr>
+                        <th>Mã Đơn</th>
+                        <th>Ngày Kê Đơn</th>
+                        <th>Bệnh Nhân</th>
+                        <th>Bác Sĩ</th>
+                        <th>Loại Đơn</th>
+                        <th>Số Loại Thuốc</th>
+                        <th>Tổng SL</th>
+                        <th>Trạng Thái</th>
+                        <th>Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyDonThuoc">
+                    <tr>
+                        <td colspan="9" class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Đang tải...</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODAL TẠO ĐƠN THUỐC ==================== -->
+<div class="modal fade" id="modalTaoDonThuoc" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus-circle me-2"></i>Tạo Đơn Thuốc Mới
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formTaoDonThuoc">
+                    <!-- Thông tin bệnh nhân -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-gradient-info text-white">
+                            <h6 class="mb-0">Thông Tin Bệnh Nhân</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Bệnh Nhân <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="maBenhNhan" required>
+                                        <option value="">-- Chọn bệnh nhân --</option>
+                                        @foreach (var bn in (List<dynamic>)ViewBag.BenhNhans)
+                                        {
+                                            <option value="@bn.MaBenhNhan">@bn.MaBenhNhan - @bn.TenBenhNhan</option>
+                                        }
+                                    </select>
+                                    <div class="invalid-feedback">Vui lòng chọn bệnh nhân</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Loại Đơn <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="loaiDon" required>
+                                        <option value="">-- Chọn loại đơn --</option>
+                                        <option value="NoiTru">Nội trú</option>
+                                        <option value="NgoaiTru">Ngoại trú</option>
+                                        <option value="ChanKhoa">Chẩn khoa</option>
+                                    </select>
+                                    <div class="invalid-feedback">Vui lòng chọn loại đơn</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Chẩn Đoán <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="maChanDoan" required>
+                                        <option value="">-- Chọn chẩn đoán --</option>
+                                        @foreach (var cd in (List<dynamic>)ViewBag.ChanDoans)
+                                        {
+                                            <option value="@cd.MaChanDoan">@cd.ChanDoanSoBo</option>
+                                        }
+                                    </select>
+                                    <div class="invalid-feedback">Vui lòng chọn chẩn đoán</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Ghi Chú</label>
+                                    <textarea class="form-control" id="ghiChu" rows="1"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chi tiết thuốc -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-gradient-success text-white d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">Chi Tiết Thuốc</h6>
+                            <button type="button" class="btn btn-sm btn-light" onclick="themDongThuoc()">
+                                <i class="fas fa-plus me-2"></i>Thêm Thuốc
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th width="25%">Thuốc <span class="text-danger">*</span></th>
+                                            <th width="8%">SL <span class="text-danger">*</span></th>
+                                            <th width="15%">Liều Dùng <span class="text-danger">*</span></th>
+                                            <th width="15%">Tần Suất <span class="text-danger">*</span></th>
+                                            <th width="12%">Thời Gian <span class="text-danger">*</span></th>
+                                            <th width="20%">Ghi Chú</th>
+                                            <th width="5%"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbodyChiTietThuoc">
+                                        <!-- Rows added dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" onclick="submitTaoDonThuoc()">
+                    <i class="fas fa-save me-2"></i>Lưu Đơn Thuốc
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODAL CHI TIẾT ĐƠN THUỐC ==================== -->
+<div class="modal fade" id="modalChiTiet" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-info-circle me-2"></i>Chi Tiết Đơn Thuốc
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="chiTietContent">
+                <!-- Content loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    let rowIndex = 0;
+    const thuocs = @Html.Raw(Json.Serialize(ViewBag.Thuocs));
+
+    $(document).ready(function() {
+        loadDanhSachDonThuoc();
+        themDongThuoc(); // Thêm 1 dòng mặc định
+    });
+
+    function loadDanhSachDonThuoc() {
+        const params = {
+            loaiDon: $('#filterLoaiDon').val(),
+            trangThai: $('#filterTrangThai').val(),
+            tuNgay: $('#filterTuNgay').val(),
+            denNgay: $('#filterDenNgay').val(),
+            timKiem: $('#searchInput').val()
+        };
+
+        $.get('/DonThuoc/DanhSachDonThuoc', params, function(response) {
+            if (response.success) {
+                renderTable(response.data);
+            } else {
+                alert('Lỗi: ' + response.message);
+            }
+        });
+    }
+
+    function renderTable(data) {
+        let html = '';
+        
+        if (data.length === 0) {
+            html = '<tr><td colspan="9" class="text-center py-4">Không có dữ liệu</td></tr>';
+        } else {
+            data.forEach(item => {
+                html += `
+                    <tr>
+                        <td>${item.maDonThuoc}</td>
+                        <td>${new Date(item.ngayKeDon).toLocaleString('vi-VN')}</td>
+                        <td>
+                            <strong>${item.benhNhan}</strong><br>
+                            <small class="text-muted">${item.maBenhNhan}</small>
+                        </td>
+                        <td>${item.bacSi}</td>
+                        <td>${getLoaiDonBadge(item.loaiDon)}</td>
+                        <td class="text-center">${item.soLoaiThuoc}</td>
+                        <td class="text-center">${item.tongSoLuong}</td>
+                        <td>${getTrangThaiBadge(item.trangThai)}</td>
+                        <td>
+                            <button class="btn btn-sm btn-info" onclick="xemChiTiet('${item.maDonThuoc}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            ${item.trangThai === 'ChoCapPhat' ? `
+                                <button class="btn btn-sm btn-danger" onclick="huyDonThuoc('${item.maDonThuoc}')">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        $('#tbodyDonThuoc').html(html);
+    }
+
+    function getLoaiDonBadge(loai) {
+        const badges = {
+            'NoiTru': '<span class="badge bg-primary">Nội trú</span>',
+            'NgoaiTru': '<span class="badge bg-success">Ngoại trú</span>',
+            'ChanKhoa': '<span class="badge bg-info">Chẩn khoa</span>'
+        };
+        return badges[loai] || loai;
+    }
+
+    function getTrangThaiBadge(trangThai) {
+        const badges = {
+            'ChoCapPhat': '<span class="badge bg-warning">Chờ cấp phát</span>',
+            'DaCapPhat': '<span class="badge bg-success">Đã cấp phát</span>',
+            'DaHuy': '<span class="badge bg-danger">Đã hủy</span>'
+        };
+        return badges[trangThai] || trangThai;
+    }
+
+    function themDongThuoc() {
+        rowIndex++;
+        
+        let optionsThuoc = '<option value="">-- Chọn thuốc --</option>';
+        thuocs.forEach(t => {
+            optionsThuoc += `<option value="${t.maThuoc}">${t.tenThuoc} - ${t.hamLuong} (${t.donViTinh})</option>`;
+        });
+
+        $('#tbodyChiTietThuoc').append(`
+            <tr id="row${rowIndex}">
+                <td>
+                    <select class="form-select form-select-sm" name="thuoc[]" required>
+                        ${optionsThuoc}
+                    </select>
+                </td>
+                <td>
+                    <input type="number" class="form-control form-control-sm" name="soLuong[]" 
+                           min="1" value="1" required>
+                </td>
+                <td>
+                    <input type="text" class="form-control form-control-sm" name="lieuDung[]" 
+                           placeholder="VD: 1 viên" required>
+                </td>
+                <td>
+                    <input type="text" class="form-control form-control-sm" name="tanSuat[]" 
+                           placeholder="VD: 3 lần/ngày" required>
+                </td>
+                <td>
+                    <input type="text" class="form-control form-control-sm" name="thoiGianDung[]" 
+                           placeholder="VD: 7 ngày" required>
+                </td>
+                <td>
+                    <input type="text" class="form-control form-control-sm" name="ghiChuThuoc[]">
+                </td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="xoaDongThuoc(${rowIndex})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `);
+    }
+
+    function xoaDongThuoc(index) {
+        if ($('#tbodyChiTietThuoc tr').length <= 1) {
+            alert('Phải có ít nhất một loại thuốc trong đơn');
+            return;
+        }
+        $(`#row${index}`).remove();
+    }
+
+    // SỬA: Thêm validation đầy đủ
+    function submitTaoDonThuoc() {
+        // Validate bệnh nhân
+        const maBenhNhan = $('#maBenhNhan').val();
+        if (!maBenhNhan) {
+            alert('Vui lòng chọn bệnh nhân');
+            $('#maBenhNhan').focus();
+            return;
+        }
+        
+        // Validate loại đơn
+        const loaiDon = $('#loaiDon').val();
+        if (!loaiDon) {
+            alert('Vui lòng chọn loại đơn');
+            $('#loaiDon').focus();
+            return;
+        }
+        
+        // Validate chẩn đoán
+        const maChanDoan = $('#maChanDoan').val();
+        if (!maChanDoan) {
+            alert('Vui lòng chọn chẩn đoán');
+            $('#maChanDoan').focus();
+            return;
+        }
+
+        // Thu thập chi tiết thuốc
+        const chiTiet = [];
+        let hasError = false;
+        
+        $('#tbodyChiTietThuoc tr').each(function() {
+            const maThuoc = $(this).find('select[name="thuoc[]"]').val();
+            const soLuong = parseInt($(this).find('input[name="soLuong[]"]').val());
+            const lieuDung = $(this).find('input[name="lieuDung[]"]').val();
+            const tanSuat = $(this).find('input[name="tanSuat[]"]').val();
+            const thoiGianDung = $(this).find('input[name="thoiGianDung[]"]').val();
+            const ghiChu = $(this).find('input[name="ghiChuThuoc[]"]').val();
+
+            // Validate từng trường
+            if (!maThuoc) {
+                alert('Vui lòng chọn thuốc cho tất cả các dòng');
+                hasError = true;
+                return false;
+            }
+
+            if (!soLuong || soLuong <= 0) {
+                alert('Số lượng phải lớn hơn 0');
+                hasError = true;
+                return false;
+            }
+
+            if (!lieuDung || lieuDung.trim() === '') {
+                alert('Vui lòng nhập liều dùng');
+                hasError = true;
+                return false;
+            }
+
+            if (!tanSuat || tanSuat.trim() === '') {
+                alert('Vui lòng nhập tần suất dùng thuốc');
+                hasError = true;
+                return false;
+            }
+
+            if (!thoiGianDung || thoiGianDung.trim() === '') {
+                alert('Vui lòng nhập thời gian dùng thuốc');
+                hasError = true;
+                return false;
+            }
+
+            chiTiet.push({
+                maThuoc: maThuoc,
+                soLuong: soLuong,
+                lieuDung: lieuDung.trim(),
+                tanSuat: tanSuat.trim(),
+                thoiGianDung: thoiGianDung.trim(),
+                ghiChu: ghiChu ? ghiChu.trim() : ''
+            });
+        });
+
+        if (hasError) {
+            return;
+        }
+
+        if (chiTiet.length === 0) {
+            alert('Vui lòng thêm ít nhất một loại thuốc');
+            return;
+        }
+
+        const data = {
+            maBenhNhan: maBenhNhan,
+            loaiDon: loaiDon,
+            maChanDoan: maChanDoan,
+            chiTiet: chiTiet
+        };
+
+        // Disable button để tránh submit nhiều lần
+        const btnSubmit = event.target;
+        btnSubmit.disabled = true;
+        btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xử lý...';
+
+        $.ajax({
+            url: '/DonThuoc/TaoDonThuoc',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(response) {
+                if (response.success) {
+                    alert('Tạo đơn thuốc thành công!\nMã đơn: ' + response.maDonThuoc);
+                    $('#modalTaoDonThuoc').modal('hide');
+                    loadDanhSachDonThuoc();
+                    resetForm();
+                } else {
+                    alert('Lỗi: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('Lỗi kết nối: ' + error);
+            },
+            complete: function() {
+                // Enable lại button
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = '<i class="fas fa-save me-2"></i>Lưu Đơn Thuốc';
+            }
+        });
+    }
+
+    function resetForm() {
+        $('#formTaoDonThuoc')[0].reset();
+        $('#tbodyChiTietThuoc').empty();
+        rowIndex = 0;
+        themDongThuoc();
+    }
+
+    function xemChiTiet(maDonThuoc) {
+        $.get('/DonThuoc/ChiTietDonThuoc', { maDonThuoc }, function(response) {
+            if (response.success) {
+                renderChiTiet(response.data);
+                $('#modalChiTiet').modal('show');
+            } else {
+                alert('Lỗi: ' + response.message);
+            }
+        });
+    }
+
+    function renderChiTiet(data) {
+        const html = `
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header bg-gradient-primary text-white">
+                            <h6 class="mb-0">Thông Tin Đơn Thuốc</h6>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm">
+                                <tr><th>Mã đơn:</th><td>${data.maDonThuoc}</td></tr>
+                                <tr><th>Ngày kê:</th><td>${new Date(data.ngayKeDon).toLocaleString('vi-VN')}</td></tr>
+                                <tr><th>Loại đơn:</th><td>${getLoaiDonBadge(data.loaiDon)}</td></tr>
+                                <tr><th>Trạng thái:</th><td>${getTrangThaiBadge(data.trangThai)}</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header bg-gradient-info text-white">
+                            <h6 class="mb-0">Thông Tin Bệnh Nhân</h6>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm">
+                                <tr><th>Mã BN:</th><td>${data.benhNhan.maBenhNhan}</td></tr>
+                                <tr><th>Họ tên:</th><td>${data.benhNhan.tenBenhNhan}</td></tr>
+                                <tr><th>Ngày sinh:</th><td>${new Date(data.benhNhan.ngaySinh).toLocaleDateString('vi-VN')}</td></tr>
+                                <tr><th>Giới tính:</th><td>${data.benhNhan.gioiTinh}</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="card mb-3">
+                        <div class="card-header bg-gradient-success text-white">
+                            <h6 class="mb-0">Chẩn Đoán & Ghi Chú</h6>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Chẩn đoán:</strong> ${data.chanDoan || 'Không có'}</p>
+                            <p><strong>Bác sĩ:</strong> ${data.bacSi.tenNhanVien} (${data.bacSi.chucVu})</p>
+                            ${data.ghiChu ? `<p><strong>Ghi chú:</strong> ${data.ghiChu}</p>` : ''}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-gradient-warning text-white">
+                            <h6 class="mb-0">Chi Tiết Thuốc</h6>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>STT</th>
+                                        <th>Tên Thuốc</th>
+                                        <th>Hàm Lượng</th>
+                                        <th>SL</th>
+                                        <th>Liều Dùng</th>
+                                        <th>Tần Suất</th>
+                                        <th>Thời Gian</th>
+                                        <th>Ghi Chú</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.chiTiet.map((item, index) => `
+                                        <tr>
+                                            <td>${index + 1}</td>
+                                            <td><strong>${item.tenThuoc}</strong></td>
+                                            <td>${item.hamLuong || 'N/A'}</td>
+                                            <td>${item.soLuong} ${item.donViTinh}</td>
+                                            <td>${item.lieuDung}</td>
+                                            <td>${item.tanSuat}</td>
+                                            <td>${item.thoiGianDung}</td>
+                                            <td>${item.ghiChu || ''}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        $('#chiTietContent').html(html);
+    }
+
+    function huyDonThuoc(maDonThuoc) {
+        if (!confirm('Bạn có chắc muốn hủy đơn thuốc này?')) return;
+
+        $.ajax({
+            url: '/DonThuoc/HuyDonThuoc',
+            type: 'DELETE',
+            data: { maDonThuoc },
+            success: function(response) {
+                if (response.success) {
+                    alert('Hủy đơn thuốc thành công!');
+                    loadDanhSachDonThuoc();
+                } else {
+                    alert('Lỗi: ' + response.message);
+                }
+            }
+        });
+    }
+
+    // Reset form khi đóng modal
+    $('#modalTaoDonThuoc').on('hidden.bs.modal', function() {
+        resetForm();
+    });
+</script>
+}

@@ -1,0 +1,589 @@
+@{
+    ViewData["Title"] = "Cấp Phát Thuốc";
+}
+
+<!-- ==================== HEADER SECTION ==================== -->
+<div class="page-header mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="text-gradient-success mb-2">
+                <i class="fas fa-hand-holding-medical me-2"></i>Cấp Phát Thuốc
+            </h2>
+            <p class="text-muted mb-0">Xử lý cấp phát và thanh toán đơn thuốc</p>
+        </div>
+        <div>
+            <button class="btn btn-outline-primary" onclick="loadDanhSachChoCapPhat()">
+                <i class="fas fa-sync me-2"></i>Làm Mới
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== STATISTICS CARDS ==================== -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="stat-card card-hover">
+            <div class="stat-icon bg-gradient-warning">
+                <i class="fas fa-hourglass-half"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value" id="donChoCapPhat">@ViewBag.DonChoCapPhat</h3>
+                <p class="stat-label">Đơn Chờ Cấp Phát</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="stat-card card-hover">
+            <div class="stat-icon bg-gradient-success">
+                <i class="fas fa-check-double"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value" id="donDaCapPhat">@ViewBag.DonDaCapPhat</h3>
+                <p class="stat-label">Đã Cấp Phát Hôm Nay</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== SEARCH ==================== -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="input-group">
+            <span class="input-group-text">
+                <i class="fas fa-search"></i>
+            </span>
+            <input type="text" class="form-control" id="searchInput" 
+                   placeholder="Tìm kiếm theo mã đơn, bệnh nhân...">
+            <button class="btn btn-primary" onclick="loadDanhSachChoCapPhat()">Tìm Kiếm</button>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== TABLE ==================== -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-clipboard-list me-2"></i>Danh Sách Đơn Chờ Cấp Phát
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" id="tableDonChoCapPhat">
+                <thead>
+                    <tr>
+                        <th>Mã Đơn</th>
+                        <th>Ngày Kê</th>
+                        <th>Bệnh Nhân</th>
+                        <th>SĐT</th>
+                        <th>Bác Sĩ</th>
+                        <th>Loại Đơn</th>
+                        <th>Số Loại Thuốc</th>
+                        <th>Tổng SL</th>
+                        <th>Thời Gian Chờ</th>
+                        <th>Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyDonChoCapPhat">
+                    <tr>
+                        <td colspan="10" class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Đang tải...</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODAL CẤP PHÁT ==================== -->
+<div class="modal fade" id="modalCapPhat" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-pills me-2"></i>Cấp Phát Thuốc
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="capPhatContent">
+                <!-- Content loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-success" id="btnXacNhanCapPhat">
+                    <i class="fas fa-check me-2"></i>Xác Nhận Cấp Phát
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODAL THANH TOÁN ==================== -->
+<div class="modal fade" id="modalThanhToan" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-cash-register me-2"></i>Thanh Toán Hóa Đơn
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <h4 class="mb-3">Thông Tin Hóa Đơn</h4>
+                            <div class="row">
+                                <div class="col-6">
+                                    <p><strong>Mã hóa đơn:</strong> <span id="ttMaHoaDon"></span></p>
+                                    <p><strong>Mã đơn thuốc:</strong> <span id="ttMaDonThuoc"></span></p>
+                                </div>
+                                <div class="col-6">
+                                    <p><strong>Bệnh nhân:</strong> <span id="ttBenhNhan"></span></p>
+                                    <p><strong>Tổng tiền:</strong> <span id="ttTongTien" class="text-danger fw-bold"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Hình Thức Thanh Toán <span class="text-danger">*</span></label>
+                        <select class="form-select" id="hinhThucThanhToan" required>
+                            <option value="">-- Chọn hình thức --</option>
+                            <option value="TienMat">Tiền mặt</option>
+                            <option value="ChuyenKhoan">Chuyển khoản</option>
+                            <option value="TheATM">Thẻ ATM</option>
+                            <option value="ViDienTu">Ví điện tử</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Số Tiền Khách Đưa <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control form-control-lg" id="soTienKhachDua" 
+                               min="0" step="1000" required>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="alert alert-success">
+                            <h5>Tiền Thừa: <span id="tienThua" class="fw-bold">0 ₫</span></h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-success btn-lg" onclick="submitThanhToan()">
+                    <i class="fas fa-check-circle me-2"></i>Xác Nhận Thanh Toán
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODAL IN PHIẾU ==================== -->
+<div class="modal fade" id="modalInPhieu" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-print me-2"></i>In Phiếu
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3">
+                    <button class="btn btn-primary me-2" onclick="window.print()">
+                        <i class="fas fa-print me-2"></i>In Phiếu Xuất
+                    </button>
+                    <button class="btn btn-success" onclick="inHoaDon()">
+                        <i class="fas fa-file-invoice me-2"></i>In Hóa Đơn
+                    </button>
+                </div>
+                <div id="phieuInContent">
+                    <!-- Content for printing -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    let currentMaDonThuoc = '';
+    let currentMaHoaDon = '';
+    let currentTongTien = 0;
+    let currentMaPhieuXuat = '';
+
+    $(document).ready(function() {
+        loadDanhSachChoCapPhat();
+
+        $('#soTienKhachDua').on('input', function() {
+            const soTien = parseFloat($(this).val()) || 0;
+            const tienThua = soTien - currentTongTien;
+            $('#tienThua').text(formatCurrency(tienThua >= 0 ? tienThua : 0));
+        });
+    });
+
+    function loadDanhSachChoCapPhat() {
+        const timKiem = $('#searchInput').val();
+
+        $.get('/DonThuoc/DanhSachChoCapPhat', { timKiem }, function(response) {
+            if (response.success) {
+                renderDanhSachChoCapPhat(response.data);
+                $('#donChoCapPhat').text(response.data.length);
+            }
+        });
+    }
+
+    function renderDanhSachChoCapPhat(data) {
+        const tbody = $('#tbodyDonChoCapPhat');
+        tbody.empty();
+
+        if (data.length === 0) {
+            tbody.html(`
+                <tr>
+                    <td colspan="10" class="text-center py-4">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <p class="text-muted">Không có đơn thuốc chờ cấp phát</p>
+                    </td>
+                </tr>
+            `);
+            return;
+        }
+
+        data.forEach(item => {
+            const loaiDonBadge = getLoaiDonBadge(item.loaiDon);
+            const thoiGianCho = formatThoiGianCho(item.thoiGianCho);
+            
+            tbody.append(`
+                <tr>
+                    <td><strong>${item.maDonThuoc}</strong></td>
+                    <td>${new Date(item.ngayKeDon).toLocaleDateString('vi-VN')}</td>
+                    <td>
+                        <div><strong>${item.benhNhan}</strong></div>
+                        <small class="text-muted">${item.maBenhNhan}</small>
+                    </td>
+                    <td>${item.soDienThoai || 'N/A'}</td>
+                    <td>${item.bacSi}</td>
+                    <td>${loaiDonBadge}</td>
+                    <td class="text-center">${item.soLoaiThuoc}</td>
+                    <td class="text-center">${item.tongSoLuong}</td>
+                    <td>${thoiGianCho}</td>
+                    <td>
+                        <button class="btn btn-sm btn-success" onclick="moModalCapPhat('${item.maDonThuoc}')">
+                            <i class="fas fa-hand-holding-medical me-1"></i>Cấp Phát
+                        </button>
+                    </td>
+                </tr>
+            `);
+        });
+    }
+
+    function getLoaiDonBadge(loaiDon) {
+        const badges = {
+            'NoiTru': '<span class="badge badge-primary">Nội trú</span>',
+            'NgoaiTru': '<span class="badge badge-info">Ngoại trú</span>',
+            'ChanKhoa': '<span class="badge badge-success">Chẩn khoa</span>'
+        };
+        return badges[loaiDon] || loaiDon;
+    }
+
+    function formatThoiGianCho(phut) {
+        if (phut < 60) {
+            return `<span class="badge badge-success">${phut} phút</span>`;
+        } else if (phut < 180) {
+            const gio = Math.floor(phut / 60);
+            return `<span class="badge badge-warning">${gio} giờ</span>`;
+        } else {
+            const gio = Math.floor(phut / 60);
+            return `<span class="badge badge-danger">${gio} giờ</span>`;
+        }
+    }
+
+    function moModalCapPhat(maDonThuoc) {
+        currentMaDonThuoc = maDonThuoc;
+
+        // Load chi tiết đơn thuốc
+        $.get('/DonThuoc/ChiTietDonThuoc', { maDonThuoc }, function(response) {
+            if (response.success) {
+                const data = response.data;
+
+                // Kiểm tra tồn kho
+                const danhSachThuoc = data.chiTiet.map(ct => ({
+                    maThuoc: ct.maThuoc,
+                    soLuong: ct.soLuong
+                }));
+
+                $.ajax({
+                    url: '/DonThuoc/KiemTraTonKho',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ danhSach: danhSachThuoc }),
+                    success: function(tonKhoResponse) {
+                        if (tonKhoResponse.success) {
+                            renderCapPhatContent(data, tonKhoResponse.data);
+                            $('#modalCapPhat').modal('show');
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function renderCapPhatContent(donThuoc, tonKho) {
+        const duTonKho = tonKho.every(item => item.duTonKho);
+
+        let html = `
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header bg-gradient-primary text-white">
+                            <h6 class="mb-0">Thông Tin Bệnh Nhân</h6>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Mã BN:</strong> ${donThuoc.benhNhan.maBenhNhan}</p>
+                            <p><strong>Họ tên:</strong> ${donThuoc.benhNhan.tenBenhNhan}</p>
+                            <p><strong>SĐT:</strong> ${donThuoc.benhNhan.soDienThoai || 'N/A'}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-header bg-gradient-info text-white">
+                            <h6 class="mb-0">Thông Tin Đơn Thuốc</h6>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Mã đơn:</strong> ${donThuoc.maDonThuoc}</p>
+                            <p><strong>Ngày kê:</strong> ${new Date(donThuoc.ngayKeDon).toLocaleString('vi-VN')}</p>
+                            <p><strong>Bác sĩ:</strong> ${donThuoc.bacSi.tenNhanVien}</p>
+                        </div>
+                    </div>
+                </div>
+
+                ${!duTonKho ? `
+                <div class="col-12">
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>CẢNH BÁO:</strong> Một số thuốc không đủ tồn kho!
+                    </div>
+                </div>
+                ` : ''}
+
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-gradient-success text-white">
+                            <h6 class="mb-0">Chi Tiết Thuốc & Tồn Kho</h6>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>STT</th>
+                                        <th>Tên Thuốc</th>
+                                        <th>SL Yêu Cầu</th>
+                                        <th>Tồn Kho</th>
+                                        <th>Trạng Thái</th>
+                                        <th>Liều Dùng</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${tonKho.map((item, index) => {
+                                        const ct = donThuoc.chiTiet[index];
+                                        return `
+                                            <tr class="${!item.duTonKho ? 'table-danger' : ''}">
+                                                <td>${index + 1}</td>
+                                                <td>${item.tenThuoc}</td>
+                                                <td><strong>${item.soLuongYeuCau}</strong></td>
+                                                <td>${item.tonKhoHienTai}</td>
+                                                <td>
+                                                    ${item.duTonKho ? 
+                                                        '<span class="badge badge-success">Đủ hàng</span>' : 
+                                                        `<span class="badge badge-danger">Thiếu ${item.thieuSoLuong}</span>`
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <small>
+                                                        ${ct.lieuDung}, ${ct.tanSuat}<br>
+                                                        ${ct.thoiGianDung}
+                                                    </small>
+                                                </td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 mt-3">
+                    <label class="form-label">Ghi Chú Cấp Phát</label>
+                    <textarea class="form-control" id="ghiChuCapPhat" rows="2"></textarea>
+                </div>
+            </div>
+        `;
+
+        $('#capPhatContent').html(html);
+
+        // Set up button handler
+        $('#btnXacNhanCapPhat').off('click').on('click', function() {
+            if (!duTonKho && !confirm('Một số thuốc không đủ tồn kho. Bạn có chắc muốn tiếp tục?')) {
+                return;
+            }
+            xuLyCapPhat();
+        });
+    }
+
+    function xuLyCapPhat() {
+        const data = {
+            maDonThuoc: currentMaDonThuoc,
+            ghiChu: $('#ghiChuCapPhat').val()
+        };
+
+        $.ajax({
+            url: '/DonThuoc/XuLyCapPhat',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(response) {
+                if (response.success) {
+                    $('#modalCapPhat').modal('hide');
+                    
+                    // Lưu thông tin để thanh toán
+                    currentMaHoaDon = response.maHoaDon;
+                    currentMaPhieuXuat = response.maPhieuXuat;
+                    currentTongTien = response.tongTien;
+
+                    // Mở modal thanh toán
+                    moModalThanhToan();
+                } else {
+                    alert('Lỗi: ' + response.message);
+                }
+            }
+        });
+    }
+
+    function moModalThanhToan() {
+        $('#ttMaHoaDon').text(currentMaHoaDon);
+        $('#ttMaDonThuoc').text(currentMaDonThuoc);
+        $('#ttTongTien').text(formatCurrency(currentTongTien));
+        $('#soTienKhachDua').val(currentTongTien);
+        $('#tienThua').text('0 ₫');
+
+        $('#modalThanhToan').modal('show');
+    }
+
+    function submitThanhToan() {
+        const hinhThuc = $('#hinhThucThanhToan').val();
+        const soTien = parseFloat($('#soTienKhachDua').val());
+
+        if (!hinhThuc) {
+            alert('Vui lòng chọn hình thức thanh toán');
+            return;
+        }
+
+        if (soTien < currentTongTien) {
+            alert('Số tiền thanh toán không đủ');
+            return;
+        }
+
+        const data = {
+            maHoaDon: currentMaHoaDon,
+            hinhThucThanhToan: hinhThuc,
+            soTienThanhToan: soTien
+        };
+
+        $.ajax({
+            url: '/DonThuoc/ThanhToanHoaDon',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(response) {
+                if (response.success) {
+                    $('#modalThanhToan').modal('hide');
+                    alert('Thanh toán thành công!\nTiền thừa: ' + formatCurrency(response.soTienThua));
+                    
+                    loadDanhSachChoCapPhat();
+                    
+                    // Hỏi có muốn in phiếu không
+                    if (confirm('Bạn có muốn in phiếu không?')) {
+                        moModalInPhieu();
+                    }
+                } else {
+                    alert('Lỗi: ' + response.message);
+                }
+            }
+        });
+    }
+
+    function moModalInPhieu() {
+        // Load nội dung phiếu để in
+        $('#modalInPhieu').modal('show');
+    }
+
+    function formatCurrency(value) {
+        return new Intl.NumberFormat('vi-VN', { 
+            style: 'currency', 
+            currency: 'VND' 
+        }).format(value);
+    }
+</script>
+
+<style>
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .stat-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 28px;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--gray-900);
+    }
+
+    .stat-label {
+        margin: 0;
+        color: var(--gray-600);
+        font-size: 0.9rem;
+    }
+
+    .page-header {
+        margin-bottom: 32px;
+    }
+
+    @@media print {
+        body * {
+            visibility: hidden;
+        }
+        #phieuInContent, #phieuInContent * {
+            visibility: visible;
+        }
+        #phieuInContent {
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+    }
+</style>
+}

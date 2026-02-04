@@ -31,17 +31,24 @@
         margin-bottom: 1rem;
         flex-wrap: wrap;
         gap: 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 1.5rem;
+        border-radius: 1rem;
+        color: white;
     }
 
     .header-left h2 {
         font-size: 1.5rem;
         margin: 0 0 0.25rem 0;
-        color: #1e293b;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
     .header-left .subtitle {
         font-size: 0.875rem;
-        color: #64748b;
+        color: rgba(255, 255, 255, 0.9);
         margin: 0;
     }
 
@@ -53,7 +60,7 @@
 
     .btn-action-header {
         padding: 0.5rem 1rem;
-        border: none;
+        border: 2px solid rgba(255, 255, 255, 0.3);
         border-radius: 0.5rem;
         font-size: 0.875rem;
         cursor: pointer;
@@ -61,24 +68,15 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
-    }
-
-    .btn-stats {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: rgba(255, 255, 255, 0.1);
         color: white;
-    }
-
-    .btn-export {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        color: white;
-    }
-
-    .btn-refresh {
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-        color: white;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
     }
 
     .btn-action-header:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.5);
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
@@ -100,12 +98,13 @@
         gap: 0.75rem;
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         transition: all 0.2s;
+        cursor: pointer;
     }
 
-    .stat-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
 
     .stat-icon {
         width: 3rem;
@@ -148,18 +147,18 @@
         min-width: 0;
     }
 
-    .stat-content h3 {
-        font-size: 1.5rem;
-        font-weight: 700;
-        margin: 0 0 0.25rem 0;
-        color: #1e293b;
-    }
+        .stat-content h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 0 0.25rem 0;
+            color: #1e293b;
+        }
 
-    .stat-content p {
-        font-size: 0.75rem;
-        color: #64748b;
-        margin: 0 0 0.25rem 0;
-    }
+        .stat-content p {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin: 0 0 0.25rem 0;
+        }
 
     .stat-trend {
         font-size: 0.7rem;
@@ -168,20 +167,20 @@
         display: inline-block;
     }
 
-    .stat-trend.positive {
-        background: #dcfce7;
-        color: #166534;
-    }
+        .stat-trend.positive {
+            background: #dcfce7;
+            color: #166534;
+        }
 
-    .stat-trend.warning {
-        background: #fef3c7;
-        color: #92400e;
-    }
+        .stat-trend.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
 
-    .stat-trend.danger {
-        background: #fee2e2;
-        color: #991b1b;
-    }
+        .stat-trend.danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
 
     /* Quick Filters - Compact */
     .quick-filters-section {
@@ -207,29 +206,29 @@
         font-size: 0.875rem;
     }
 
-    .filter-chip:hover {
-        border-color: #3b82f6;
-        background: #eff6ff;
-    }
+        .filter-chip:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
 
-    .filter-chip.active {
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-        color: white;
-        border-color: #2563eb;
-    }
+        .filter-chip.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border-color: #2563eb;
+        }
 
-    .filter-chip .badge {
-        background: rgba(0,0,0,0.1);
-        padding: 0.125rem 0.5rem;
-        border-radius: 1rem;
-        font-size: 0.75rem;
-        font-weight: 600;
-    }
+        .filter-chip .badge {
+            background: rgba(0,0,0,0.1);
+            padding: 0.125rem 0.5rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
 
-    .filter-chip.active .badge {
-        background: rgba(255,255,255,0.3);
-        color: white;
-    }
+        .filter-chip.active .badge {
+            background: rgba(255,255,255,0.3);
+            color: white;
+        }
 
     /* Filter Card - Compact */
     .filter-card {
@@ -247,11 +246,11 @@
         align-items: center;
     }
 
-    .filter-header h4 {
-        margin: 0;
-        font-size: 1rem;
-        color: #1e293b;
-    }
+        .filter-header h4 {
+            margin: 0;
+            font-size: 1rem;
+            color: #1e293b;
+        }
 
     .btn-toggle-filter {
         background: none;
@@ -268,44 +267,49 @@
     .filter-row {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1rem;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
     }
 
-    .filter-group label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: #475569;
+    .form-group-inline {
+        display: flex;
+        flex-direction: column;
+        gap: 0.375rem;
     }
 
-    .form-control-modern {
-        width: 100%;
-        padding: 0.5rem 0.75rem;
-        border: 1px solid #e2e8f0;
-        border-radius: 0.5rem;
-        font-size: 0.875rem;
-        transition: all 0.2s;
-    }
+        .form-group-inline label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
 
-    .form-control-modern:focus {
-        outline: none;
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
+        .form-group-inline input,
+        .form-group-inline select {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+            .form-group-inline input:focus,
+            .form-group-inline select:focus {
+                outline: none;
+                border-color: #3b82f6;
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            }
 
     .filter-actions {
         display: flex;
         gap: 0.5rem;
+        justify-content: flex-end;
     }
 
-    .btn-primary-modern,
-    .btn-secondary-modern {
+    .btn-filter {
         padding: 0.5rem 1rem;
         border: none;
         border-radius: 0.5rem;
         font-size: 0.875rem;
+        font-weight: 600;
         cursor: pointer;
         transition: all 0.2s;
         display: flex;
@@ -318,52 +322,23 @@
         color: white;
     }
 
+        .btn-primary-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
     .btn-secondary-modern {
-        background: #f1f5f9;
-        color: #475569;
-    }
-
-    /* Results Bar - Compact */
-    .results-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.75rem;
         background: white;
-        border-radius: 0.5rem;
-        margin-bottom: 1rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        flex-wrap: wrap;
-        gap: 0.5rem;
-    }
-
-    .results-info {
-        font-size: 0.875rem;
         color: #64748b;
-    }
-
-    .view-options {
-        display: flex;
-        gap: 0.25rem;
-    }
-
-    .view-btn {
-        padding: 0.375rem 0.75rem;
         border: 1px solid #e2e8f0;
-        background: white;
-        border-radius: 0.375rem;
-        cursor: pointer;
-        font-size: 0.875rem;
-        transition: all 0.2s;
     }
 
-    .view-btn.active {
-        background: #3b82f6;
-        color: white;
-        border-color: #3b82f6;
-    }
+        .btn-secondary-modern:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
 
-    /* Table - Compact & Responsive */
+    /* Table - Compact */
     .tonkho-table-wrapper {
         background: white;
         border-radius: 0.75rem;
@@ -372,46 +347,87 @@
         margin-bottom: 1rem;
     }
 
+    .table-header-modern {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+        .table-header-modern h4 {
+            margin: 0;
+            font-size: 1rem;
+            color: #1e293b;
+        }
+
+    .view-toggle {
+        display: flex;
+        gap: 0.25rem;
+        background: white;
+        padding: 0.25rem;
+        border-radius: 0.5rem;
+        border: 1px solid #e2e8f0;
+    }
+
+    .view-btn {
+        padding: 0.375rem 0.75rem;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        border-radius: 0.375rem;
+        transition: all 0.2s;
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+
+        .view-btn.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
     .tonkho-table {
         width: 100%;
         border-collapse: collapse;
         font-size: 0.875rem;
     }
 
-    .tonkho-table thead {
-        background: #f8fafc;
-        border-bottom: 2px solid #e2e8f0;
-    }
+        .tonkho-table thead {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        }
 
-    .tonkho-table th {
-        padding: 0.75rem;
-        text-align: left;
-        font-weight: 600;
-        color: #475569;
-        white-space: nowrap;
-    }
+        .tonkho-table th {
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            color: #1e293b;
+            border-bottom: 2px solid #e2e8f0;
+            white-space: nowrap;
+        }
 
-    .tonkho-table td {
-        padding: 0.75rem;
-        border-bottom: 1px solid #f1f5f9;
-        vertical-align: middle;
-    }
+        .tonkho-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
 
-    .tonkho-table tbody tr:hover {
-        background: #f8fafc;
-    }
+        .tonkho-table tbody tr {
+            transition: all 0.2s;
+        }
 
-    /* Badges - Smaller */
-    .badge {
-        padding: 0.25rem 0.5rem;
-        border-radius: 0.375rem;
+            .tonkho-table tbody tr:hover {
+                background: #f8fafc;
+            }
+
+    .badge-status {
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
         font-size: 0.75rem;
         font-weight: 600;
         display: inline-block;
-        white-space: nowrap;
     }
 
-    .badge-success {
+    .badge-active {
         background: #dcfce7;
         color: #166534;
     }
@@ -426,24 +442,14 @@
         color: #991b1b;
     }
 
-    .badge-secondary {
-        background: #f1f5f9;
-        color: #475569;
-    }
-
-    /* Action Buttons - Smaller */
-    .action-btn {
-        padding: 0.375rem 0.5rem;
+    .action-btn-small {
+        padding: 0.25rem 0.5rem;
+        margin: 0 0.125rem;
         border: none;
         border-radius: 0.375rem;
         cursor: pointer;
         font-size: 0.75rem;
         transition: all 0.2s;
-        margin-right: 0.25rem;
-    }
-
-    .action-btn i {
-        font-size: 0.875rem;
     }
 
     .btn-view {
@@ -451,56 +457,82 @@
         color: #1e40af;
     }
 
+        .btn-view:hover {
+            background: #dbeafe;
+        }
+
     .btn-print {
         background: #f0fdf4;
         color: #166534;
     }
 
-    .btn-handle {
-        background: #fef3c7;
-        color: #92400e;
-    }
+        .btn-print:hover {
+            background: #dcfce7;
+        }
 
     /* Pagination - Compact */
     .pagination-container {
         display: flex;
-        justify-content: center;
         align-items: center;
         gap: 0.5rem;
-        padding: 1rem;
+        padding: 0.75rem;
         background: white;
-        border-radius: 0.5rem;
-        margin-top: 1rem;
-        flex-wrap: wrap;
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
     }
 
     .pagination-btn {
-        padding: 0.375rem 0.75rem;
+        padding: 0.5rem 0.75rem;
         border: 1px solid #e2e8f0;
         background: white;
-        border-radius: 0.375rem;
+        border-radius: 0.5rem;
         cursor: pointer;
-        font-size: 0.875rem;
         transition: all 0.2s;
+        font-size: 0.875rem;
+        color: #64748b;
+        min-width: 2.5rem;
+        text-align: center;
     }
 
-    .pagination-btn:hover:not(:disabled) {
-        background: #f8fafc;
-        border-color: #3b82f6;
+        .pagination-btn:hover:not(:disabled) {
+            background: #f8fafc;
+            border-color: #3b82f6;
+        }
+
+        .pagination-btn.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border-color: #2563eb;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+    /* Bulk Actions Bar */
+    #bulkActionsBar {
+        position: fixed;
+        bottom: -100px;
+        left: 0;
+        right: 0;
+        background: white;
+        box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        justify-content: center;
+        transition: bottom 0.3s;
+        z-index: 1000;
     }
 
-    .pagination-btn.active {
-        background: #3b82f6;
-        color: white;
-        border-color: #3b82f6;
-    }
+        #bulkActionsBar.show {
+            bottom: 0;
+        }
 
-    .pagination-btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
-    /* Modal - Optimized */
+    /* Modal */
     .modal {
         display: none;
         position: fixed;
@@ -509,184 +541,74 @@
         top: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0,0,0,0.5);
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
         align-items: center;
         justify-content: center;
     }
 
     .modal-content {
         background: white;
-        border-radius: 0.75rem;
-        max-width: 90%;
+        border-radius: 1rem;
         max-height: 90vh;
         overflow-y: auto;
-        box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     }
 
-    /* Responsive Design */
-    @@media (max-width: 1024px) {
-        .tonkho-stats {
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        }
-        
-        .filter-row {
-            grid-template-columns: 1fr;
-        }
+    .loading-spinner {
+        text-align: center;
+        padding: 2rem;
+        color: #64748b;
     }
 
+        .loading-spinner i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+    /* Responsive */
     @@media (max-width: 768px) {
-        .tonkho-container {
-            padding: 0.5rem;
-        }
-
         .tonkho-header {
             flex-direction: column;
-            align-items: stretch;
+            align-items: flex-start;
         }
 
         .header-actions {
-            justify-content: stretch;
+            width: 100%;
+            flex-direction: column;
         }
 
         .btn-action-header {
-            flex: 1;
+            width: 100%;
+            justify-content: center;
         }
 
         .tonkho-stats {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: 1fr;
         }
 
-        .stat-card {
-            padding: 0.75rem;
-        }
-
-        .stat-icon {
-            width: 2.5rem;
-            height: 2.5rem;
-            font-size: 1.25rem;
-        }
-
-        .stat-content h3 {
-            font-size: 1.25rem;
-        }
-
-        .results-bar {
-            flex-direction: column;
-            align-items: stretch;
+        .filter-row {
+            grid-template-columns: 1fr;
         }
 
         .tonkho-table {
             font-size: 0.75rem;
         }
 
-        .tonkho-table th,
-        .tonkho-table td {
-            padding: 0.5rem 0.25rem;
+            .tonkho-table th,
+            .tonkho-table td {
+                padding: 0.5rem;
+            }
+
+        .pagination-container {
+            flex-wrap: wrap;
+            justify-content: center;
         }
-    }
-
-    @@media (max-width: 480px) {
-        .tonkho-stats {
-            grid-template-columns: 1fr;
-        }
-
-        .filter-chips {
-            flex-direction: column;
-        }
-
-        .filter-chip {
-            width: 100%;
-            justify-content: space-between;
-        }
-    }
-
-    /* Grid View - Compact */
-    .grid-view {
-        display: none;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .lot-card {
-        background: white;
-        border-radius: 0.75rem;
-        padding: 1rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        transition: all 0.2s;
-    }
-
-    .lot-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-
-    .lot-card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: start;
-        margin-bottom: 0.75rem;
-    }
-
-    .lot-card-title {
-        font-weight: 600;
-        color: #1e293b;
-        font-size: 0.875rem;
-        margin-bottom: 0.25rem;
-    }
-
-    .lot-card-info {
-        display: grid;
-        gap: 0.5rem;
-        font-size: 0.75rem;
-        color: #64748b;
-        margin-bottom: 0.75rem;
-    }
-
-    .lot-card-actions {
-        display: flex;
-        gap: 0.25rem;
-        padding-top: 0.75rem;
-        border-top: 1px solid #f1f5f9;
-    }
-
-    /* Loading & Empty States */
-    .loading-spinner,
-    .error-message,
-    .empty-state {
-        text-align: center;
-        padding: 3rem 1rem;
-        color: #64748b;
-    }
-
-    .loading-spinner i {
-        font-size: 2rem;
-        color: #3b82f6;
-    }
-
-    /* Bulk Actions Bar */
-    #bulkActionsBar {
-        position: fixed;
-        bottom: 1rem;
-        left: 50%;
-        transform: translateX(-50%);
-        background: white;
-        padding: 0.75rem 1rem;
-        border-radius: 0.75rem;
-        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-        display: none;
-        align-items: center;
-        gap: 1rem;
-        z-index: 100;
-    }
-
-    #bulkActionsBar.show {
-        display: flex;
     }
 </style>
 
 <div class="tonkho-container">
-    <!-- Header Actions -->
+    <!-- Header -->
     <div class="tonkho-header">
         <div class="header-left">
             <h2><i class="fas fa-warehouse"></i> Quản lý tồn kho</h2>
@@ -707,68 +629,48 @@
 
     <!-- Statistics Cards -->
     <div class="tonkho-stats">
-        <div class="stat-card stat-all">
-            <div class="stat-icon">
-                <i class="fas fa-boxes"></i>
-            </div>
+        <div class="stat-card stat-all" onclick="setQuickFilter('all')">
+            <div class="stat-icon"><i class="fas fa-boxes"></i></div>
             <div class="stat-content">
                 <h3>@totalItems</h3>
                 <p>Tổng số lô</p>
-                <span class="stat-trend">
-                    <i class="fas fa-info-circle"></i> Tất cả
-                </span>
+                <span class="stat-trend positive">100%</span>
             </div>
         </div>
 
-        <div class="stat-card stat-active">
-            <div class="stat-icon">
-                <i class="fas fa-check-circle"></i>
-            </div>
+        <div class="stat-card stat-active" onclick="setQuickFilter('active')">
+            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
             <div class="stat-content">
                 <h3>@activeCount</h3>
                 <p>Còn hàng</p>
-                <span class="stat-trend positive">
-                    <i class="fas fa-arrow-up"></i> @string.Format("{0:P0}", activeCount / (double)Math.Max(totalItems, 1))
-                </span>
+                <span class="stat-trend positive">@(totalItems > 0 ? Math.Round(activeCount * 100.0 / totalItems, 1) : 0)%</span>
             </div>
         </div>
 
-        <div class="stat-card stat-expiring">
-            <div class="stat-icon">
-                <i class="fas fa-clock"></i>
-            </div>
+        <div class="stat-card stat-expiring" onclick="setQuickFilter('expiring')">
+            <div class="stat-icon"><i class="fas fa-clock"></i></div>
             <div class="stat-content">
                 <h3>@expiringCount</h3>
                 <p>Sắp hết hạn</p>
-                <span class="stat-trend warning">
-                    <i class="fas fa-exclamation-triangle"></i> 30 ngày
-                </span>
+                <span class="stat-trend warning">≤30 ngày</span>
             </div>
         </div>
 
-        <div class="stat-card stat-expired">
-            <div class="stat-icon">
-                <i class="fas fa-times-circle"></i>
-            </div>
+        <div class="stat-card stat-expired" onclick="setQuickFilter('expired')">
+            <div class="stat-icon"><i class="fas fa-times-circle"></i></div>
             <div class="stat-content">
                 <h3>@expiredCount</h3>
                 <p>Đã hết hạn</p>
-                <span class="stat-trend danger">
-                    <i class="fas fa-ban"></i> Cần xử lý
-                </span>
+                <span class="stat-trend danger">Cần xử lý</span>
             </div>
         </div>
 
-        <div class="stat-card stat-outofstock">
-            <div class="stat-icon">
-                <i class="fas fa-box-open"></i>
-            </div>
+        <div class="stat-card stat-outofstock" onclick="setQuickFilter('outofstock')">
+            <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
             <div class="stat-content">
                 <h3>@outOfStockCount</h3>
                 <p>Hết hàng</p>
-                <span class="stat-trend">
-                    <i class="fas fa-shopping-cart"></i> SL = 0
-                </span>
+                <span class="stat-trend danger">Số lượng = 0</span>
             </div>
         </div>
     </div>
@@ -776,242 +678,187 @@
     <!-- Quick Filters -->
     <div class="quick-filters-section">
         <div class="filter-chips">
-            <button type="button" class="filter-chip @(filter == "all" ? "active" : "")" onclick="setQuickFilter('all')">
-                <i class="fas fa-list"></i>
-                <span>Tất cả</span>
+            <div class="filter-chip @(filter == "all" ? "active" : "")" onclick="setQuickFilter('all')">
+                <i class="fas fa-th"></i>
+                Tất cả
                 <span class="badge">@totalItems</span>
-            </button>
-            <button type="button" class="filter-chip @(filter == "active" ? "active" : "")" onclick="setQuickFilter('active')">
+            </div>
+            <div class="filter-chip @(filter == "active" ? "active" : "")" onclick="setQuickFilter('active')">
                 <i class="fas fa-check-circle"></i>
-                <span>Còn hàng</span>
+                Còn hàng
                 <span class="badge">@activeCount</span>
-            </button>
-            <button type="button" class="filter-chip @(filter == "expiring" ? "active" : "")" onclick="setQuickFilter('expiring')">
+            </div>
+            <div class="filter-chip @(filter == "expiring" ? "active" : "")" onclick="setQuickFilter('expiring')">
                 <i class="fas fa-clock"></i>
-                <span>Sắp hết hạn</span>
+                Sắp hết hạn
                 <span class="badge">@expiringCount</span>
-            </button>
-            <button type="button" class="filter-chip @(filter == "expired" ? "active" : "")" onclick="setQuickFilter('expired')">
-                <i class="fas fa-exclamation-triangle"></i>
-                <span>Đã hết hạn</span>
+            </div>
+            <div class="filter-chip @(filter == "expired" ? "active" : "")" onclick="setQuickFilter('expired')">
+                <i class="fas fa-times-circle"></i>
+                Đã hết hạn
                 <span class="badge">@expiredCount</span>
-            </button>
-            <button type="button" class="filter-chip @(filter == "outofstock" ? "active" : "")" onclick="setQuickFilter('outofstock')">
-                <i class="fas fa-box-open"></i>
-                <span>Hết hàng</span>
+            </div>
+            <div class="filter-chip @(filter == "outofstock" ? "active" : "")" onclick="setQuickFilter('outofstock')">
+                <i class="fas fa-exclamation-triangle"></i>
+                Hết hàng
                 <span class="badge">@outOfStockCount</span>
-            </button>
+            </div>
         </div>
     </div>
 
-    <!-- Advanced Search & Filter -->
+    <!-- Advanced Filter -->
     <div class="filter-card">
-        <form id="tonKhoFilterForm" method="get">
-            <div class="filter-header">
-                <h4><i class="fas fa-search"></i> Tìm kiếm & Lọc</h4>
-                <button type="button" class="btn-toggle-filter" onclick="toggleAdvancedFilter()">
-                    <i class="fas fa-chevron-down"></i>
-                </button>
-            </div>
-
-            <div class="filter-body" id="advancedFilter" style="display: none;">
+        <div class="filter-header">
+            <h4><i class="fas fa-filter"></i> Bộ lọc nâng cao</h4>
+            <button type="button" class="btn-toggle-filter" onclick="toggleAdvancedFilter()">
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+        <div class="filter-body" id="advancedFilter" style="display: none;">
+            <form id="tonKhoFilterForm">
+                <input type="hidden" name="page" value="@currentPage" />
                 <div class="filter-row">
-                    <div class="filter-group" style="grid-column: span 2;">
-                        <label><i class="fas fa-search"></i> Tìm kiếm</label>
-                        <input type="text" name="search" value="@search"
-                               placeholder="Tên thuốc, mã lô, số lô, kho..."
-                               class="form-control-modern" />
+                    <div class="form-group-inline">
+                        <label>Tìm kiếm</label>
+                        <input type="text" name="search" value="@search" placeholder="Tên thuốc, mã lô, số lô..." />
                     </div>
-
-                    <div class="filter-group">
-                        <label><i class="fas fa-filter"></i> Trạng thái</label>
-                        <select name="filter" class="form-control-modern">
-                            <option value="all" selected="@(filter == "all")">Tất cả</option>
-                            <option value="active" selected="@(filter == "active")">Còn hàng</option>
-                            <option value="expiring" selected="@(filter == "expiring")">Sắp hết hạn (30 ngày)</option>
-                            <option value="expired" selected="@(filter == "expired")">Đã hết hạn</option>
-                            <option value="outofstock" selected="@(filter == "outofstock")">Hết hàng</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-group">
-                        <label><i class="fas fa-sort-amount-down"></i> Sắp xếp</label>
-                        <select name="sortBy" class="form-control-modern">
-                            <option value="HanSuDung">Hạn sử dụng</option>
-                            <option value="TenThuoc">Tên thuốc</option>
-                            <option value="SoLuongCon">Số lượng còn</option>
-                            <option value="NgaySanXuat">Ngày sản xuất</option>
+                    <div class="form-group-inline">
+                        <label>Trạng thái</label>
+                        <select name="filter" class="form-control">
+                            <option value="all" selected="@(ViewBag.Filter == "all")">Tất cả</option>
+                            <option value="active" selected="@(ViewBag.Filter == "active")">Còn hàng</option>
+                            <option value="expiring" selected="@(ViewBag.Filter == "expiring")">Sắp hết hạn</option>
+                            <option value="expired" selected="@(ViewBag.Filter == "expired")">Đã hết hạn</option>
+                            <option value="outofstock" selected="@(ViewBag.Filter == "outofstock")">Hết hàng</option>
                         </select>
                     </div>
                 </div>
-
                 <div class="filter-actions">
-                    <button type="submit" class="btn-primary-modern">
+                    <button type="submit" class="btn-filter btn-primary-modern">
                         <i class="fas fa-search"></i> Tìm kiếm
                     </button>
-                    <button type="button" class="btn-secondary-modern" onclick="resetFilter()">
+                    <button type="button" class="btn-filter btn-secondary-modern" onclick="resetFilter()">
                         <i class="fas fa-redo"></i> Đặt lại
                     </button>
                 </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="tonkho-table-wrapper">
+        <div class="table-header-modern">
+            <h4><i class="fas fa-list"></i> Danh sách lô thuốc (@totalItems lô)</h4>
+            <div class="view-toggle">
+                <button class="view-btn active" data-view="table">
+                    <i class="fas fa-table"></i> Bảng
+                </button>
+                <button class="view-btn" data-view="grid">
+                    <i class="fas fa-th"></i> Lưới
+                </button>
             </div>
+        </div>
 
-            <input type="hidden" name="page" value="@currentPage" />
-        </form>
-    </div>
-
-    <!-- Results Info Bar -->
-    <div class="results-bar">
-        <div class="results-info">
-            <i class="fas fa-info-circle"></i>
-            Hiển thị <strong>@Model.Count()</strong> / <strong>@totalItems</strong> lô thuốc
-            @if (!string.IsNullOrEmpty(search))
+        <div id="tableView">
+            @if (Model != null && Model.Any())
             {
-                <span class="search-query">| Tìm kiếm: <strong>"@search"</strong></span>
-            }
-        </div>
-        <div class="view-options">
-            <button type="button" class="view-btn active" data-view="table">
-                <i class="fas fa-table"></i>
-            </button>
-            <button type="button" class="view-btn" data-view="grid">
-                <i class="fas fa-th"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- Table View -->
-    <div id="tableView" class="tonkho-table-wrapper">
-        <table class="tonkho-table">
-            <thead>
-                <tr>
-                    <th style="width: 40px;">
-                        <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)" />
-                    </th>
-                    <th>Mã lô</th>
-                    <th>Tên thuốc</th>
-                    <th>Số lô</th>
-                    <th>Kho</th>
-                    <th style="text-align: right;">SL còn</th>
-                    <th>HSD</th>
-                    <th>Trạng thái</th>
-                    <th style="text-align: center;">Thao tác</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model != null && Model.Any())
-                {
-                    foreach (var lot in Model)
-                    {
-                        var daysToExpire = (lot.HanSuDung - now).Days;
-                        var isExpiring = daysToExpire <= 30 && daysToExpire >= 0;
-                        var isExpired = daysToExpire < 0;
-                        var statusBadge = isExpired ? "badge-danger" : isExpiring ? "badge-warning" : lot.TrangThai == "ConHang" ? "badge-success" : "badge-secondary";
-                        var statusText = isExpired ? "Hết hạn" : isExpiring ? "Sắp hết hạn" : lot.TrangThai == "ConHang" ? "Còn hàng" : "Hết hàng";
-
+                <table class="tonkho-table">
+                    <thead>
                         <tr>
-                            <td>
-                                <input type="checkbox" class="row-checkbox" value="@lot.MaLo" />
-                            </td>
-                            <td><strong>@lot.MaLo</strong></td>
-                            <td>@lot.Thuoc?.TenThuoc</td>
-                            <td>@lot.SoLo</td>
-                            <td>@lot.Kho?.TenKho</td>
-                            <td style="text-align: right;">
-                                <strong>@lot.SoLuongCon.ToString("N0")</strong>
-                            </td>
-                            <td>
-                                <small>@lot.HanSuDung.ToString("dd/MM/yyyy")</small>
-                                @if (isExpiring || isExpired)
-                                {
-                                    <br /><small class="@(isExpired ? "text-danger" : "text-warning")">
-                                        (@(isExpired ? $"{Math.Abs(daysToExpire)} ngày" : $"Còn {daysToExpire} ngày"))
-                                    </small>
-                                }
-                            </td>
-                            <td>
-                                <span class="badge @statusBadge">@statusText</span>
-                            </td>
-                            <td style="text-align: center; white-space: nowrap;">
-                                <button type="button" class="action-btn btn-view" onclick="viewLotDetail('@lot.MaLo')" title="Xem chi tiết">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button type="button" class="action-btn btn-print" onclick="printLotLabel('@lot.MaLo')" title="In nhãn">
-                                    <i class="fas fa-print"></i>
-                                </button>
-                                @if (isExpired)
-                                {
-                                    <button type="button" class="action-btn btn-handle" onclick="handleExpiredLot('@lot.MaLo')" title="Xử lý">
-                                        <i class="fas fa-exclamation-circle"></i>
-                                    </button>
-                                }
-                            </td>
+                            <th style="width: 40px;">
+                                <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)" />
+                            </th>
+                            <th>Mã lô</th>
+                            <th>Số lô</th>
+                            <th>Tên thuốc</th>
+                            <th>Kho</th>
+                            <th>Số lượng còn</th>
+                            <th>HSD</th>
+                            <th>Trạng thái</th>
+                            <th style="text-align: center;">Thao tác</th>
                         </tr>
-                    }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="9" class="empty-state">
-                            <i class="fas fa-inbox" style="font-size: 3rem; color: #cbd5e1;"></i>
-                            <p>Không có dữ liệu</p>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Grid View -->
-    <div id="gridView" class="grid-view">
-        @if (Model != null && Model.Any())
-        {
-            foreach (var lot in Model)
-            {
-                var daysToExpire = (lot.HanSuDung - now).Days;
-                var isExpiring = daysToExpire <= 30 && daysToExpire >= 0;
-                var isExpired = daysToExpire < 0;
-                var statusBadge = isExpired ? "badge-danger" : isExpiring ? "badge-warning" : lot.TrangThai == "ConHang" ? "badge-success" : "badge-secondary";
-                var statusText = isExpired ? "Hết hạn" : isExpiring ? "Sắp hết hạn" : lot.TrangThai == "ConHang" ? "Còn hàng" : "Hết hàng";
-
-                <div class="lot-card">
-                    <div class="lot-card-header">
-                        <div>
-                            <div class="lot-card-title">@lot.Thuoc?.TenThuoc</div>
-                            <small style="color: #64748b;">@lot.MaLo</small>
-                        </div>
-                        <span class="badge @statusBadge">@statusText</span>
-                    </div>
-                    <div class="lot-card-info">
-                        <div><i class="fas fa-tag"></i> Số lô: <strong>@lot.SoLo</strong></div>
-                        <div><i class="fas fa-warehouse"></i> Kho: @lot.Kho?.TenKho</div>
-                        <div><i class="fas fa-boxes"></i> Còn lại: <strong>@lot.SoLuongCon.ToString("N0")</strong></div>
-                        <div>
-                            <i class="fas fa-calendar-alt"></i> HSD: <strong>@lot.HanSuDung.ToString("dd/MM/yyyy")</strong>
-                            @if (isExpiring || isExpired)
-                            {
-                                <br /><small class="@(isExpired ? "text-danger" : "text-warning")">
-                                    (@(isExpired ? $"{Math.Abs(daysToExpire)} ngày" : $"Còn {daysToExpire} ngày"))
-                                </small>
-                            }
-                        </div>
-                    </div>
-                    <div class="lot-card-actions">
-                        <button type="button" class="action-btn btn-view" onclick="viewLotDetail('@lot.MaLo')" title="Xem chi tiết" style="flex: 1;">
-                            <i class="fas fa-eye"></i> Xem
-                        </button>
-                        <button type="button" class="action-btn btn-print" onclick="printLotLabel('@lot.MaLo')" title="In nhãn" style="flex: 1;">
-                            <i class="fas fa-print"></i> In
-                        </button>
-                        @if (isExpired)
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
                         {
-                            <button type="button" class="action-btn btn-handle" onclick="handleExpiredLot('@lot.MaLo')" title="Xử lý" style="flex: 1;">
-                                <i class="fas fa-exclamation-circle"></i>
-                            </button>
+                            var daysUntilExpiry = (item.HanSuDung - now).Days;
+                            var isExpired = item.HanSuDung < now;
+                            var isExpiring = !isExpired && daysUntilExpiry <= 30;
+
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="row-checkbox" value="@item.MaLo" />
+                                </td>
+                                <td><strong>@item.MaLo</strong></td>
+                                <td>@item.SoLo</td>
+                                <td>@item.Thuoc.TenThuoc</td>
+                                <td>@item.Kho.TenKho</td>
+                                <td>
+                                    <strong>@item.SoLuongCon</strong> @item.Thuoc.DonViTinh
+                                </td>
+                                <td class="@(isExpired ? "text-danger" : (isExpiring ? "text-warning" : ""))">
+                                    @item.HanSuDung.ToString("dd/MM/yyyy")
+                                    @if (isExpired)
+                                    {
+                                        <br /><small>(Quá hạn @Math.Abs(daysUntilExpiry) ngày)</small>
+                                    }
+                                    else if (isExpiring)
+                                    {
+                                        <br /><small>(Còn @daysUntilExpiry ngày)</small>
+                                    }
+                                </td>
+                                <td>
+                                    @if (isExpired)
+                                    {
+                                        <span class="badge-status badge-danger">
+                                            <i class="fas fa-times-circle"></i> Hết hạn
+                                        </span>
+                                    }
+                                    else if (isExpiring)
+                                    {
+                                        <span class="badge-status badge-warning">
+                                            <i class="fas fa-clock"></i> Sắp hết hạn
+                                        </span>
+                                    }
+                                    else if (item.SoLuongCon == 0)
+                                    {
+                                        <span class="badge-status badge-danger">
+                                            <i class="fas fa-exclamation-triangle"></i> Hết hàng
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge-status badge-active">
+                                            <i class="fas fa-check-circle"></i> Còn hàng
+                                        </span>
+                                    }
+                                </td>
+                                <td style="text-align: center; white-space: nowrap;">
+                                    <button type="button" class="action-btn-small btn-view" onclick="viewLotDetail('@item.MaLo')" title="Xem chi tiết">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button type="button" class="action-btn-small btn-print" onclick="printLotLabel('@item.MaLo')" title="In nhãn">
+                                        <i class="fas fa-print"></i>
+                                    </button>
+                                </td>
+                            </tr>
                         }
-                    </div>
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div style="padding: 2rem; text-align: center; color: #64748b;">
+                    <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                    <p>Không có dữ liệu</p>
                 </div>
             }
-        }
+        </div>
+
+        <div id="gridView" style="display: none; padding: 1rem; display: none;">
+            <!-- Grid view implementation -->
+            <p style="text-align: center; color: #64748b;">Chế độ xem lưới đang được phát triển</p>
+        </div>
     </div>
 
     <!-- Pagination -->
@@ -1066,6 +913,13 @@
 <div id="lotDetailModal" class="modal">
     <div class="modal-content" style="width: 90%; max-width: 800px;">
         <div id="lotDetailContent"></div>
+    </div>
+</div>
+
+<!-- Stats Modal -->
+<div id="statsModal" class="modal">
+    <div class="modal-content" style="width: 95%; max-width: 1200px;">
+        <div id="statsContent"></div>
     </div>
 </div>
 
@@ -1141,6 +995,11 @@
         document.getElementById('lotDetailModal').style.display = 'none';
     }
 
+    // Close stats modal
+    function closeStatsModal() {
+        document.getElementById('statsModal').style.display = 'none';
+    }
+
     // Print lot label
     function printLotLabel(maLo) {
         window.open(`/Admin/Thuoc/PrintLotLabel/${maLo}`, '_blank');
@@ -1170,7 +1029,22 @@
 
     // Load ton kho stats
     function loadTonKhoStats() {
-        alert('Chức năng thống kê đang được phát triển');
+        const modal = document.getElementById('statsModal');
+        const content = document.getElementById('statsContent');
+
+        modal.style.display = 'flex';
+        content.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Đang tải thống kê...</div>';
+
+        fetch('/Admin/Thuoc/TonKhoStats', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.text())
+        .then(html => {
+            content.innerHTML = html;
+        })
+        .catch(error => {
+            content.innerHTML = '<div class="error-message"><i class="fas fa-exclamation-triangle"></i> Lỗi khi tải thống kê</div>';
+        });
     }
 
     // Export ton kho
@@ -1248,7 +1122,7 @@
                 document.getElementById('gridView').style.display = 'none';
             } else {
                 document.getElementById('tableView').style.display = 'none';
-                document.getElementById('gridView').style.display = 'grid';
+                document.getElementById('gridView').style.display = 'block';
             }
         });
     });
@@ -1273,6 +1147,12 @@
     document.getElementById('lotDetailModal')?.addEventListener('click', function(e) {
         if (e.target === this) {
             closeLotDetailModal();
+        }
+    });
+
+    document.getElementById('statsModal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeStatsModal();
         }
     });
 

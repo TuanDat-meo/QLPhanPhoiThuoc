@@ -46,9 +46,11 @@ namespace QLPhanPhoiThuoc.Models.ViewModels
         public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Vui lòng nhập mật khẩu")]
-        [StringLength(100, ErrorMessage = "Mật khẩu phải có ít nhất {2} ký tự", MinimumLength = 6)]
+        [StringLength(100, ErrorMessage = "Mật khẩu phải từ {2} đến {1} ký tự", MinimumLength = 8)]
         [DataType(DataType.Password)]
         [Display(Name = "Mật khẩu")]
+        // Yêu cầu: ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt
+        [RegularExpression(@"^(?=.*[a-z])(?=(.*[A-Z]))(?=.*[0-9])(?=.*[!@#$%^&*()_+{}:;<>,.?~-]).{8,}$",ErrorMessage = "Mật khẩu phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt")]
         public string Password { get; set; } = string.Empty;
 
         [DataType(DataType.Password)]
@@ -75,8 +77,8 @@ namespace QLPhanPhoiThuoc.Models.ViewModels
         [StringLength(500, ErrorMessage = "Tiền sử dị ứng không được quá 500 ký tự")]
         public string TienSuDiUng { get; set; } = string.Empty;
 
-        [Display(Name = "Tôi đồng ý với điều khoản sử dụng")]
-        [Range(typeof(bool), "true", "true", ErrorMessage = "Bạn phải đồng ý với điều khoản sử dụng")]
+        [Required(ErrorMessage = "Bạn phải đồng ý với điều khoản sử dụng")]
+        [Range(typeof(bool), "true", "true", ErrorMessage = "Vui lòng xác nhận đồng ý với điều khoản")]
         public bool AgreeTerms { get; set; }
     }
 }

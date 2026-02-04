@@ -1,0 +1,507 @@
+@model dynamic
+@{
+    ViewData["Title"] = "Thống kê chi tiết";
+    var tongQuan = ViewBag.TongQuanData;
+    var thongKeNhom = ViewBag.ThongKeNhomThuoc as List<dynamic>;
+    var thongKeKho = ViewBag.ThongKeTheoKho as List<dynamic>;
+    var topTonNhieu = ViewBag.TopThuocTonNhieu as List<dynamic>;
+    var topGiaTriCao = ViewBag.TopThuocGiaTriCao as List<dynamic>;
+    var canhBao = ViewBag.ThuocCanCanhBao as List<dynamic>;
+}
+
+<div class="container-fluid p-4">
+    <!-- Header với Actions -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-gradient-primary mb-2">
+                <i class="fas fa-chart-line me-2"></i>Thống kê chi tiết
+            </h2>
+            <p class="text-muted mb-0">
+                Từ <strong>@ViewBag.TuNgay.ToString("dd/MM/yyyy")</strong> đến <strong>@ViewBag.DenNgay.ToString("dd/MM/yyyy")</strong>
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary" onclick="xuatBaoCao()">
+                <i class="fas fa-file-excel me-2"></i>Xuất Excel
+            </button>
+            <button class="btn btn-outline-primary" onclick="chonKhoangThoiGian()">
+                <i class="fas fa-calendar-alt me-2"></i>Chọn thời gian
+            </button>
+        </div>
+    </div>
+
+    <!-- Thống kê tổng quan -->
+    <div class="row g-3 mb-4">
+        <!-- Tổng số thuốc -->
+        <div class="col-md-3">
+            <div class="card card-hover h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1">Tổng số thuốc</p>
+                            <h3 class="mb-0 fw-bold">@tongQuan.TongSoThuoc</h3>
+                        </div>
+                        <div class="bg-gradient-primary text-white rounded p-3">
+                            <i class="fas fa-pills fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tổng số lô -->
+        <div class="col-md-3">
+            <div class="card card-hover h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1">Tổng số lô</p>
+                            <h3 class="mb-0 fw-bold">@tongQuan.TongSoLo</h3>
+                        </div>
+                        <div class="bg-gradient-info text-white rounded p-3">
+                            <i class="fas fa-box fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Giá trị tồn kho -->
+        <div class="col-md-3">
+            <div class="card card-hover h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1">Giá trị tồn kho</p>
+                            <h3 class="mb-0 fw-bold">@string.Format("{0:N0}₫", tongQuan.TongGiaTriTonKho)</h3>
+                            <small class="text-success">
+                                <i class="fas fa-arrow-up me-1"></i>@string.Format("{0:+0.0;-0.0;0}%", tongQuan.TangTruongTonKho)
+                            </small>
+                        </div>
+                        <div class="bg-gradient-success text-white rounded p-3">
+                            <i class="fas fa-dollar-sign fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cảnh báo -->
+        <div class="col-md-3">
+            <div class="card card-hover h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1">Cảnh báo</p>
+                            <h3 class="mb-0 fw-bold text-warning">@(tongQuan.SoLoSapHetHan + tongQuan.SoLoHetHan + tongQuan.SoThuocSapHet)</h3>
+                            <small class="text-muted">
+                                @tongQuan.SoLoSapHetHan sắp HH, @tongQuan.SoLoHetHan đã HH
+                            </small>
+                        </div>
+                        <div class="bg-gradient-warning text-white rounded p-3">
+                            <i class="fas fa-exclamation-triangle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 2: Charts & Tables -->
+    <div class="row g-3 mb-4">
+        <!-- Thống kê theo nhóm thuốc -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <i class="fas fa-chart-pie me-2"></i>Thống kê theo nhóm thuốc
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nhóm thuốc</th>
+                                    <th class="text-end">SL thuốc</th>
+                                    <th class="text-end">Tồn kho</th>
+                                    <th class="text-end">Giá trị</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (thongKeNhom != null && thongKeNhom.Any())
+                                {
+                                    foreach (var item in thongKeNhom.Take(8))
+                                    {
+                                        <tr>
+                                            <td>
+                                                <span class="badge badge-primary">@item.NhomThuoc</span>
+                                            </td>
+                                            <td class="text-end">@item.SoLuongThuoc</td>
+                                            <td class="text-end">@string.Format("{0:N0}", item.TongTonKho)</td>
+                                            <td class="text-end fw-bold">@string.Format("{0:N0}₫", item.GiaTriTonKho)</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-4">
+                                            <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                                            Chưa có dữ liệu
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thống kê theo kho -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <i class="fas fa-warehouse me-2"></i>Thống kê theo kho
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Tên kho</th>
+                                    <th class="text-end">Số lô</th>
+                                    <th class="text-end">Tổng SL</th>
+                                    <th class="text-end">Giá trị</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (thongKeKho != null && thongKeKho.Any())
+                                {
+                                    foreach (var item in thongKeKho)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <i class="fas fa-warehouse text-primary me-2"></i>@item.TenKho
+                                                @if (item.SoLoSapHetHan > 0 || item.SoLoHetHan > 0)
+                                                {
+                                                    <span class="badge badge-warning ms-2">
+                                                        <i class="fas fa-exclamation-triangle"></i>
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td class="text-end">@item.SoLoThuoc</td>
+                                            <td class="text-end">@string.Format("{0:N0}", item.TongSoLuong)</td>
+                                            <td class="text-end fw-bold">@string.Format("{0:N0}₫", item.GiaTriTonKho)</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-4">
+                                            <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                                            Chưa có dữ liệu
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 3: Top thuốc -->
+    <div class="row g-3 mb-4">
+        <!-- Top thuốc tồn nhiều -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <i class="fas fa-trophy me-2"></i>Top 10 thuốc tồn kho nhiều nhất
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;">#</th>
+                                    <th>Tên thuốc</th>
+                                    <th class="text-end">Số lượng</th>
+                                    <th class="text-end">Giá trị</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (topTonNhieu != null && topTonNhieu.Any())
+                                {
+                                    int rank = 1;
+                                    foreach (var item in topTonNhieu)
+                                    {
+                                        var medalClass = rank <= 3 ? (rank == 1 ? "gold" : rank == 2 ? "silver" : "bronze") : "";
+                                        <tr>
+                                            <td>
+                                                @if (rank <= 3)
+                                                {
+                                                    <i class="fas fa-medal text-@medalClass"></i>
+                                                }
+                                                else
+                                                {
+                                                    <span>@rank</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div>@item.TenThuoc</div>
+                                                <small class="text-muted">@item.MaThuoc - @item.SoLo lô</small>
+                                            </td>
+                                            <td class="text-end">
+                                                <strong>@string.Format("{0:N0}", item.TongSoLuong)</strong>
+                                                <small class="text-muted d-block">@item.DonViTinh</small>
+                                            </td>
+                                            <td class="text-end fw-bold">@string.Format("{0:N0}₫", item.GiaTri)</td>
+                                        </tr>
+                                        rank++;
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top thuốc giá trị cao -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <i class="fas fa-gem me-2"></i>Top 10 thuốc giá trị cao nhất
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;">#</th>
+                                    <th>Tên thuốc</th>
+                                    <th class="text-end">Số lượng</th>
+                                    <th class="text-end">Giá trị</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (topGiaTriCao != null && topGiaTriCao.Any())
+                                {
+                                    int rank = 1;
+                                    foreach (var item in topGiaTriCao)
+                                    {
+                                        var medalClass = rank <= 3 ? (rank == 1 ? "gold" : rank == 2 ? "silver" : "bronze") : "";
+                                        <tr>
+                                            <td>
+                                                @if (rank <= 3)
+                                                {
+                                                    <i class="fas fa-medal text-@medalClass"></i>
+                                                }
+                                                else
+                                                {
+                                                    <span>@rank</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div>@item.TenThuoc</div>
+                                                <small class="text-muted">@item.MaThuoc</small>
+                                            </td>
+                                            <td class="text-end">
+                                                <strong>@string.Format("{0:N0}", item.TongSoLuong)</strong>
+                                                <small class="text-muted d-block">@item.DonViTinh</small>
+                                            </td>
+                                            <td class="text-end fw-bold text-success">@string.Format("{0:N0}₫", item.GiaTri)</td>
+                                        </tr>
+                                        rank++;
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 4: Cảnh báo -->
+    @if (canhBao != null && canhBao.Any())
+    {
+        <div class="row g-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-gradient-warning text-white">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Thuốc cần cảnh báo (@canhBao.Count)
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Mã thuốc</th>
+                                        <th>Tên thuốc</th>
+                                        <th class="text-end">Tồn kho</th>
+                                        <th class="text-end">Tồn tối thiểu</th>
+                                        <th class="text-end">Lô sắp HH</th>
+                                        <th class="text-end">Trạng thái</th>
+                                        <th class="text-center">Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in canhBao)
+                                    {
+                                        var tonKho = item.TonKho;
+                                        var tonToiThieu = item.Thuoc.TonKhoToiThieu;
+                                        var sapHetHan = item.SoLoSapHetHan;
+
+                                        <tr>
+                                            <td>@item.Thuoc.MaThuoc</td>
+                                            <td>@item.Thuoc.TenThuoc</td>
+                                            <td class="text-end">
+                                                <strong class="@(tonKho == 0 ? "text-danger" : tonKho <= tonToiThieu ? "text-warning" : "")">
+                                                    @tonKho
+                                                </strong>
+                                                <small class="text-muted d-block">@item.Thuoc.DonViTinh</small>
+                                            </td>
+                                            <td class="text-end">@tonToiThieu</td>
+                                            <td class="text-end">
+                                                @if (sapHetHan > 0)
+                                                {
+                                                    <span class="badge badge-warning">@sapHetHan lô</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td class="text-end">
+                                                @if (tonKho == 0)
+                                                {
+                                                    <span class="badge badge-danger">
+                                                        <i class="fas fa-times-circle me-1"></i>Hết hàng
+                                                    </span>
+                                                }
+                                                else if (tonKho <= tonToiThieu)
+                                                {
+                                                    <span class="badge badge-warning">
+                                                        <i class="fas fa-exclamation-triangle me-1"></i>Sắp hết
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="/Admin/Thuoc/Details/@item.Thuoc.MaThuoc" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Modal chọn khoảng thời gian -->
+<div class="modal fade" id="modalChonThoiGian" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-calendar-alt me-2"></i>Chọn khoảng thời gian
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Từ ngày</label>
+                    <input type="date" class="form-control" id="tuNgay" value="@ViewBag.TuNgay.ToString("yyyy-MM-dd")">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Đến ngày</label>
+                    <input type="date" class="form-control" id="denNgay" value="@ViewBag.DenNgay.ToString("yyyy-MM-dd")">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Nhóm theo</label>
+                    @{
+                    var selectedValue = ViewBag.GroupBy?.ToString();
+                    }
+                    <select class="form-select" id="groupBy">
+                        <option value="Ngay" selected="@(selectedValue == "Ngay")">Ngày</option>
+                        <option value="Tuan" selected="@(selectedValue == "Tuan")">Tuần</option>
+                        <option value="Thang" selected="@(selectedValue == "Thang")">Tháng</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" onclick="apDungThoiGian()">
+                    <i class="fas fa-check me-2"></i>Áp dụng
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function chonKhoangThoiGian() {
+            new bootstrap.Modal(document.getElementById('modalChonThoiGian')).show();
+        }
+
+        function apDungThoiGian() {
+            const tuNgay = document.getElementById('tuNgay').value;
+            const denNgay = document.getElementById('denNgay').value;
+            const groupBy = document.getElementById('groupBy').value;
+            
+            window.location.href = `/Admin/Thuoc/ThongKeChiTiet?tuNgay=${tuNgay}&denNgay=${denNgay}&groupBy=${groupBy}`;
+        }
+
+        function xuatBaoCao() {
+            const tuNgay = document.getElementById('tuNgay')?.value || '@ViewBag.TuNgay.ToString("yyyy-MM-dd")';
+            const denNgay = document.getElementById('denNgay')?.value || '@ViewBag.DenNgay.ToString("yyyy-MM-dd")';
+            
+            window.location.href = `/Admin/Thuoc/ExportThongKeChiTiet?tuNgay=${tuNgay}&denNgay=${denNgay}`;
+        }
+
+        // Medal colors
+        const style = document.createElement('style');
+        style.textContent = `
+            .text-gold { color: #FFD700 !important; }
+            .text-silver { color: #C0C0C0 !important; }
+            .text-bronze { color: #CD7F32 !important; }
+        `;
+        document.head.appendChild(style);
+    </script>
+}
+
+<style>
+    .card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card-hover:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .badge {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+    }
+
+    .table th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+</style>

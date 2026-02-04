@@ -1,0 +1,378 @@
+@model QLPhanPhoiThuoc.Models.Entities.LoThuoc
+
+<!-- Modal xử lý lô hết hạn -->
+<div class="modal fade" id="modalXuLyLoHetHan" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-warning text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Xử lý lô thuốc hết hạn
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            
+            <form id="formXuLyLoHetHan" asp-action="XuLyLoHetHan" asp-controller="Thuoc" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" id="maLoHetHan" />
+                
+                <div class="modal-body">
+                    <!-- Thông tin lô thuốc -->
+                    <div class="alert alert-warning border-0">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <strong>Mã lô:</strong>
+                                    <span id="displayMaLo"></span>
+                                </div>
+                                <div class="mb-2">
+                                    <strong>Tên thuốc:</strong>
+                                    <span id="displayTenThuoc"></span>
+                                </div>
+                                <div class="mb-2">
+                                    <strong>Số lô:</strong>
+                                    <span id="displaySoLo"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <strong>Hạn sử dụng:</strong>
+                                    <span id="displayHanSuDung" class="text-danger"></span>
+                                </div>
+                                <div class="mb-2">
+                                    <strong>Số lượng còn:</strong>
+                                    <span id="displaySoLuongCon" class="badge badge-warning"></span>
+                                </div>
+                                <div class="mb-2">
+                                    <strong>Kho:</strong>
+                                    <span id="displayTenKho"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form xử lý -->
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-clipboard-list me-2"></i>Lý do xử lý <span class="text-danger">*</span>
+                            </label>
+                            <textarea class="form-control" name="lyDo" id="lyDoXuLy" rows="3" required 
+                                      placeholder="Nhập lý do xử lý (VD: Thuốc hết hạn sử dụng, không đảm bảo chất lượng...)"></textarea>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>Lý do này sẽ được ghi vào phiếu hủy
+                            </div>
+                        </div>
+
+                        <div class="col-12 mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-cog me-2"></i>Phương thức xử lý <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" name="phuongThucXuLy" id="phuongThucXuLy" required>
+                                <option value="">-- Chọn phương thức --</option>
+                                <option value="TieuHuy" selected>Tiêu hủy theo quy định</option>
+                                <option value="TraNhaCungCap">Trả lại nhà cung cấp</option>
+                                <option value="TieuHuyTaiCho">Tiêu hủy tại chỗ</option>
+                                <option value="ChuyenKhac">Chuyển sang kho khác (nếu có)</option>
+                            </select>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>Chọn phương thức xử lý phù hợp với quy định
+                            </div>
+                        </div>
+
+                        <!-- Thông tin bổ sung -->
+                        <div class="col-12">
+                            <div class="card bg-light border-0">
+                                <div class="card-body">
+                                    <h6 class="fw-bold mb-3">
+                                        <i class="fas fa-info-circle me-2"></i>Quy trình xử lý:
+                                    </h6>
+                                    <ol class="mb-0 ps-3">
+                                        <li class="mb-2">Hệ thống sẽ tự động tạo <strong>Phiếu hủy</strong> với trạng thái "Chờ xử lý"</li>
+                                        <li class="mb-2">Lô thuốc sẽ được chuyển sang trạng thái <strong>"Hết hạn"</strong></li>
+                                        <li class="mb-2">Phiếu hủy cần được <strong>duyệt</strong> bởi người có thẩm quyền</li>
+                                        <li class="mb-2">Sau khi duyệt, tiến hành <strong>tiêu hủy</strong> theo đúng quy định</li>
+                                        <li>Cập nhật trạng thái phiếu hủy thành <strong>"Đã xử lý"</strong></li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cảnh báo -->
+                    <div class="alert alert-danger border-0 mt-3 mb-0">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+                            <div>
+                                <strong>Lưu ý quan trọng:</strong>
+                                <ul class="mb-0 ps-3">
+                                    <li>Hành động này không thể hoàn tác</li>
+                                    <li>Vui lòng kiểm tra kỹ thông tin trước khi xác nhận</li>
+                                    <li>Đảm bảo tuân thủ đúng quy định về tiêu hủy thuốc</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Hủy bỏ
+                    </button>
+                    <button type="submit" class="btn btn-warning text-white">
+                        <i class="fas fa-check me-2"></i>Xác nhận xử lý
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xử lý hàng loạt -->
+<div class="modal fade" id="modalXuLyHangLoat" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-warning text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-boxes me-2"></i>Xử lý hàng loạt lô hết hạn
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            
+            <form id="formXuLyHangLoat" asp-action="XuLyHangLoatLoHetHan" asp-controller="Thuoc" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="ids" id="danhSachMaLo" />
+                
+                <div class="modal-body">
+                    <!-- Danh sách lô sẽ xử lý -->
+                    <div class="alert alert-info border-0 mb-4">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-info-circle fa-2x me-3"></i>
+                            <div>
+                                <strong>Đã chọn <span id="soLoChon">0</span> lô thuốc để xử lý</strong>
+                                <p class="mb-0 mt-2">Hệ thống sẽ tạo một phiếu hủy chung cho tất cả các lô được chọn</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bảng danh sách -->
+                    <div class="table-responsive mb-4" style="max-height: 300px; overflow-y: auto;">
+                        <table class="table table-hover">
+                            <thead class="sticky-top bg-white">
+                                <tr>
+                                    <th>Mã lô</th>
+                                    <th>Tên thuốc</th>
+                                    <th>Số lô</th>
+                                    <th>Hạn SD</th>
+                                    <th>SL còn</th>
+                                    <th>Kho</th>
+                                </tr>
+                            </thead>
+                            <tbody id="danhSachLoHetHan">
+                                <!-- Sẽ được điền bằng JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Form xử lý -->
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-clipboard-list me-2"></i>Lý do xử lý <span class="text-danger">*</span>
+                            </label>
+                            <textarea class="form-control" name="lyDo" rows="3" required 
+                                      placeholder="Nhập lý do xử lý chung cho tất cả các lô...">Hủy hàng loạt lô thuốc hết hạn sử dụng</textarea>
+                        </div>
+
+                        <div class="col-12 mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-cog me-2"></i>Phương thức xử lý <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" name="phuongThucXuLy" required>
+                                <option value="TieuHuy" selected>Tiêu hủy theo quy định</option>
+                                <option value="TraNhaCungCap">Trả lại nhà cung cấp</option>
+                                <option value="TieuHuyTaiCho">Tiêu hủy tại chỗ</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Cảnh báo -->
+                    <div class="alert alert-danger border-0 mb-0">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+                            <div>
+                                <strong>Cảnh báo:</strong>
+                                <ul class="mb-0 ps-3">
+                                    <li>Hành động này sẽ xử lý đồng thời tất cả các lô đã chọn</li>
+                                    <li>Không thể hoàn tác sau khi xác nhận</li>
+                                    <li>Vui lòng kiểm tra kỹ danh sách trước khi thực hiện</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Hủy bỏ
+                    </button>
+                    <button type="submit" class="btn btn-warning text-white">
+                        <i class="fas fa-check me-2"></i>Xác nhận xử lý tất cả
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Xử lý form đơn lẻ
+        $('#formXuLyLoHetHan').on('submit', function(e) {
+            e.preventDefault();
+            
+            if (!confirm('Bạn có chắc chắn muốn xử lý lô thuốc này không?')) {
+                return;
+            }
+
+            const formData = new FormData(this);
+            const maLo = $('#maLoHetHan').val();
+
+            $.ajax({
+                url: `/Admin/Thuoc/XuLyLoHetHan/${maLo}`,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        toastr.success(response.message);
+                        $('#modalXuLyLoHetHan').modal('hide');
+                        
+                        // Reload trang sau 1.5s
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        toastr.error(response.message);
+                    }
+                },
+                error: function() {
+                    toastr.error('Có lỗi xảy ra khi xử lý');
+                }
+            });
+        });
+
+        // Xử lý form hàng loạt
+        $('#formXuLyHangLoat').on('submit', function(e) {
+            e.preventDefault();
+            
+            const soLo = $('#soLoChon').text();
+            if (!confirm(`Bạn có chắc chắn muốn xử lý ${soLo} lô thuốc không?`)) {
+                return;
+            }
+
+            const formData = new FormData(this);
+
+            $.ajax({
+                url: '/Admin/Thuoc/XuLyHangLoatLoHetHan',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        toastr.success(response.message);
+                        $('#modalXuLyHangLoat').modal('hide');
+                        
+                        // Reload trang sau 1.5s
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        toastr.error(response.message);
+                    }
+                },
+                error: function() {
+                    toastr.error('Có lỗi xảy ra khi xử lý');
+                }
+            });
+        });
+
+        // Hàm mở modal xử lý đơn
+        function moModalXuLyLo(maLo, tenThuoc, soLo, hanSuDung, soLuongCon, tenKho) {
+            $('#maLoHetHan').val(maLo);
+            $('#displayMaLo').text(maLo);
+            $('#displayTenThuoc').text(tenThuoc);
+            $('#displaySoLo').text(soLo);
+            $('#displayHanSuDung').text(hanSuDung);
+            $('#displaySoLuongCon').text(soLuongCon);
+            $('#displayTenKho').text(tenKho);
+            
+            new bootstrap.Modal(document.getElementById('modalXuLyLoHetHan')).show();
+        }
+
+        // Hàm mở modal xử lý hàng loạt
+        function moModalXuLyHangLoat(danhSachLo) {
+            if (!danhSachLo || danhSachLo.length === 0) {
+                toastr.warning('Vui lòng chọn ít nhất một lô để xử lý');
+                return;
+            }
+
+            // Cập nhật số lượng
+            $('#soLoChon').text(danhSachLo.length);
+            
+            // Cập nhật danh sách ID
+            const ids = danhSachLo.map(lo => lo.maLo).join(',');
+            $('#danhSachMaLo').val(ids);
+            
+            // Render bảng
+            let html = '';
+            danhSachLo.forEach(lo => {
+                html += `
+                    <tr>
+                        <td><code>${lo.maLo}</code></td>
+                        <td>${lo.tenThuoc}</td>
+                        <td>${lo.soLo}</td>
+                        <td class="text-danger">${lo.hanSuDung}</td>
+                        <td><span class="badge badge-warning">${lo.soLuongCon}</span></td>
+                        <td>${lo.tenKho}</td>
+                    </tr>
+                `;
+            });
+            $('#danhSachLoHetHan').html(html);
+            
+            new bootstrap.Modal(document.getElementById('modalXuLyHangLoat')).show();
+        }
+
+        // Export functions to global scope
+        window.moModalXuLyLo = moModalXuLyLo;
+        window.moModalXuLyHangLoat = moModalXuLyHangLoat;
+    </script>
+}
+
+<style>
+    .sticky-top {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .modal-xl {
+        max-width: 1200px;
+    }
+
+    .form-label {
+        font-size: 0.95rem;
+    }
+
+    .form-text {
+        font-size: 0.85rem;
+    }
+
+    code {
+        background: #f0f0f0;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.9em;
+    }
+</style>
