@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using QLPhanPhoiThuoc.Models.EF;
-
+using OfficeOpenXml;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
 builder.Services.AddDbContext<BenhVienDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("BenhVienConnection")));
 
@@ -34,6 +33,7 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+//ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 // Add Controllers with Views
 builder.Services.AddControllersWithViews(options =>
 {

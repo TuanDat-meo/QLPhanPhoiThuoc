@@ -58,6 +58,7 @@ namespace QLPhanPhoiThuoc.Models.Entities
 
         public DateTime NgayTao { get; set; } = DateTime.Now;
 
+
         // Navigation Properties
         public virtual ICollection<TheBHYT> TheBHYTs { get; set; }
         public virtual ICollection<ChanDoan> ChanDoans { get; set; }

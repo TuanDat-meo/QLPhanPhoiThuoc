@@ -181,280 +181,401 @@
         .form-control:disabled { background:#f1f5f9; color:#64748b; cursor:not-allowed; }
 
         /* ─── Alerts ─── */
-        .alert { padding:16px 20px; border-radius:10px; margin-bottom:22px; display:flex; align-items:flex-start; gap:12px; }
-        .alert ul { margin:0; padding-left:20px; flex:1; }
-        .alert li { margin-bottom:5px; }
-        .alert i { margin-top:2px; font-size:1.2rem; }
+        .alert-custom {
+            padding:16px 18px; border-radius:12px;
+            display:flex; align-items:flex-start; gap:12px;
+            margin-bottom:22px; font-size:.9rem; line-height:1.5;
+        }
+        .alert-custom i { font-size:1.15rem; margin-top:2px; flex-shrink:0; }
+        .alert-error { background:#fee; border:2px solid #fca5a5; color:#991b1b; }
+        .alert-error i { color:#dc2626; }
+        .alert-success { background:#d1fae5; border:2px solid #6ee7b7; color:#065f46; }
+        .alert-success i { color:#10b981; }
+        .alert-info { background:#dbeafe; border:2px solid #93c5fd; color:#1e3a8a; }
+        .alert-info i { color:#3b82f6; }
 
-        .alert-danger {
-            background:linear-gradient(135deg,#fef2f2,#fee2e2);
-            border-left:4px solid #f87171; color:#991b1b;
+        .alert-custom ul { margin:0; padding-left:20px; }
+        .alert-custom li { margin-bottom:4px; }
+
+        /* ─── VNeID lookup card ─── */
+        .vneid-lookup {
+            background:#f0f9ff;
+            border:2px dashed #38bdf8;
+            border-radius:14px;
+            padding:30px 28px;
+            text-align:center;
         }
-        .alert-success {
-            background:linear-gradient(135deg,#f0fdf4,#dcfce7);
-            border-left:4px solid #4ade80; color:#166534;
+        .vneid-lookup .icon-block {
+            display:inline-flex; align-items:center; justify-content:center;
+            width:70px; height:70px; border-radius:50%;
+            background:linear-gradient(135deg,#38bdf8,#0ea5e9);
+            color:#fff; font-size:2rem; margin-bottom:18px;
+            box-shadow:0 8px 20px rgba(14,165,233,.25);
         }
-        .alert-info {
-            background:linear-gradient(135deg,#f0f9ff,#e0f2fe);
-            border-left:4px solid #38bdf8; color:#075985;
+        .vneid-lookup h4 {
+            font-size:1.2rem; color:#0f172a; margin-bottom:10px; font-weight:700;
+        }
+        .vneid-lookup p {
+            color:#475569; font-size:.92rem; margin-bottom:20px; line-height:1.5;
+        }
+        .vneid-lookup .input-group {
+            display:flex; gap:12px; max-width:500px; margin:0 auto 14px;
+        }
+        .vneid-lookup input {
+            flex:1; padding:12px 18px; border-radius:10px;
+            border:2px solid #cbd5e1; font-size:.95rem; background:#fff;
+        }
+        .vneid-lookup input:focus {
+            outline:none; border-color:#38bdf8;
+            box-shadow:0 0 0 3px rgba(56,189,248,.18);
+        }
+        .vneid-lookup button {
+            padding:12px 28px; background:linear-gradient(135deg,#1e3a5f,#162d4a);
+            color:#fff; border:none; border-radius:10px;
+            font-weight:600; font-size:.92rem; cursor:pointer;
+            transition:transform .2s, box-shadow .2s;
+            display:flex; align-items:center; gap:8px;
+        }
+        .vneid-lookup button:hover {
+            transform:translateY(-2px);
+            box-shadow:0 8px 18px rgba(30,58,95,.3);
+        }
+        .vneid-lookup button:disabled {
+            opacity:.6; cursor:not-allowed; transform:none;
+        }
+        #cccdError {
+            color:#dc2626; font-size:.85rem; margin-top:8px;
+            font-weight:600; display:block; min-height:18px;
         }
 
-        /* ─── Buttons ─── */
-        .btn { padding:12px 28px; border:none; border-radius:10px; font-weight:600; font-size:.94rem; cursor:pointer; transition:all .3s; display:inline-flex; align-items:center; gap:8px; }
-        .btn-primary {
-            background:linear-gradient(135deg,#1e3a5f,#162d4a);
-            color:#fff;
-            box-shadow:0 4px 12px rgba(30,58,95,.25);
-        }
-        .btn-primary:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(30,58,95,.35); }
-        .btn-secondary {
-            background:#f1f5f9; color:#1e293b;
-            box-shadow:0 2px 8px rgba(0,0,0,.08);
-        }
-        .btn-secondary:hover { background:#e2e8f0; }
-        .btn-success {
-            background:linear-gradient(135deg,#4ade80,#22c55e);
-            color:#fff;
-            box-shadow:0 4px 12px rgba(74,222,128,.25);
-        }
-        .btn-success:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(74,222,128,.35); }
-        .btn-outline {
-            background:transparent;
-            border:2px solid #1e3a5f;
-            color:#1e3a5f;
-        }
-        .btn-outline:hover { background:#1e3a5f; color:#fff; }
-
-        .btn:disabled { opacity:.5; cursor:not-allowed; transform:none !important; }
-
-        .btn-group { display:flex; gap:12px; margin-top:28px; justify-content:flex-end; }
-
-        /* ─── Loading spinner ─── */
-        .loading-spinner {
-            display:inline-block; width:14px; height:14px;
-            border:2px solid rgba(255,255,255,.3);
-            border-top-color:#fff;
-            border-radius:50%; animation:spin .6s linear infinite;
-        }
-        @@keyframes spin { to { transform:rotate(360deg); } }
-
-        /* ─── VNeID result ─── */
+        /* ─── Result card ─── */
         .vneid-result {
-            display:none; background:linear-gradient(135deg,#f0f9ff,#e0f2fe);
-            border:2px solid #38bdf8; border-radius:14px; padding:25px;
-            margin-bottom:22px;
+            background:linear-gradient(135deg,#dcfce7,#d1fae5);
+            border:2px solid #4ade80;
+            border-radius:14px;
+            padding:26px 30px;
+            display:none;
+        }
+        .vneid-result .result-header {
+            display:flex; align-items:center; gap:14px; margin-bottom:20px;
+        }
+        .vneid-result .result-header .icon {
+            width:50px; height:50px; border-radius:50%;
+            background:linear-gradient(135deg,#4ade80,#22c55e);
+            color:#fff; display:flex; align-items:center; justify-content:center;
+            font-size:1.5rem; box-shadow:0 6px 16px rgba(34,197,94,.3);
+        }
+        .vneid-result .result-header h4 {
+            font-size:1.15rem; color:#065f46; margin:0; font-weight:700;
         }
         .vneid-result .info-grid {
             display:grid; grid-template-columns:1fr 1fr; gap:16px;
         }
-        .vneid-result .info-item {
-            display:flex; flex-direction:column; gap:5px;
+        .vneid-result .info-item strong {
+            display:block; color:#064e3b; font-size:.82rem;
+            margin-bottom:5px; font-weight:600;
         }
-        .vneid-result .info-label {
-            font-size:.82rem; color:#0369a1; font-weight:600; text-transform:uppercase; letter-spacing:.5px;
-        }
-        .vneid-result .info-value {
-            font-size:1rem; color:#0f172a; font-weight:600;
+        .vneid-result .info-item span {
+            display:block; color:#0f172a; font-size:.94rem;
+            padding:9px 14px; background:#fff;
+            border-radius:8px; border:1px solid #bbf7d0;
         }
         .vneid-result .btn-change {
-            margin-top:16px; padding:10px 20px; font-size:.88rem;
+            margin-top:18px; padding:10px 22px; background:#fff;
+            border:2px solid #4ade80; border-radius:9px; color:#065f46;
+            cursor:pointer; font-weight:600; font-size:.88rem;
+            transition:all .2s; display:inline-flex; align-items:center; gap:8px;
+        }
+        .vneid-result .btn-change:hover {
+            background:#4ade80; color:#fff; transform:translateY(-1px);
         }
 
-        /* ─── Confirmation ─── */
-        .confirm-section { margin-bottom:28px; }
-        .confirm-section h3 {
-            font-size:1.1rem; color:#1e3a5f; margin-bottom:14px;
-            font-weight:700; display:flex; align-items:center; gap:8px;
+        /* ─── Buttons ─── */
+        .btn {
+            padding:14px 32px; border-radius:12px;
+            font-weight:600; font-size:.96rem; cursor:pointer;
+            border:none; transition:all .25s;
+            display:inline-flex; align-items:center; gap:10px;
+            text-decoration:none;
         }
-        .confirm-section h3 i { color:#38bdf8; font-size:1rem; }
-        .confirm-grid {
-            display:grid; grid-template-columns:1fr 1fr; gap:16px;
-            background:#f8fafc; border-radius:12px; padding:20px;
+        .btn-primary {
+            background:linear-gradient(135deg,#1e3a5f,#162d4a);
+            color:#fff; box-shadow:0 6px 18px rgba(30,58,95,.3);
         }
-        .confirm-item {
-            display:flex; flex-direction:column; gap:5px;
+        .btn-primary:hover {
+            transform:translateY(-2px);
+            box-shadow:0 10px 24px rgba(30,58,95,.4);
         }
-        .confirm-item .label {
-            font-size:.82rem; color:#64748b; font-weight:600;
+        .btn-secondary {
+            background:#fff; color:#475569;
+            border:2px solid #cbd5e1;
         }
-        .confirm-item .value {
-            font-size:1rem; color:#0f172a; font-weight:600;
+        .btn-secondary:hover { background:#f8fafc; border-color:#94a3b8; }
+        .btn-success {
+            background:linear-gradient(135deg,#4ade80,#22c55e);
+            color:#fff; box-shadow:0 6px 18px rgba(34,197,94,.3);
+        }
+        .btn-success:hover {
+            transform:translateY(-2px);
+            box-shadow:0 10px 24px rgba(34,197,94,.4);
+        }
+        .btn:disabled {
+            opacity:.6; cursor:not-allowed;
+            transform:none !important;
+            box-shadow:none !important;
+        }
+        .btn i { font-size:1rem; }
+
+        /* ─── Navigation Buttons ─── */
+        .step-navigation {
+            display:flex; justify-content:space-between;
+            margin-top:32px; padding-top:28px;
+            border-top:2px solid #e2e8f0;
         }
 
-        /* ─── Checkbox ─── */
-        .checkbox-wrapper {
-            display:flex; align-items:flex-start; gap:10px;
-            padding:14px; background:#f8fafc; border-radius:10px;
-            margin-bottom:18px; cursor:pointer; transition:background .2s;
-        }
-        .checkbox-wrapper:hover { background:#f1f5f9; }
+        /* ─── Checkbox custom ─── */
+        .checkbox-wrapper { display:flex; align-items:flex-start; gap:12px; }
         .checkbox-wrapper input[type="checkbox"] {
-            margin-top:3px; width:18px; height:18px; cursor:pointer;
+            width:22px; height:22px; margin-top:2px; cursor:pointer;
+            accent-color:#1e3a5f; flex-shrink:0;
         }
         .checkbox-wrapper label {
-            flex:1; cursor:pointer; color:#334155; font-size:.9rem; line-height:1.5;
+            font-size:.92rem; color:#475569; line-height:1.5; cursor:pointer;
         }
-        .checkbox-wrapper label a { color:#1e3a5f; text-decoration:underline; }
-        .checkbox-wrapper label a:hover { color:#0f2847; }
+        .checkbox-wrapper label a {
+            color:#0ea5e9; text-decoration:none; font-weight:600;
+        }
+        .checkbox-wrapper label a:hover {
+            text-decoration:underline;
+        }
 
-        /* ─── Text danger ─── */
-        .text-danger { color:#dc2626; font-size:.85rem; margin-top:6px; display:block; }
+        /* ─── Review/Confirm section ─── */
+        .review-section {
+            background:#f8fafc;
+            border:2px solid #e2e8f0;
+            border-radius:12px;
+            padding:24px 28px;
+            margin-bottom:20px;
+        }
+        .review-section h5 {
+            font-size:1.1rem; color:#0f172a; margin-bottom:16px;
+            font-weight:700; display:flex; align-items:center; gap:8px;
+        }
+        .review-section h5 i { color:#38bdf8; }
+        .review-grid {
+            display:grid; grid-template-columns:1fr 1fr; gap:14px;
+        }
+        .review-item {
+            padding:12px 16px; background:#fff;
+            border-radius:9px; border:1px solid #e2e8f0;
+        }
+        .review-item strong {
+            display:block; color:#64748b; font-size:.82rem;
+            margin-bottom:5px; font-weight:600;
+        }
+        .review-item span {
+            display:block; color:#0f172a; font-size:.94rem;
+        }
+
+        /* ─── Loading Spinner ─── */
+        .loading-spinner {
+            display:inline-block;
+            width:16px; height:16px;
+            border:2px solid rgba(255,255,255,.3);
+            border-radius:50%;
+            border-top-color:#fff;
+            animation:spin .6s linear infinite;
+        }
+        @@keyframes spin { to { transform:rotate(360deg); } }
+
+        /* ─── Footer link ─── */
+        .footer-link {
+            text-align:center; padding:25px 0;
+            background:#f8fafc; border-top:2px solid #e2e8f0;
+            font-size:.92rem; color:#475569;
+        }
+        .footer-link a {
+            color:#0ea5e9; text-decoration:none; font-weight:600;
+        }
+        .footer-link a:hover { text-decoration:underline; }
 
         /* ─── Responsive ─── */
         @@media (max-width: 768px) {
-            .register-container { margin:0 15px; }
-            .register-header { padding:30px 25px 25px; }
-            .register-header h1 { font-size:1.6rem; }
+            body { padding:20px 15px; }
             .register-body { padding:30px 25px; }
-            .form-row { grid-template-columns:1fr; gap:0; }
-            .step-indicator { gap:0; }
-            .step { max-width:none; }
-            .step-title { font-size:.75rem; }
-            .step-number { width:40px; height:40px; font-size:.95rem; }
-            .vneid-result .info-grid { grid-template-columns:1fr; }
-            .confirm-grid { grid-template-columns:1fr; }
+            .register-header { padding:30px 25px; }
+            .register-header h1 { font-size:1.7rem; }
+            .form-row, .info-grid, .review-grid { grid-template-columns:1fr; }
+            .step-navigation { flex-direction:column; gap:12px; }
+            .step-navigation .btn { width:100%; justify-content:center; }
         }
     </style>
 </head>
 <body>
     <div class="register-container">
-        <!-- Header -->
+        <!-- ────────────────── HEADER ────────────────── -->
         <div class="register-header">
-            <h1><i class="fas fa-user-plus"></i> Đăng ký tài khoản</h1>
-            <p>Tạo tài khoản mới để sử dụng hệ thống quản lý thuốc bệnh viện</p>
+            <h1><i class="fas fa-hospital-user"></i> Đăng ký tài khoản</h1>
+            <p>Hệ thống quản lý phân phối thuốc bệnh viện</p>
             <div class="vneid-badge">
                 <i class="fas fa-shield-alt"></i>
-                Xác thực qua VNeID
+                Tích hợp VNeID
             </div>
         </div>
 
-        <!-- Body -->
+        <!-- ────────────────── BODY ────────────────── -->
         <div class="register-body">
-            <!-- Step Indicator -->
+            @if (ViewData.ModelState.ErrorCount > 0)
+            {
+                <div class="alert-custom alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <div>
+                        <strong>Có lỗi xảy ra:</strong>
+                        <ul>
+                            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                            {
+                                <li>@error.ErrorMessage</li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            }
+
+            <!-- ────── STEP INDICATOR ────── -->
             <div class="step-indicator">
-                <div class="step active">
+                <div class="step active" id="stepIndicator1">
                     <div class="step-number">1</div>
                     <div class="step-title">Xác minh VNeID</div>
                 </div>
-                <div class="step">
+                <div class="step" id="stepIndicator2">
                     <div class="step-number">2</div>
-                    <div class="step-title">Thông tin tài khoản</div>
+                    <div class="step-title">Tài khoản</div>
                 </div>
-                <div class="step">
+                <div class="step" id="stepIndicator3">
                     <div class="step-number">3</div>
                     <div class="step-title">Xác nhận</div>
                 </div>
             </div>
 
-            <form asp-action="Register" method="post">
-                <!-- Hidden fields to store VNeID data -->
-                <input type="hidden" id="hiddenCCCD" asp-for="CCCD" />
-                <input type="hidden" id="hiddenHoTen" asp-for="HoTen" />
-                <input type="hidden" id="hiddenNgaySinh" asp-for="NgaySinh" />
-                <input type="hidden" id="hiddenGioiTinh" asp-for="GioiTinh" />
-                <input type="hidden" id="hiddenDiaChi" asp-for="DiaChi" />
-                <input type="hidden" id="hiddenQueQuan" asp-for="QueQuan" />
+            <!-- ────────────────── FORM ────────────────── -->
+            <form id="registerForm" asp-action="Register" method="post">
+                @Html.AntiForgeryToken()
 
-                <!--═══ ═══ Step 1 ═══ ═══-->
+                <!-- ═════════════════════════════════════════════════════════════ -->
+                <!--                         STEP 1: VNeID                          -->
+                <!-- ═════════════════════════════════════════════════════════════ -->
                 <div class="step-content active" id="step1">
                     <div class="section-title">
-                        <i class="fas fa-shield-alt"></i>
-                        Bước 1: Xác minh danh tính qua VNeID
+                        <i class="fas fa-id-card"></i>
+                        Bước 1: Tra cứu và xác minh VNeID
                     </div>
 
-                    <!-- Lookup form -->
+                    <!-- VNeID Lookup Section -->
                     <div class="vneid-lookup">
-                        <div class="form-group">
-                            <label class="form-label">Số CCCD/CMND <span class="required">*</span></label>
-                            <div class="input-wrapper">
-                                <i class="fas fa-id-card icon-left"></i>
-                                <input type="text" class="form-control" id="cccdInput" placeholder="Nhập 12 số CCCD" maxlength="12" autocomplete="off" />
-                            </div>
-                            <span class="text-danger" id="cccdError"></span>
+                        <div class="icon-block">
+                            <i class="fas fa-search"></i>
                         </div>
-                        <button type="button" class="btn btn-primary" id="btnLookup">
-                            <i class="fas fa-search"></i> Tra cứu
-                        </button>
+                        <h4>Nhập số CCCD để tra cứu</h4>
+                        <p>Vui lòng nhập chính xác 12 số CCCD của bạn để hệ thống VNeID xác minh thông tin</p>
+                        <div class="input-group">
+                            <input type="text" id="cccdInput" placeholder="Nhập 12 số CCCD" maxlength="12" />
+                            <button type="button" id="btnLookup">
+                                <i class="fas fa-search"></i> Tra cứu
+                            </button>
+                        </div>
+                        <span id="cccdError"></span>
                     </div>
 
-                    <!-- VNeID result -->
+                    <!-- VNeID Result (Hidden initially) -->
                     <div class="vneid-result" id="vneidResult">
-                        <div class="alert alert-success">
-                            <i class="fas fa-check-circle"></i>
-                            <div>
-                                <strong>Xác thực thành công!</strong><br />
-                                Thông tin công dân đã được tìm thấy trong hệ thống VNeID.
-                            </div>
+                        <div class="result-header">
+                            <div class="icon"><i class="fas fa-check"></i></div>
+                            <h4>Đã xác minh thành công qua VNeID</h4>
                         </div>
                         <div class="info-grid">
                             <div class="info-item">
-                                <div class="info-label">Số CCCD</div>
-                                <div class="info-value" id="displayCCCD">-</div>
+                                <strong>Số CCCD</strong>
+                                <span id="displayCCCD">-</span>
                             </div>
                             <div class="info-item">
-                                <div class="info-label">Họ và tên</div>
-                                <div class="info-value" id="displayHoTen">-</div>
+                                <strong>Họ và tên</strong>
+                                <span id="displayHoTen">-</span>
                             </div>
                             <div class="info-item">
-                                <div class="info-label">Ngày sinh</div>
-                                <div class="info-value" id="displayNgaySinh">-</div>
+                                <strong>Ngày sinh</strong>
+                                <span id="displayNgaySinh">-</span>
                             </div>
                             <div class="info-item">
-                                <div class="info-label">Giới tính</div>
-                                <div class="info-value" id="displayGioiTinh">-</div>
+                                <strong>Giới tính</strong>
+                                <span id="displayGioiTinh">-</span>
                             </div>
                             <div class="info-item">
-                                <div class="info-label">Quê quán</div>
-                                <div class="info-value" id="displayQueQuan">-</div>
+                                <strong>Quê quán</strong>
+                                <span id="displayQueQuan">-</span>
                             </div>
                             <div class="info-item">
-                                <div class="info-label">Nơi thường trú</div>
-                                <div class="info-value" id="displayNoiThuongTru">-</div>
+                                <strong>Nơi thường trú</strong>
+                                <span id="displayNoiThuongTru">-</span>
                             </div>
                         </div>
-                        <button type="button" class="btn btn-outline btn-change" id="btnChangeCCCD">
-                            <i class="fas fa-sync-alt"></i> Đổi số CCCD
+                        <button type="button" class="btn-change" id="btnChangeCCCD">
+                            <i class="fas fa-edit"></i> Thay đổi CCCD
                         </button>
                     </div>
 
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-success" id="btnNextStep1">
+                    <!-- Hidden fields to store VNeID data -->
+                    <input type="hidden" id="hiddenCCCD" asp-for="CCCD" />
+                    <input type="hidden" id="hiddenHoTen" asp-for="HoTen" />
+                    <input type="hidden" id="hiddenNgaySinh" asp-for="NgaySinh" />
+                    <input type="hidden" id="hiddenGioiTinh" asp-for="GioiTinh" />
+                    <input type="hidden" id="hiddenDiaChi" asp-for="DiaChi" />
+                    <input type="hidden" id="hiddenQueQuan" asp-for="QueQuan" />
+
+                    <div class="step-navigation">
+                        <div></div>
+                        <button type="button" class="btn btn-primary" id="btnNextStep1">
                             Tiếp tục <i class="fas fa-arrow-right"></i>
                         </button>
                     </div>
                 </div>
 
-                <!--═══ ═══ Step 2 ═══ ═══-->
+                <!-- ═════════════════════════════════════════════════════════════ -->
+                <!--                    STEP 2: Account Information                 -->
+                <!-- ═════════════════════════════════════════════════════════════ -->
                 <div class="step-content" id="step2">
                     <div class="section-title">
-                        <i class="fas fa-user-cog"></i>
-                        Bước 2: Tạo thông tin tài khoản
+                        <i class="fas fa-user-plus"></i>
+                        Bước 2: Thông tin tài khoản và liên hệ
                     </div>
 
-                    <!-- Error container -->
-                    <div class="alert alert-danger" id="step2Errors" style="display:none;">
-                        <i class="fas fa-exclamation-triangle"></i>
+                    <!-- Error Container for Step 2 -->
+                    <div class="alert-custom alert-error" id="step2Errors" style="display:none;">
+                        <i class="fas fa-exclamation-circle"></i>
                         <div>
-                            <strong>Vui lòng kiểm tra lại thông tin:</strong>
+                            <strong>Vui lòng sửa các lỗi sau:</strong>
                             <ul id="step2ErrorList"></ul>
                         </div>
                     </div>
 
+                    <!-- Account Info -->
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label" asp-for="Username">Tên đăng nhập <span class="required">*</span></label>
+                            <label class="form-label" asp-for="Username">
+                                <i class="fas fa-user"></i> Tên đăng nhập <span class="required">*</span>
+                            </label>
                             <div class="input-wrapper">
                                 <i class="fas fa-user icon-left"></i>
-                                <input type="text" class="form-control" asp-for="Username" placeholder="VD: nguyen_van_a" autocomplete="off" />
+                                <input asp-for="Username" class="form-control" placeholder="Tên đăng nhập" />
                             </div>
                             <span asp-validation-for="Username" class="text-danger"></span>
                         </div>
-
                         <div class="form-group">
-                            <label class="form-label" asp-for="Email">Email <span class="required">*</span></label>
+                            <label class="form-label" asp-for="Email">
+                                <i class="fas fa-envelope"></i> Email <span class="required">*</span>
+                            </label>
                             <div class="input-wrapper">
                                 <i class="fas fa-envelope icon-left"></i>
-                                <input type="email" class="form-control" asp-for="Email" placeholder="example@email.com" autocomplete="off" />
+                                <input asp-for="Email" class="form-control" placeholder="email@example.com" />
                             </div>
                             <span asp-validation-for="Email" class="text-danger"></span>
                         </div>
@@ -462,32 +583,27 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label" asp-for="SoDienThoai">Số điện thoại <span class="required">*</span></label>
+                            <label class="form-label" asp-for="SoDienThoai">
+                                <i class="fas fa-phone"></i> Số điện thoại <span class="required">*</span>
+                            </label>
                             <div class="input-wrapper">
                                 <i class="fas fa-phone icon-left"></i>
-                                <input type="text" class="form-control" asp-for="SoDienThoai" placeholder="0912345678" maxlength="10" autocomplete="off" />
+                                <input asp-for="SoDienThoai" class="form-control" placeholder="0912345678" />
                             </div>
                             <span asp-validation-for="SoDienThoai" class="text-danger"></span>
                         </div>
-
                         <div class="form-group">
-                            <label class="form-label" asp-for="NhomMau">Nhóm máu</label>
+                            <label class="form-label" asp-for="NhomMau">
+                                <i class="fas fa-tint"></i> Nhóm máu
+                            </label>
                             <div class="input-wrapper">
                                 <i class="fas fa-tint icon-left"></i>
-                                <select class="form-select" asp-for="NhomMau">
+                                <select asp-for="NhomMau" class="form-select">
                                     <option value="">-- Chọn nhóm máu --</option>
                                     <option value="A">A</option>
                                     <option value="B">B</option>
                                     <option value="AB">AB</option>
                                     <option value="O">O</option>
-                                    <option value="A+">A+</option>
-                                    <option value="A-">A-</option>
-                                    <option value="B+">B+</option>
-                                    <option value="B-">B-</option>
-                                    <option value="AB+">AB+</option>
-                                    <option value="AB-">AB-</option>
-                                    <option value="O+">O+</option>
-                                    <option value="O-">O-</option>
                                 </select>
                             </div>
                         </div>
@@ -495,22 +611,25 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label" asp-for="Password">Mật khẩu <span class="required">*</span></label>
+                            <label class="form-label" asp-for="Password">
+                                <i class="fas fa-lock"></i> Mật khẩu <span class="required">*</span>
+                            </label>
                             <div class="input-wrapper">
                                 <i class="fas fa-lock icon-left"></i>
-                                <input type="password" class="form-control" asp-for="Password" placeholder="••••••••" id="Password" />
+                                <input asp-for="Password" class="form-control" type="password" placeholder="••••••••" />
                                 <button type="button" class="toggle-pw" data-target="Password">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
                             <span asp-validation-for="Password" class="text-danger"></span>
                         </div>
-
                         <div class="form-group">
-                            <label class="form-label" asp-for="ConfirmPassword">Xác nhận mật khẩu <span class="required">*</span></label>
+                            <label class="form-label" asp-for="ConfirmPassword">
+                                <i class="fas fa-lock"></i> Xác nhận mật khẩu <span class="required">*</span>
+                            </label>
                             <div class="input-wrapper">
                                 <i class="fas fa-lock icon-left"></i>
-                                <input type="password" class="form-control" asp-for="ConfirmPassword" placeholder="••••••••" id="ConfirmPassword" />
+                                <input asp-for="ConfirmPassword" class="form-control" type="password" placeholder="••••••••" />
                                 <button type="button" class="toggle-pw" data-target="ConfirmPassword">
                                     <i class="fas fa-eye"></i>
                                 </button>
@@ -519,147 +638,176 @@
                         </div>
                     </div>
 
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i>
-                        <div>
-                            <strong>Yêu cầu mật khẩu:</strong><br />
-                            • Tối thiểu 8 ký tự<br />
-                            • Bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt
+                    <div class="form-group">
+                        <label class="form-label" asp-for="NgheNghiep">
+                            <i class="fas fa-briefcase"></i> Nghề nghiệp
+                        </label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-briefcase icon-left"></i>
+                            <input asp-for="NgheNghiep" class="form-control" placeholder="Nghề nghiệp của bạn" />
                         </div>
                     </div>
 
-                    <div class="checkbox-wrapper">
-                        <input type="checkbox" asp-for="AgreeTerms" id="AgreeTerms" />
-                        <label asp-for="AgreeTerms">
-                            Tôi đồng ý với <a href="#" target="_blank">Điều khoản sử dụng</a> 
+                    <div class="form-group">
+                        <label class="form-label" asp-for="TienSuDiUng">
+                            <i class="fas fa-allergies"></i> Tiền sử dị ứng (nếu có)
                         </label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-allergies icon-left"></i>
+                            <input asp-for="TienSuDiUng" class="form-control" placeholder="VD: Dị ứng penicillin" />
+                        </div>
                     </div>
-                    <span asp-validation-for="AgreeTerms" class="text-danger"></span>
 
-                    <div class="btn-group">
+                    <div class="form-group">
+                        <div class="checkbox-wrapper">
+                            <input asp-for="AgreeTerms" type="checkbox" />
+                            <label asp-for="AgreeTerms">
+                                Tôi đã đọc và đồng ý với <a href="#" target="_blank">Điều khoản sử dụng</a>
+                                và <a href="#" target="_blank">Chính sách bảo mật</a> của hệ thống
+                                <span class="required">*</span>
+                            </label>
+                        </div>
+                        <span asp-validation-for="AgreeTerms" class="text-danger"></span>
+                    </div>
+
+                    <div class="step-navigation">
                         <button type="button" class="btn btn-secondary" id="btnBackStep1">
                             <i class="fas fa-arrow-left"></i> Quay lại
                         </button>
-                        <button type="button" class="btn btn-success" id="btnNextStep2">
+                        <button type="button" class="btn btn-primary" id="btnNextStep2">
                             Tiếp tục <i class="fas fa-arrow-right"></i>
                         </button>
                     </div>
                 </div>
 
-                <!--═══ ═══ Step 3 ═══ ═══-->
+                <!-- ═════════════════════════════════════════════════════════════ -->
+                <!--                       STEP 3: Confirm & Submit                 -->
+                <!-- ═════════════════════════════════════════════════════════════ -->
                 <div class="step-content" id="step3">
                     <div class="section-title">
-                        <i class="fas fa-check-circle"></i>
-                        Bước 3: Xác nhận thông tin
+                        <i class="fas fa-clipboard-check"></i>
+                        Bước 3: Xác nhận thông tin và hoàn tất
                     </div>
 
-                    <div class="alert alert-success">
+                    <div class="alert-custom alert-info">
                         <i class="fas fa-info-circle"></i>
-                        <span>Vui lòng kiểm tra lại thông tin trước khi hoàn tất đăng ký.</span>
+                        <div>
+                            <strong>Lưu ý:</strong> Vui lòng kiểm tra kỹ thông tin trước khi hoàn tất đăng ký.
+                            Nếu có sai sót, bạn có thể quay lại các bước trước để chỉnh sửa.
+                        </div>
                     </div>
 
-                    <!-- Thông tin cá nhân từ VNeID -->
-                    <div class="confirm-section">
-                        <h3><i class="fas fa-user"></i> Thông tin cá nhân</h3>
-                        <div class="confirm-grid">
-                            <div class="confirm-item">
-                                <div class="label">Số CCCD</div>
-                                <div class="value" id="confirmCCCD">-</div>
+                    <div class="review-section">
+                        <h5><i class="fas fa-id-card"></i> Thông tin cá nhân (từ VNeID)</h5>
+                        <div class="review-grid">
+                            <div class="review-item">
+                                <strong>Số CCCD</strong>
+                                <span id="confirmCCCD">-</span>
                             </div>
-                            <div class="confirm-item">
-                                <div class="label">Họ và tên</div>
-                                <div class="value" id="confirmHoTen">-</div>
+                            <div class="review-item">
+                                <strong>Họ và tên</strong>
+                                <span id="confirmHoTen">-</span>
                             </div>
-                            <div class="confirm-item">
-                                <div class="label">Ngày sinh</div>
-                                <div class="value" id="confirmNgaySinh">-</div>
+                            <div class="review-item">
+                                <strong>Ngày sinh</strong>
+                                <span id="confirmNgaySinh">-</span>
                             </div>
-                            <div class="confirm-item">
-                                <div class="label">Giới tính</div>
-                                <div class="value" id="confirmGioiTinh">-</div>
+                            <div class="review-item">
+                                <strong>Giới tính</strong>
+                                <span id="confirmGioiTinh">-</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Thông tin tài khoản -->
-                    <div class="confirm-section">
-                        <h3><i class="fas fa-user-cog"></i> Thông tin tài khoản</h3>
-                        <div class="confirm-grid">
-                            <div class="confirm-item">
-                                <div class="label">Tên đăng nhập</div>
-                                <div class="value" id="confirmUsername">-</div>
+                    <div class="review-section">
+                        <h5><i class="fas fa-user-circle"></i> Thông tin tài khoản</h5>
+                        <div class="review-grid">
+                            <div class="review-item">
+                                <strong>Tên đăng nhập</strong>
+                                <span id="confirmUsername">-</span>
                             </div>
-                            <div class="confirm-item">
-                                <div class="label">Email</div>
-                                <div class="value" id="confirmEmail">-</div>
+                            <div class="review-item">
+                                <strong>Email</strong>
+                                <span id="confirmEmail">-</span>
                             </div>
-                            <div class="confirm-item">
-                                <div class="label">Số điện thoại</div>
-                                <div class="value" id="confirmPhone">-</div>
+                            <div class="review-item">
+                                <strong>Số điện thoại</strong>
+                                <span id="confirmPhone">-</span>
                             </div>
-                            <div class="confirm-item">
-                                <div class="label">Nhóm máu</div>
-                                <div class="value" id="confirmNhomMau">-</div>
+                            <div class="review-item">
+                                <strong>Nhóm máu</strong>
+                                <span id="confirmNhomMau">Chưa xác định</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="btn-group">
+                    <div class="step-navigation">
                         <button type="button" class="btn btn-secondary" id="btnBackStep2">
                             <i class="fas fa-arrow-left"></i> Quay lại
                         </button>
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-check"></i> Hoàn tất đăng ký
+                        <button type="submit" class="btn btn-success" id="btnSubmit">
+                            <i class="fas fa-check-circle"></i> Hoàn tất đăng ký
                         </button>
                     </div>
                 </div>
             </form>
         </div>
+
+        <!-- ────────────────── FOOTER ────────────────── -->
+        <div class="footer-link">
+            Đã có tài khoản? <a href="@Url.Action("Login", "Account")">Đăng nhập ngay</a>
+        </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        /* ─── Toggle password visibility ─── */
+        /* ────────────────── GLOBAL VARIABLES ────────────────── */
+        let currentStep = 1;
+        let vneidVerified = false;
+
+        /* ────────────────── STEP MANAGEMENT ────────────────── */
+        function goToStep(stepNumber) {
+            // Hide all steps
+            document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.step').forEach(el => {
+                el.classList.remove('active', 'completed');
+            });
+
+            // Show target step
+            document.getElementById('step' + stepNumber).classList.add('active');
+            document.getElementById('stepIndicator' + stepNumber).classList.add('active');
+
+            // Mark previous steps as completed
+            for (let i = 1; i < stepNumber; i++) {
+                document.getElementById('stepIndicator' + i).classList.add('completed');
+            }
+
+            currentStep = stepNumber;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* ────────────────── PASSWORD TOGGLE ────────────────── */
         document.querySelectorAll('.toggle-pw').forEach(btn => {
             btn.addEventListener('click', function () {
-                const target = document.getElementById(this.dataset.target);
+                const targetId = this.getAttribute('data-target');
+                const input = document.getElementById(targetId);
                 const icon = this.querySelector('i');
-                if (target.type === 'password') {
-                    target.type = 'text';
+
+                if (input.type === 'password') {
+                    input.type = 'text';
                     icon.classList.remove('fa-eye');
                     icon.classList.add('fa-eye-slash');
                 } else {
-                    target.type = 'password';
+                    input.type = 'password';
                     icon.classList.remove('fa-eye-slash');
                     icon.classList.add('fa-eye');
                 }
             });
         });
 
-        /* ─── Step navigation ─── */
-        const totalSteps = 3;
-        let currentStep = 1;
-
-        function goToStep(step) {
-            if (step < 1 || step > totalSteps) return;
-
-            document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
-            document.getElementById('step' + step).classList.add('active');
-
-            document.querySelectorAll('.step').forEach((el, i) => {
-                el.classList.remove('active','completed');
-                if (i + 1 < step)      el.classList.add('completed');
-                else if (i + 1 === step) el.classList.add('active');
-            });
-
-            currentStep = step;
-            window.scrollTo(0, 0);
-        }
-
-        /* ─── VNeID Lookup ─── */
+        /* ────────────────── VNEID LOOKUP ────────────────── */
         document.getElementById('btnLookup').addEventListener('click', function () {
             const cccd = document.getElementById('cccdInput').value.trim();
-            const err  = document.getElementById('cccdError');
+            const err = document.getElementById('cccdError');
             err.textContent = '';
 
             if (!cccd || cccd.length !== 12 || !/^\d{12}$/.test(cccd)) {
@@ -672,7 +820,10 @@
 
             fetch('/Account/LookupVNeID', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
                 body: JSON.stringify(cccd)
             })
             .then(r => r.json())
@@ -700,6 +851,7 @@
 
                     document.getElementById('vneidResult').style.display = 'block';
                     document.querySelector('.vneid-lookup').style.display = 'none';
+                    vneidVerified = true;
                 } else {
                     err.textContent = data.message || 'Không tìm thấy thông tin công dân';
                 }
@@ -716,10 +868,23 @@
             document.getElementById('vneidResult').style.display = 'none';
             document.getElementById('cccdInput').value = '';
             document.getElementById('cccdError').textContent = '';
+            vneidVerified = false;
         });
 
-        /* ─── Step navigation ─── */
-        document.getElementById('btnNextStep1').addEventListener('click', () => goToStep(2));
+        /* ─── Step 1 Navigation ─── */
+        document.getElementById('btnNextStep1').addEventListener('click', function () {
+            const err = document.getElementById('cccdError');
+            err.textContent = '';
+
+            if (!vneidVerified) {
+                err.textContent = 'Vui lòng tra cứu và xác minh thông tin VNeID trước';
+                return;
+            }
+
+            goToStep(2);
+        });
+
+        /* ─── Step 2 Navigation ─── */
         document.getElementById('btnBackStep1').addEventListener('click', () => goToStep(1));
 
         document.getElementById('btnNextStep2').addEventListener('click', function () {
@@ -800,7 +965,17 @@
             goToStep(3);
         });
 
+        /* ─── Step 3 Navigation ─── */
         document.getElementById('btnBackStep2').addEventListener('click', () => goToStep(2));
+
+        /* ─── Form submission ─── */
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            // Disable button to prevent double submission
+            const submitBtn = document.getElementById('btnSubmit');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="loading-spinner"></span> Đang xử lý...';
+            // Form will submit normally - don't prevent default
+        });
 
         /* Only numbers in CCCD */
         document.getElementById('cccdInput').addEventListener('input', function () {

@@ -26,11 +26,11 @@ namespace QLPhanPhoiThuoc.Models.ViewModels
 
         [Display(Name = "Địa chỉ")]
         [StringLength(300, ErrorMessage = "Địa chỉ không được quá 300 ký tự")]
-        public string DiaChi { get; set; } = string.Empty;
+        public string? DiaChi { get; set; }
 
         [Display(Name = "Quê quán")]
         [StringLength(200, ErrorMessage = "Quê quán không được quá 200 ký tự")]
-        public string QueQuan { get; set; } = string.Empty;
+        public string? QueQuan { get; set; }
 
         // Thông tin tài khoản
         [Required(ErrorMessage = "Vui lòng nhập tên đăng nhập")]
@@ -50,7 +50,7 @@ namespace QLPhanPhoiThuoc.Models.ViewModels
         [DataType(DataType.Password)]
         [Display(Name = "Mật khẩu")]
         // Yêu cầu: ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt
-        [RegularExpression(@"^(?=.*[a-z])(?=(.*[A-Z]))(?=.*[0-9])(?=.*[!@#$%^&*()_+{}:;<>,.?~-]).{8,}$",ErrorMessage = "Mật khẩu phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt")]
+        [RegularExpression(@"^(?=.*[a-z])(?=(.*[A-Z]))(?=.*[0-9])(?=.*[!@#$%^&*()_+{}:;<>,.?~-]).{8,}$", ErrorMessage = "Mật khẩu phải bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt")]
         public string Password { get; set; } = string.Empty;
 
         [DataType(DataType.Password)]
@@ -67,15 +67,15 @@ namespace QLPhanPhoiThuoc.Models.ViewModels
 
         [Display(Name = "Nhóm máu")]
         [StringLength(5, ErrorMessage = "Nhóm máu không được quá 5 ký tự")]
-        public string NhomMau { get; set; } = string.Empty;
+        public string? NhomMau { get; set; }
 
         [Display(Name = "Nghề nghiệp")]
         [StringLength(100, ErrorMessage = "Nghề nghiệp không được quá 100 ký tự")]
-        public string NgheNghiep { get; set; } = string.Empty;
+        public string? NgheNghiep { get; set; }
 
         [Display(Name = "Tiền sử dị ứng")]
         [StringLength(500, ErrorMessage = "Tiền sử dị ứng không được quá 500 ký tự")]
-        public string TienSuDiUng { get; set; } = string.Empty;
+        public string? TienSuDiUng { get; set; }
 
         [Required(ErrorMessage = "Bạn phải đồng ý với điều khoản sử dụng")]
         [Range(typeof(bool), "true", "true", ErrorMessage = "Vui lòng xác nhận đồng ý với điều khoản")]

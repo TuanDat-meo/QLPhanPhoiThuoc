@@ -625,7 +625,7 @@ namespace QLPhanPhoiThuoc.Controllers.Admin
                 .ToListAsync();
 
             // Tạo file Excel
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
             using var package = new ExcelPackage();
             var worksheet = package.Workbook.Worksheets.Add("Tồn kho");
 

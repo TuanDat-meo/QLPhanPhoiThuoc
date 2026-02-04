@@ -16,11 +16,16 @@ namespace QLPhanPhoiThuoc.Controllers
     {
         private readonly BenhVienDbContext _benhVienContext;
         private readonly VNeIDDbContext _vneIdContext;
+        private readonly ILogger<AccountController> _logger;
 
-        public AccountController(BenhVienDbContext benhVienContext, VNeIDDbContext vneIdContext)
+        public AccountController(
+            BenhVienDbContext benhVienContext,
+            VNeIDDbContext vneIdContext,
+            ILogger<AccountController> logger)
         {
             _benhVienContext = benhVienContext;
             _vneIdContext = vneIdContext;
+            _logger = logger;
         }
 
         // GET: /Account/Login
@@ -123,6 +128,7 @@ namespace QLPhanPhoiThuoc.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Lỗi khi đăng nhập với username: {Username}", model.Username);
                 ModelState.AddModelError("", "Đã xảy ra lỗi trong quá trình đăng nhập: " + ex.Message);
                 return View(model);
             }
@@ -136,28 +142,37 @@ namespace QLPhanPhoiThuoc.Controllers
             return View();
         }
 
-        // POST: /Account/Register
+        // POST: /Account/Register - Xử lý đăng ký 3 bước
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
+            _logger.LogInformation("Bắt đầu xử lý đăng ký cho CCCD: {CCCD}", model.CCCD);
+
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning("ModelState không hợp lệ. Errors: {Errors}",
+                    string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)));
                 return View(model);
             }
 
             try
             {
+                _logger.LogInformation("Kiểm tra username đã tồn tại: {Username}", model.Username);
+
                 // Kiểm tra username đã tồn tại
                 var existingUser = await _benhVienContext.TaiKhoans
                     .FirstOrDefaultAsync(t => t.Username == model.Username);
 
                 if (existingUser != null)
                 {
+                    _logger.LogWarning("Username đã tồn tại: {Username}", model.Username);
                     ModelState.AddModelError("Username", "Tên đăng nhập đã tồn tại");
                     return View(model);
                 }
+
+                _logger.LogInformation("Kiểm tra email đã tồn tại: {Email}", model.Email);
 
                 // Kiểm tra email đã tồn tại
                 var existingEmail = await _benhVienContext.BenhNhans
@@ -165,9 +180,12 @@ namespace QLPhanPhoiThuoc.Controllers
 
                 if (existingEmail != null)
                 {
+                    _logger.LogWarning("Email đã được sử dụng: {Email}", model.Email);
                     ModelState.AddModelError("Email", "Email đã được sử dụng");
                     return View(model);
                 }
+
+                _logger.LogInformation("Kiểm tra CCCD đã tồn tại: {CCCD}", model.CCCD);
 
                 // Kiểm tra CCCD đã tồn tại
                 var existingCCCD = await _benhVienContext.BenhNhans
@@ -175,9 +193,12 @@ namespace QLPhanPhoiThuoc.Controllers
 
                 if (existingCCCD != null)
                 {
+                    _logger.LogWarning("CCCD đã được đăng ký: {CCCD}", model.CCCD);
                     ModelState.AddModelError("CCCD", "Số CCCD đã được đăng ký");
                     return View(model);
                 }
+
+                _logger.LogInformation("Tạo tài khoản mới cho username: {Username}", model.Username);
 
                 // Tạo tài khoản mới
                 var taiKhoan = new TaiKhoan
@@ -191,8 +212,21 @@ namespace QLPhanPhoiThuoc.Controllers
                     NgayCapNhat = DateTime.Now
                 };
 
+                _logger.LogInformation("Thêm tài khoản vào database: {MaTaiKhoan}", taiKhoan.MaTaiKhoan);
                 _benhVienContext.TaiKhoans.Add(taiKhoan);
-                await _benhVienContext.SaveChangesAsync();
+
+                try
+                {
+                    await _benhVienContext.SaveChangesAsync();
+                    _logger.LogInformation("Đã lưu tài khoản thành công: {MaTaiKhoan}", taiKhoan.MaTaiKhoan);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Lỗi khi lưu tài khoản: {MaTaiKhoan}", taiKhoan.MaTaiKhoan);
+                    throw;
+                }
+
+                _logger.LogInformation("Tạo bệnh nhân mới cho CCCD: {CCCD}", model.CCCD);
 
                 // Tạo bệnh nhân mới
                 var benhNhan = new BenhNhan
@@ -203,25 +237,101 @@ namespace QLPhanPhoiThuoc.Controllers
                     NgaySinh = model.NgaySinh,
                     GioiTinh = model.GioiTinh,
                     CCCD = model.CCCD,
-                    DiaChi = model.DiaChi,
+                    DiaChi = model.DiaChi ?? "",
                     SoDienThoai = model.SoDienThoai,
                     Email = model.Email,
                     NhomMau = model.NhomMau ?? "Chưa xác định",
                     NgheNghiep = model.NgheNghiep ?? "",
                     TienSuDiUng = model.TienSuDiUng ?? "",
+                    TrangThai = "HoatDong",
+                    LoaiBenhNhan = "NgoaiTru",
                     NgayTao = DateTime.Now
                 };
 
-                _benhVienContext.BenhNhans.Add(benhNhan);
-                await _benhVienContext.SaveChangesAsync();
+                // Note: Không set Avatar vì cột này không tồn tại trong database
 
+                _logger.LogInformation("Thêm bệnh nhân vào database: {MaBenhNhan}", benhNhan.MaBenhNhan);
+                _benhVienContext.BenhNhans.Add(benhNhan);
+
+                try
+                {
+                    await _benhVienContext.SaveChangesAsync();
+                    _logger.LogInformation("Đã lưu bệnh nhân thành công: {MaBenhNhan}", benhNhan.MaBenhNhan);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Lỗi khi lưu bệnh nhân: {MaBenhNhan}", benhNhan.MaBenhNhan);
+                    throw;
+                }
+
+                _logger.LogInformation("Đăng ký thành công cho username: {Username}", model.Username);
                 TempData["SuccessMessage"] = "Đăng ký tài khoản thành công! Vui lòng đăng nhập.";
                 return RedirectToAction(nameof(Login));
             }
+            catch (DbUpdateException dbEx)
+            {
+                _logger.LogError(dbEx, "Lỗi database khi đăng ký cho CCCD: {CCCD}. InnerException: {InnerException}",
+                    model.CCCD, dbEx.InnerException?.Message);
+
+                ModelState.AddModelError("", $"Lỗi database: {dbEx.InnerException?.Message ?? dbEx.Message}");
+                return View(model);
+            }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Lỗi không xác định khi đăng ký cho CCCD: {CCCD}", model.CCCD);
+
                 ModelState.AddModelError("", "Đã xảy ra lỗi trong quá trình đăng ký: " + ex.Message);
                 return View(model);
+            }
+        }
+
+        // API: Tra cứu thông tin VNeID theo CCCD
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> LookupVNeID([FromBody] string cccd)
+        {
+            try
+            {
+                _logger.LogInformation("Tra cứu VNeID cho CCCD: {CCCD}", cccd);
+
+                if (string.IsNullOrEmpty(cccd) || cccd.Length != 12)
+                {
+                    _logger.LogWarning("CCCD không hợp lệ: {CCCD}", cccd);
+                    return Json(new { success = false, message = "Số CCCD không hợp lệ" });
+                }
+
+                // Tìm trong VNeID database
+                var congDan = await _vneIdContext.CongDans
+                    .FirstOrDefaultAsync(c => c.SoDinhDanh == cccd);
+
+                if (congDan == null)
+                {
+                    _logger.LogWarning("Không tìm thấy công dân với CCCD: {CCCD}", cccd);
+                    return Json(new { success = false, message = "Không tìm thấy thông tin công dân với số CCCD này" });
+                }
+
+                _logger.LogInformation("Tìm thấy công dân: {HoTen}", congDan.HoTen);
+
+                // Trả về thông tin
+                return Json(new
+                {
+                    success = true,
+                    data = new
+                    {
+                        soDinhDanh = congDan.SoDinhDanh,
+                        hoTen = congDan.HoTen,
+                        ngaySinh = congDan.NgaySinh.ToString("yyyy-MM-dd"),
+                        gioiTinh = congDan.GioiTinh,
+                        queQuan = congDan.QueQuan,
+                        noiThuongTru = congDan.NoiThuongTru,
+                        diaChiHienTai = congDan.DiaChiHienTai
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi tra cứu VNeID cho CCCD: {CCCD}", cccd);
+                return Json(new { success = false, message = "Đã xảy ra lỗi: " + ex.Message });
             }
         }
 
@@ -266,6 +376,7 @@ namespace QLPhanPhoiThuoc.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Lỗi khi xử lý quên mật khẩu cho email: {Email}", model.Email);
                 ModelState.AddModelError("", "Đã xảy ra lỗi: " + ex.Message);
                 return View(model);
             }
@@ -319,6 +430,7 @@ namespace QLPhanPhoiThuoc.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Lỗi khi đặt lại mật khẩu");
                 ModelState.AddModelError("", "Đã xảy ra lỗi: " + ex.Message);
                 return View(model);
             }
