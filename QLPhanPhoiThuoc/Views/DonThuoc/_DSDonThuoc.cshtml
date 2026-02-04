@@ -1,0 +1,140 @@
+﻿@model IEnumerable<QLPhanPhoiThuoc.Models.Entities.DonThuoc>
+
+<div class="medicine-table-card animate-fadeIn">
+    <div class="p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="text-primary m-0"><i class="fas fa-prescription me-2"></i>Danh sách đơn thuốc</h5>
+
+        <div class="search-box w-50">
+            <form onsubmit="searchDonThuoc(); return false;">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                    <input type="text" id="donThuocSearch" class="form-control border-start-0 ps-0" 
+                           placeholder="Nhập mã đơn hoặc tên bệnh nhân..." value="@ViewBag.Search">
+                    <button class="btn btn-primary" type="button" onclick="searchDonThuoc()">Tìm</button>
+                </div>
+            </form>
+        </div>
+
+        <button class="btn-add" onclick="alert('Chức năng tạo đơn sẽ làm sau')">
+            <i class="fas fa-plus me-2"></i>Tạo đơn mới
+        </button>
+    </div>
+
+    <div class="p-2 border-bottom bg-white d-flex gap-2">
+        <button class="btn btn-sm btn-outline-secondary @(ViewBag.Status == "All" ? "active" : "")" onclick="filterDonThuoc('All')">Tất cả</button>
+        <button class="btn btn-sm btn-outline-warning @(ViewBag.Status == "ChuaCapPhat" ? "active" : "")" onclick="filterDonThuoc('ChuaCapPhat')">Chờ xử lý</button>
+        <button class="btn btn-sm btn-outline-success @(ViewBag.Status == "DaCapPhat" ? "active" : "")" onclick="filterDonThuoc('DaCapPhat')">Đã xử lý</button>
+    </div>
+
+    <table class="medicine-table table-hover">
+        <thead>
+            <tr>
+                <th class="ps-4">Mã Đơn</th>
+                <th>Bệnh Nhân</th>
+                <th>Bác Sĩ Kê</th>
+                <th>Ngày Kê</th>
+                <th>Loại Đơn</th>
+                <th>Trạng Thái</th>
+                <th class="text-end pe-4">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                    <tr>
+                        <td class="ps-4 fw-bold text-primary">@item.MaDonThuoc</td>
+                        <td>
+                            <div class="fw-bold">@item.BenhNhan?.TenBenhNhan</div>
+                            <div class="small text-muted">Mã: @item.MaBenhNhan</div>
+                        </td>
+                        <td>@(item.NhanVien?.TenNhanVien ?? item.MaNhanVien)</td>
+                        <td>@item.NgayKeDon.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>
+                        @if (item.LoaiDon == "BHYT")
+                        {
+                            <span class="badge bg-primary">BHYT</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-info text-dark">Dịch vụ</span>
+                        }
+                        </td>
+                        <td>
+                        @if (item.TrangThai == "ChuaCapPhat")
+                        {
+                            <span class="badge bg-warning text-dark">Chờ xử lý</span>
+                        }
+                        else if (item.TrangThai == "DaCapPhat")
+                        {
+                            <span class="badge bg-success">Đã hoàn thành</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Đã hủy</span>
+                        }
+                        </td>
+                        <td class="text-end pe-4">
+                            <button class="btn btn-sm btn-outline-info" title="Xem chi tiết" onclick="viewDonThuocDetail('@item.MaDonThuoc')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="p-3 border-top d-flex justify-content-between align-items-center bg-light">
+        <div class="small text-muted">Trang @ViewBag.CurrentPage / @ViewBag.TotalPages</div>
+        <nav>
+            <ul class="pagination pagination-sm m-0">
+                 <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" href="javascript:void(0)" onclick="loadPrescriptionContent('/Admin/DonThuoc/_DSDonThuoc?page=@(ViewBag.CurrentPage - 1)&search=@ViewBag.Search&status=@ViewBag.Status')">Trước</a>
+                </li>
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                        <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                            <a class="page-link" href="javascript:void(0)" onclick="loadPrescriptionContent('/Admin/DonThuoc/_DSDonThuoc?page=@i&search=@ViewBag.Search&status=@ViewBag.Status')">@i</a>
+                        </li>
+                }
+                <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                    <a class="page-link" href="javascript:void(0)" onclick="loadPrescriptionContent('/Admin/DonThuoc/_DSDonThuoc?page=@(ViewBag.CurrentPage + 1)&search=@ViewBag.Search&status=@ViewBag.Status')">Sau</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+<div class="modal fade" id="commonModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);">
+                <h5 class="modal-title" id="commonModalTitle">
+                    <i class="fas fa-info-circle me-2"></i>Thông tin chi tiết
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0" id="commonModalBody">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Đang tải...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Hàm tìm kiếm
+    function searchDonThuoc() {
+        var val = $('#donThuocSearch').val();
+        loadPrescriptionContent('/Admin/DonThuoc/_DSDonThuoc?search=' + encodeURIComponent(val) + '&status=@ViewBag.Status');
+    }
+
+    // Hàm lọc trạng thái
+    function filterDonThuoc(status) {
+        var val = $('#donThuocSearch').val();
+        loadPrescriptionContent('/Admin/DonThuoc/_DSDonThuoc?search=' + encodeURIComponent(val) + '&status=' + status);
+    }
+</script>

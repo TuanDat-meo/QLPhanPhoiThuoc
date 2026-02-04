@@ -633,17 +633,14 @@
                     <i class="fas fa-chevron-right menu-arrow"></i>
                 </div>
                 <div class="menu-submenu">
-                    <a href="#" class="submenu-item" data-tab="prescription-list">
-                        <i class="fas fa-circle"></i>
-                        <span>Danh sách đơn</span>
+                    <a href="#" class="submenu-item" data-url="/Admin/DonThuoc/_DSDonThuoc">
+                        <i class="fas fa-circle"></i><span>Danh sách đơn</span>
                     </a>
-                    <a href="#" class="submenu-item" data-tab="prescription-pending">
-                        <i class="fas fa-circle"></i>
-                        <span>Chờ cấp phát</span>
+                    <a href="#" class="submenu-item" data-url="/Admin/DonThuoc/_DSDonThuoc?status=ChuaCapPhat">
+                        <i class="fas fa-circle"></i><span>Chờ xử lý</span>
                     </a>
-                    <a href="#" class="submenu-item" data-tab="prescription-completed">
-                        <i class="fas fa-circle"></i>
-                        <span>Đã hoàn thành</span>
+                    <a href="#" class="submenu-item" data-url="/Admin/DonThuoc/_DSDonThuoc?status=DaCapPhatt">
+                        <i class="fas fa-circle"></i><span>Đã hoàn thành</span>
                     </a>
                 </div>
             </div>
@@ -841,6 +838,20 @@
                 </div>
             </div>
         </div>
+        @* Đơn thuốc *@
+        <div id="prescriptions" class="content-section">
+            <div class="medicine-container">
+                <div class="page-header">
+                    <h2 style="margin: 0; font-size: 1.8rem; font-weight: 700;">Quản lý đơn thuốc</h2>
+                    <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 0.95rem;">Kê đơn và cấp phát thuốc cho bệnh nhân</p>
+                </div>
+                <div id="prescriptionContent">
+                    <div class="text-center py-5 text-muted">Đang tải dữ liệu...</div>
+                </div>
+            </div>
+        </div>
+
+
 
         <!-- Warehouse Section - PHẦN NÀY QUAN TRỌNG -->
         <div id="warehouse" class="content-section">
@@ -975,6 +986,25 @@
                     error: function () { $('#medicineContent').html('<div class="alert alert-danger">Lỗi tải dữ liệu thuốc</div>'); hideLoading(); }
                  });
             }
+            // 6. Đơn thuốc
+            function loadPrescriptionContent(url) {
+                    showLoading();
+                    showSection('prescriptions'); // ID khớp với div vừa tạo ở trên
+
+                    $.ajax({
+                        url: url,
+                        method: 'GET',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                        success: function (data) {
+                            $('#prescriptionContent').html(data);
+                            hideLoading();
+                        },
+                        error: function () {
+                            $('#prescriptionContent').html('<div class="alert alert-danger">Lỗi tải dữ liệu đơn thuốc</div>');
+                            hideLoading();
+                        }
+                    });
+                }
 
             // ==================== BHYT FUNCTIONS (QUAN TRỌNG) ====================
             // Được gọi từ View _DSTheBHYT.cshtml và _EditBenhNhan.cshtml
@@ -1003,6 +1033,29 @@
                 loadPatientsContent('/Admin/TheBHYT/_DSTheBHYT?search=' + encodeURIComponent(soThe));
             }
 
+            // Hàm xem chi tiết đơn thuốc
+            function viewDonThuocDetail(id) {
+                showLoading(); // Hiển thị spinner nếu có
+                $.get('/Admin/DonThuoc/Detail/' + id, function(data) {
+                    // 1. Đổ dữ liệu vào vùng Body của Modal chung
+                    $('#commonModalBody').html(data);
+
+                    // 2. Thiết lập tiêu đề cho Modal
+                    $('#commonModalTitle').html('<i class="fas fa-prescription me-2"></i>Chi tiết đơn thuốc: ' + id);
+
+                    // 3. Hiển thị Modal
+                    var modalEl = document.getElementById('commonModal');
+                    if (modalEl) {
+                        new bootstrap.Modal(modalEl).show();
+                    } else {
+                        alert('Lỗi: Không tìm thấy khung Modal chung!');
+                    }
+                    hideLoading();
+                }).fail(function() {
+                    hideLoading();
+                    alert('Lỗi: Không thể tải thông tin đơn thuốc.');
+                });
+            }
             // ==================== DOCUMENT READY (INIT) ====================
             $(document).ready(function () {
                 // 1. Load Dashboard mặc định
@@ -1049,6 +1102,7 @@
                         if (url.includes('/NhanVien/')) loadEmployeeContent(url);
                         else if (url.includes('/HoaDon/')) loadInvoiceContent(url);
                         else if (url.includes('/Kho/')) loadWarehouseContent(url);
+                            else if (url.includes('/DonThuoc/')) loadPrescriptionContent(url);
                         else loadThuocContent(url);
                     }
                 });
