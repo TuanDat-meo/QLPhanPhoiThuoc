@@ -13,40 +13,48 @@ namespace QLPhanPhoiThuoc.Models.EF
         }
 
         // NHÓM A: DANH MỤC CƠ SỞ
-        public DbSet<Thuoc> Thuocs { get; set; }
-        public DbSet<NhaCungCap> NhaCungCaps { get; set; }
-        public DbSet<Kho> Khos { get; set; }
-        public DbSet<KhoaPhong> KhoaPhongs { get; set; }
-        public DbSet<NhanVien> NhanViens { get; set; }
-        public DbSet<TaiKhoan> TaiKhoans { get; set; }
+        public DbSet<Thuoc> Thuocs { get; set; } = null!;
+        public DbSet<Thuoc> Thuoc { get; set; } = null!; // Alias cho query _context.Thuoc
+        public DbSet<NhaCungCap> NhaCungCaps { get; set; } = null!;
+        public DbSet<NhaCungCap> NhaCungCap { get; set; } = null!; // Alias
+        public DbSet<Kho> Khos { get; set; } = null!;
+        public DbSet<Kho> Kho { get; set; } = null!; // Alias cho query _context.Kho
+        public DbSet<KhoaPhong> KhoaPhongs { get; set; } = null!;
+        public DbSet<NhanVien> NhanViens { get; set; } = null!;
+        public DbSet<NhanVien> NhanVien { get; set; } = null!; // Alias
+        public DbSet<TaiKhoan> TaiKhoans { get; set; } = null!;
 
         // NHÓM B: QUẢN LÝ KHO THUỐC
-        public DbSet<LoThuoc> LoThuocs { get; set; }
-        public DbSet<PhieuNhap> PhieuNhaps { get; set; }
-        public DbSet<ChiTietPhieuNhap> ChiTietPhieuNhaps { get; set; }
+        public DbSet<LoThuoc> LoThuocs { get; set; } = null!;
+        public DbSet<LoThuoc> LoThuoc { get; set; } = null!; // Alias cho query _context.LoThuoc
+        public DbSet<PhieuNhap> PhieuNhaps { get; set; } = null!;
+        public DbSet<PhieuNhap> PhieuNhap { get; set; } = null!; // Alias
+        public DbSet<ChiTietPhieuNhap> ChiTietPhieuNhaps { get; set; } = null!;
 
         // NHÓM C: BỆNH NHÂN
-        public DbSet<BenhNhan> BenhNhans { get; set; }
-        public DbSet<TheBHYT> TheBHYTs { get; set; }
+        public DbSet<BenhNhan> BenhNhans { get; set; } = null!;
+        public DbSet<BenhNhan> BenhNhan { get; set; } = null!; // Alias
+        public DbSet<TheBHYT> TheBHYTs { get; set; } = null!;
 
         // NHÓM D: KHÁM BỆNH & ĐƠN THUỐC
-        public DbSet<ChanDoan> ChanDoans { get; set; }
-        public DbSet<DonThuoc> DonThuocs { get; set; }
-        public DbSet<ChiTietDonThuoc> ChiTietDonThuocs { get; set; }
+        public DbSet<ChanDoan> ChanDoans { get; set; } = null!;
+        public DbSet<DonThuoc> DonThuocs { get; set; } = null!;
+        public DbSet<ChiTietDonThuoc> ChiTietDonThuocs { get; set; } = null!;
 
         // NHÓM E: XUẤT THUỐC
-        public DbSet<PhieuCapPhat> PhieuCapPhats { get; set; }
-        public DbSet<ChiTietPhieuCap> ChiTietPhieuCaps { get; set; }
+        public DbSet<PhieuCapPhat> PhieuCapPhats { get; set; } = null!;
+        public DbSet<PhieuCapPhat> PhieuCapPhat { get; set; } = null!; // Alias
+        public DbSet<ChiTietPhieuCap> ChiTietPhieuCaps { get; set; } = null!;
 
         // NHÓM F: HÓA ĐƠN & THANH TOÁN
-        public DbSet<HoaDon> HoaDons { get; set; }
-        public DbSet<PhieuThuTien> PhieuThuTiens { get; set; }
-        public DbSet<VietQRGiaoDich> VietQRGiaoDichs { get; set; }
-        public DbSet<CauHinhVietQR> CauHinhVietQRs { get; set; }
+        public DbSet<HoaDon> HoaDons { get; set; } = null!;
+        public DbSet<PhieuThuTien> PhieuThuTiens { get; set; } = null!;
+        public DbSet<VietQRGiaoDich> VietQRGiaoDichs { get; set; } = null!;
+        public DbSet<CauHinhVietQR> CauHinhVietQRs { get; set; } = null!;
 
         // NHÓM G: HỆ THỐNG
-        public DbSet<CauHinhHeThong> CauHinhHeThongs { get; set; }
-        public DbSet<ThongBao> ThongBaos { get; set; }
+        public DbSet<CauHinhHeThong> CauHinhHeThongs { get; set; } = null!;
+        public DbSet<ThongBao> ThongBaos { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -164,12 +172,12 @@ namespace QLPhanPhoiThuoc.Models.EF
                 entity.HasKey(e => e.MaTaiKhoan);
 
                 entity.Property(e => e.MaTaiKhoan).HasMaxLength(20);
-                entity.Property(e => e.MaNhanVien).HasMaxLength(20);  // THÊM CẤU HÌNH CHO CỘT NÀY
+                entity.Property(e => e.MaNhanVien).HasMaxLength(20);
                 entity.Property(e => e.Username).HasMaxLength(50).IsRequired();
                 entity.Property(e => e.PasswordHash).HasMaxLength(255).IsRequired();
                 entity.Property(e => e.Role).HasMaxLength(20).IsRequired();
                 entity.Property(e => e.TrangThai).HasMaxLength(20).HasDefaultValue("KichHoat");
-                entity.Property(e => e.LanDangNhapCuoi);  // THÊM CẤU HÌNH CHO CỘT NÀY
+                entity.Property(e => e.LanDangNhapCuoi);
                 entity.Property(e => e.NgayTao).HasDefaultValueSql("GETDATE()");
                 entity.Property(e => e.NgayCapNhat);
 
@@ -183,7 +191,6 @@ namespace QLPhanPhoiThuoc.Models.EF
                 // Cấu hình quan hệ one-to-one với BenhNhan
                 entity.HasOne(t => t.BenhNhan)
                     .WithOne(b => b.TaiKhoan)
-                    .HasForeignKey<BenhNhan>(b => b.MaTaiKhoan)
                     .HasForeignKey<BenhNhan>(b => b.MaTaiKhoan)
                     .OnDelete(DeleteBehavior.Cascade)
                     .IsRequired(false);
@@ -293,21 +300,15 @@ namespace QLPhanPhoiThuoc.Models.EF
                 entity.Property(e => e.CanNang).HasColumnType("decimal(5,2)");
                 entity.Property(e => e.ChieuCao).HasColumnType("decimal(5,2)");
                 entity.Property(e => e.TienSuDiUng).HasColumnType("nvarchar(max)");
-
-                // ✅ THÊM: MaTaiKhoan property (FK to TaiKhoan)
                 entity.Property(e => e.MaTaiKhoan).HasMaxLength(20);
-
                 entity.Property(e => e.LoaiBenhNhan).HasMaxLength(20).HasDefaultValue("NgoaiTru");
                 entity.Property(e => e.TrangThai).HasMaxLength(20).HasDefaultValue("HoatDong");
                 entity.Property(e => e.NgayTao).HasDefaultValueSql("GETDATE()");
 
-                // Indexes
                 entity.HasIndex(e => e.TenBenhNhan).HasDatabaseName("idx_tenbn");
                 entity.HasIndex(e => e.SoDienThoai).HasDatabaseName("idx_sdt");
                 entity.HasIndex(e => e.CCCD).HasDatabaseName("idx_cccd");
                 entity.HasIndex(e => e.Email).HasDatabaseName("idx_email");
-
-                // ✅ THÊM: Index cho MaTaiKhoan
                 entity.HasIndex(e => e.MaTaiKhoan).HasDatabaseName("idx_mataikhoan");
             });
 
@@ -429,7 +430,7 @@ namespace QLPhanPhoiThuoc.Models.EF
                 entity.ToTable("PhieuCapPhat");
                 entity.HasKey(e => e.MaPhieuCap);
                 entity.Property(e => e.MaPhieuCap).HasMaxLength(20);
-                entity.Property(e => e.MaDonThuoc).HasMaxLength(20).IsRequired();
+                entity.Property(e => e.MaDonThuoc).HasMaxLength(20);
                 entity.Property(e => e.MaBenhNhan).HasMaxLength(20).IsRequired();
                 entity.Property(e => e.MaKho).HasMaxLength(20).IsRequired();
                 entity.Property(e => e.TongTien).HasColumnType("decimal(15,2)").HasDefaultValue(0);
