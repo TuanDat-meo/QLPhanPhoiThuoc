@@ -551,14 +551,16 @@
                         <i class="fas fa-chevron-right menu-arrow"></i>
                     </div>
                     <div class="menu-submenu">
-                        <a href="javascript:void(0)" onclick="loadContent('/Admin/BenhNhan/_DSBenhNhan')" class="submenu-item">
+                        <a href="#" class="submenu-item" data-tab="patient-list">
                             <i class="fas fa-circle"></i>
                             <span>Danh sách bệnh nhân</span>
                         </a>
+
                         <a href="#" class="submenu-item" data-tab="patient-add">
                             <i class="fas fa-circle"></i>
                             <span>Thêm bệnh nhân mới</span>
                         </a>
+
                         <a href="#" class="submenu-item" data-tab="patient-medical">
                             <i class="fas fa-circle"></i>
                             <span>Hồ sơ bệnh án</span>
@@ -1169,7 +1171,8 @@
 @section Scripts {
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    
+    @* Excel *@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
         $(document).ready(function() {
             // Menu accordion functionality
