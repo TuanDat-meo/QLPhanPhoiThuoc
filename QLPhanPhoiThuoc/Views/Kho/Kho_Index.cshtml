@@ -1,0 +1,430 @@
+﻿@model IEnumerable<QLPhanPhoiThuoc.Models.Entities.Kho>
+@{
+    // QUAN TRỌNG: Thiết lập Layout bằng null để không load chồng chéo Header/Footer khi dùng AJAX
+    Layout = null;
+}
+
+<style>
+    /* Giữ nguyên phần Style của bạn */
+    .warehouse-header {
+        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
+        color: white;
+        padding: 25px 30px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(30, 58, 95, 0.3);
+    }
+
+    .warehouse-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 0;
+    }
+
+        .warehouse-title h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+    }
+
+    .btn-action {
+        padding: 10px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-import {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        color: white;
+    }
+
+    .btn-export {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+    }
+
+    .warehouse-filters {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .filter-row {
+        display: flex;
+        gap: 15px;
+        align-items: flex-end;
+    }
+
+    .filter-group {
+        flex: 1;
+    }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9rem;
+        }
+
+        .filter-group input, .filter-group select {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+    .btn-filter {
+        padding: 10px 24px;
+        background: #1e3a5f;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .warehouse-table-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .warehouse-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .warehouse-table thead {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+            .warehouse-table thead th {
+                padding: 16px;
+                text-align: left;
+                font-weight: 700;
+                color: #1e3a5f;
+                border-bottom: 2px solid #dee2e6;
+                font-size: 0.9rem;
+                text-transform: uppercase;
+            }
+
+        .warehouse-table tbody td {
+            padding: 14px 16px;
+            color: #495057;
+            font-size: 0.95rem;
+        }
+
+    .badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .badge-success {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .badge-warning {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .badge-danger {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .badge-info {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .action-links {
+        display: flex;
+        gap: 8px;
+    }
+
+    .action-link {
+        padding: 6px 12px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .action-link-view {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .action-link-edit {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .action-link-delete {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border-left: 4px solid #1e3a5f;
+    }
+
+    .stat-card-success {
+        border-left-color: #22c55e;
+    }
+
+    .stat-card-warning {
+        border-left-color: #f59e0b;
+    }
+
+    .stat-card-danger {
+        border-left-color: #ef4444;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1e3a5f;
+    }
+</style>
+
+<div class="warehouse-header">
+    <div class="warehouse-title">
+        <h2><i class="fas fa-warehouse"></i> Quản lý kho</h2>
+        <div class="action-buttons">
+            <button class="btn-action btn-import" onclick="openPhieuNhapPanel()">
+                <i class="fas fa-file-import"></i> Tạo phiếu nhập
+            </button>
+            <button class="btn-action btn-export" onclick="openPhieuXuatPanel()">
+                <i class="fas fa-file-export"></i> Tạo phiếu xuất
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-label">Tổng số kho</div>
+        <div class="stat-value">@Model.Count()</div>
+    </div>
+    <div class="stat-card stat-card-success">
+        <div class="stat-label">Kho hoạt động</div>
+        <div class="stat-value">@Model.Count(k => k.TrangThai == "HoatDong")</div>
+    </div>
+    <div class="stat-card stat-card-warning">
+        <div class="stat-label">Kho tạm ngưng</div>
+        <div class="stat-value">@Model.Count(k => k.TrangThai == "TamNgung")</div>
+    </div>
+    <div class="stat-card stat-card-danger">
+        <div class="stat-label">Kho đóng cửa</div>
+        <div class="stat-value">@Model.Count(k => k.TrangThai == "DongCua")</div>
+    </div>
+</div>
+
+<div class="warehouse-filters">
+    <div class="filter-row">
+        <div class="filter-group">
+            <label>Tìm kiếm</label>
+            <input type="text" id="searchInput" onkeyup="applyFilters()" placeholder="Tìm theo tên kho, địa điểm..." />
+        </div>
+        <div class="filter-group">
+            <label>Loại kho</label>
+            <select id="filterLoaiKho" onchange="applyFilters()">
+                <option value="">Tất cả</option>
+                <option value="TongKho">Tổng kho</option>
+                <option value="KhoPhu">Kho phụ</option>
+                <option value="KhoKhoa">Kho khoa</option>
+                <option value="KhoThuoc">Kho thuốc</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Trạng thái</label>
+            <select id="filterTrangThai" onchange="applyFilters()">
+                <option value="">Tất cả</option>
+                <option value="HoatDong">Hoạt động</option>
+                <option value="TamNgung">Tạm ngưng</option>
+                <option value="DongCua">Đóng cửa</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="warehouse-table-container">
+    @if (Model != null && Model.Any())
+    {
+        <table class="warehouse-table" id="warehouseTable">
+            <thead>
+                <tr>
+                    <th>Mã kho</th>
+                    <th>Tên kho</th>
+                    <th>Loại kho</th>
+                    <th>Địa điểm</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày tạo</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr data-loaikho="@item.LoaiKho" data-trangthai="@item.TrangThai">
+                        <td><strong>@item.MaKho</strong></td>
+                        <td class="warehouse-name">@item.TenKho</td>
+                        <td>
+                            @switch (item.LoaiKho)
+                            {
+                                case "TongKho":
+                                    <span class="badge badge-info">Tổng kho</span>
+                                    break;
+                                case "KhoPhu":
+
+                                    <span class="badge badge-success">Kho phụ</span>
+                                    break;
+                                case "KhoKhoa":
+
+                                    <span class="badge badge-warning">Kho khoa</span>
+                                    break;
+                                default:
+
+                                    <span class="badge">@item.LoaiKho</span>
+                                    break;
+                            }
+                        </td>
+                        <td>@item.DiaDiem</td>
+                        <td>
+                            @switch (item.TrangThai)
+                            {
+                                case "HoatDong":
+                                    <span class="badge badge-success">Hoạt động</span>
+                                    break;
+                                case "TamNgung":
+
+                                    <span class="badge badge-warning">Tạm ngưng</span>
+                                    break;
+                                case "DongCua":
+
+                                    <span class="badge badge-danger">Đóng cửa</span>
+                                    break;
+                                default:
+
+                                    <span class="badge">@item.TrangThai</span>
+                                    break;
+                            }
+                        </td>
+                        <td>@item.NgayTao.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <div class="action-links">
+                                <button class="action-link action-link-view border-0" onclick="viewWarehouse('@item.MaKho')"><i class="fas fa-eye"></i> Xem</button>
+                                <button class="action-link action-link-edit border-0" onclick="editWarehouse('@item.MaKho')"><i class="fas fa-edit"></i> Sửa</button>
+                                <button class="action-link action-link-delete border-0" onclick="deleteWarehouse('@item.MaKho', '@item.TenKho')"><i class="fas fa-trash"></i> Xóa</button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+<script>
+    // Hàm lọc dữ liệu tại chỗ
+    function applyFilters() {
+        const searchValue = $('#searchInput').val().toLowerCase();
+        const loaiKho = $('#filterLoaiKho').val();
+        const trangThai = $('#filterTrangThai').val();
+
+        $('#warehouseTable tbody tr').each(function() {
+            const rowText = $(this).text().toLowerCase();
+            const rowLoaiKho = $(this).attr('data-loaikho');
+            const rowTrangThai = $(this).attr('data-trangthai');
+
+            const matchSearch = searchValue === '' || rowText.includes(searchValue);
+            const matchLoaiKho = loaiKho === '' || rowLoaiKho === loaiKho;
+            const matchTrangThai = trangThai === '' || rowTrangThai === trangThai;
+
+            $(this).toggle(matchSearch && matchLoaiKho && matchTrangThai);
+        });
+    }
+
+    // Các hàm gọi Panel phải gọi các hàm đã định nghĩa ở AdminIndex
+    function openPhieuNhapPanel() {
+        if (typeof openPanel === 'function') {
+            openPanel('/Admin/PhieuNhap/Create', 'Tạo phiếu nhập kho', 'fas fa-file-import');
+        }
+    }
+
+    function openPhieuXuatPanel() {
+        if (typeof openPanel === 'function') {
+            openPanel('/Admin/PhieuCap/Create', 'Tạo phiếu xuất kho', 'fas fa-file-export');
+        }
+    }
+
+    function viewWarehouse(maKho) {
+        if (typeof openPanel === 'function') {
+            openPanel('/Admin/Kho/Details/' + maKho, 'Chi tiết kho', 'fas fa-warehouse');
+        }
+    }
+
+    function editWarehouse(maKho) {
+        if (typeof openPanel === 'function') {
+            openPanel('/Admin/Kho/Edit/' + maKho, 'Chỉnh sửa kho', 'fas fa-edit');
+        }
+    }
+
+    function deleteWarehouse(maKho, tenKho) {
+        if (confirm('Bạn có chắc chắn muốn xóa kho "' + tenKho + '" không?')) {
+            $.ajax({
+                url: '/Admin/Kho/Delete/' + maKho,
+                method: 'POST',
+                success: function(response) {
+                    if (response.success) {
+                        alert('Xóa kho thành công!');
+                        // Load lại nội dung kho thay vì reload trang
+                        loadWarehouseContent('/Admin/Kho/Index');
+                    } else {
+                        alert('Lỗi: ' + response.message);
+                    }
+                }
+            });
+        }
+    }
+</script>

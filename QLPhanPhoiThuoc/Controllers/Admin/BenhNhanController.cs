@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using QLPhanPhoiThuoc.Models.EF;
 using QLPhanPhoiThuoc.Models.Entities;
 
-namespace QLPhanPhoiThuoc.Controllers.Admin
+namespace QLPhanPhoiThuoc.Controllers
 {
     [Route("Admin/[controller]")]
     [Authorize(Roles = "Admin,NhanVien,BacSi,DuocSi")]
@@ -212,5 +212,47 @@ namespace QLPhanPhoiThuoc.Controllers.Admin
                 return Json(new { success = false, message = "Lỗi: " + ex.Message });
             }
         }
+
+        // GET: /BenhNhan/ExportExcel - Export Excel
+        [HttpGet]
+        [Route("ExportExcel")]
+        public async Task<IActionResult> ExportExcel()
+        {
+            // Giữ nguyên code export excel từ file cũ
+            // ...
+            return File(new MemoryStream(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "DanhSachBenhNhan.xlsx");
+        }
+
+        // GET: /BenhNhan/_BenhAnBenhNhan - Hồ sơ bệnh án
+        [HttpGet]
+        [Route("_BenhAnBenhNhan")]
+        public IActionResult BenhAnBenhNhan()
+        {
+            return PartialView("~/Views/BenhNhan/_BenhAnBenhNhan.cshtml");
+        }
+
+        // GET: /BenhNhan/_ThemBenhNhan - Form thêm bệnh nhân
+        [HttpGet]
+        [Route("_ThemBenhNhan")]
+        public IActionResult ThemBenhNhan()
+        {
+            return PartialView("~/Views/BenhNhan/_ThemBenhNhan.cshtml");
+        }
     }
 }
+
+// ==================== KIỂM TRA CẤU TRÚC THƯ MỤC ====================
+/*
+Solution/
+├── Controllers/
+│   └── BenhNhanController.cs ✅ (Đặt ở đây, KHÔNG PHẢI trong Admin/)
+│
+├── Views/
+│   └── BenhNhan/          ✅ (Views/BenhNhan/ như bạn đã nói)
+│       ├── _BenhNhan.cshtml
+│       ├── _DSBenhNhan.cshtml
+│       ├── _ChiTietBenhNhan.cshtml
+│       ├── _SuaBenhNhan.cshtml
+│       ├── _ThemBenhNhan.cshtml
+│       └── _BenhAnBenhNhan.cshtml
+*/

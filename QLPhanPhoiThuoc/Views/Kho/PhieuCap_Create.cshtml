@@ -1,0 +1,820 @@
+﻿@model QLPhanPhoiThuoc.Models.Entities.PhieuCapPhat
+
+<style>
+    .form-container {
+        padding: 30px;
+        background: #f8f9fa;
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .form-section-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1e3a5f;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e9ecef;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .form-group label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+            .form-group label .required {
+                color: #dc2626;
+            }
+
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+            .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+                outline: none;
+                border-color: #f59e0b;
+                box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+            }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+    .search-patient-section {
+        background: #fff8e1;
+        border: 2px dashed #f59e0b;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .search-input-group {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 12px 15px;
+        border: 2px solid #f59e0b;
+        border-radius: 8px;
+        font-size: 0.95rem;
+    }
+
+    .search-btn {
+        padding: 12px 24px;
+        background: #f59e0b;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        .search-btn:hover {
+            background: #d97706;
+        }
+
+    .patient-info {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        display: none;
+    }
+
+        .patient-info.show {
+            display: block;
+        }
+
+    .patient-info-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+    }
+
+    .patient-info-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .patient-info-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-bottom: 5px;
+    }
+
+    .patient-info-value {
+        font-weight: 600;
+        color: #1e3a5f;
+    }
+
+    .medicine-list-section {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .add-medicine-btn {
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+    }
+
+        .add-medicine-btn:hover {
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            transform: translateY(-2px);
+        }
+
+    .medicine-items {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .medicine-item {
+        background: #f8f9fa;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 20px;
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr auto;
+        gap: 15px;
+        align-items: end;
+        transition: all 0.3s ease;
+    }
+
+        .medicine-item:hover {
+            border-color: #f59e0b;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+        }
+
+    .stock-info {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+
+    .stock-warning {
+        color: #dc2626;
+        font-weight: 600;
+    }
+
+    .remove-medicine-btn {
+        padding: 10px;
+        background: #fee2e2;
+        color: #dc2626;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+    }
+
+        .remove-medicine-btn:hover {
+            background: #dc2626;
+            color: white;
+        }
+
+    .total-section {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 20px;
+    }
+
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+
+        .total-row:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+    .total-label {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+
+    .total-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end;
+        padding: 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .btn-submit {
+        padding: 12px 30px;
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+        }
+
+    .btn-cancel {
+        padding: 12px 30px;
+        background: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        .btn-cancel:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+    .error-message {
+        color: #dc2626;
+        font-size: 0.85rem;
+        margin-top: 5px;
+        display: none;
+    }
+
+    .form-group.error input, .form-group.error select {
+        border-color: #dc2626;
+    }
+
+    .form-group.error .error-message {
+        display: block;
+    }
+</style>
+
+<form id="phieuCapForm">
+    <div class="form-container">
+        <div class="search-patient-section">
+            <div class="form-section-title">
+                <i class="fas fa-id-card"></i> Xác thực bệnh nhân bằng CCCD
+            </div>
+
+            <div class="search-input-group">
+                <input type="text" class="search-input" id="inputCCCD" placeholder="Nhập 12 số CCCD..." maxlength="12" />
+                <button type="button" class="search-btn" onclick="btnXacThucClick()">
+                    <i class="fas fa-user-check"></i> Xác thực
+                </button>
+            </div>
+
+            <div class="patient-info" id="areaInfoBN" style="display:none; background: #fff; padding: 15px; border-radius: 8px; margin-top: 10px; border: 1px solid #f59e0b;">
+                <div class="patient-info-grid">
+                    <div class="patient-info-item">
+                        <span class="patient-info-label">Mã bệnh nhân</span>
+                        <span class="patient-info-value" id="hienMaBN" style="color: #d97706; font-weight: bold; font-size: 1.2rem;"></span>
+                    </div>
+                    <div class="patient-info-item">
+                        <span class="patient-info-label">Họ và tên</span>
+                        <span class="patient-info-value" id="hienTenBN"></span>
+                    </div>
+                </div>
+                <input type="hidden" name="MaBenhNhan" id="hiddenMaBN" />
+            </div>
+        </div>
+
+        <div class="form-card">
+            <div class="form-section-title">
+                <i class="fas fa-file-export"></i>
+                Thông tin phiếu xuất
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Mã phiếu cấp <span class="required">*</span></label>
+                    <input type="text" name="MaPhieuCap" id="maPhieuCap" value="PC@(DateTime.Now.ToString("yyyyMMddHHmmss"))" readonly />
+                </div>
+
+                <div class="form-group">
+                    <label>Mã bệnh nhân <span class="required">*</span></label>
+                    <input type="text" name="MaBenhNhan" id="maBenhNhan" readonly required />
+                    <span class="error-message">Vui lòng tìm và chọn bệnh nhân</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Kho xuất <span class="required">*</span></label>
+                    <select name="MaKho" id="maKho" required>
+                        <option value="">-- Chọn kho --</option>
+                    </select>
+                    <span class="error-message">Vui lòng chọn kho</span>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Ngày cấp <span class="required">*</span></label>
+                    <input type="datetime-local" name="NgayCap" id="ngayCap" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Nhân viên cấp</label>
+                    <input type="text" name="NhanVienCap" id="nhanVienCap" value="@ViewBag.MaNhanVien" readonly style="background-color: #e9ecef;" />
+                </div>
+
+                <div class="form-group">
+                    <label>Đơn thuốc (nếu có)</label>
+                    <input type="text" name="MaDonThuoc" id="maDonThuoc" placeholder="Mã đơn thuốc..." />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>Ghi chú</label>
+                    <textarea name="GhiChu" id="ghiChu" placeholder="Nhập ghi chú..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="medicine-list-section">
+            <div class="form-section-title">
+                <i class="fas fa-pills"></i>
+                Danh sách thuốc xuất
+            </div>
+
+            <button type="button" class="add-medicine-btn" onclick="addMedicineRow()">
+                <i class="fas fa-plus"></i>
+                Thêm thuốc
+            </button>
+
+            <div class="medicine-items" id="medicineItems">
+            </div>
+        </div>
+
+        <div class="total-section">
+            <div class="total-row">
+                <span class="total-label">Tổng số lượng:</span>
+                <span class="total-value" id="totalQuantity">0</span>
+            </div>
+            <div class="total-row">
+                <span class="total-label">Tổng tiền:</span>
+                <span class="total-value" id="totalAmount">0 ₫</span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" class="btn-cancel" onclick="closePanel(currentPanelLevel)">
+                <i class="fas fa-times"></i> Hủy
+            </button>
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-save"></i> Lưu phiếu xuất
+            </button>
+        </div>
+    </div>
+</form>
+
+<script>
+    let medicineCounter = 0;
+    let loThuocList = []; // Danh sách lô thuốc theo kho
+
+    $(document).ready(function () {
+        console.log('Bắt đầu load dữ liệu...');
+
+        // Load danh sách kho ngay khi trang được tải
+        loadKhoXuat();
+    });
+
+    // Hàm load danh sách kho
+    function loadKhoXuat() {
+        $.ajax({
+            url: '/Admin/PhieuCap/GetKho',
+            method: 'GET',
+            success: function (data) {
+                console.log('Đã load kho:', data);
+                const select = $('#maKho');
+                select.empty().append('<option value="">-- Chọn kho xuất --</option>');
+                data.forEach(item => {
+                    select.append(`<option value="${item.maKho}">${item.tenKho}</option>`);
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('Lỗi load kho:', error);
+                alert('Không thể tải danh sách kho!');
+            }
+        });
+    }
+
+    // Khi chọn kho, load danh sách lô thuốc của kho đó
+    $('#maKho').on('change', function() {
+        const maKho = $(this).val();
+        if (maKho) {
+            loadLoThuocByKho(maKho);
+        } else {
+            loThuocList = [];
+            // Xóa tất cả các dòng thuốc hiện tại vì đã đổi kho
+            $('#medicineItems').empty();
+        }
+    });
+
+    // Hàm load danh sách lô thuốc theo kho
+    function loadLoThuocByKho(maKho) {
+        $.ajax({
+            url: '/Admin/PhieuCap/GetLoThuocByKho/' + maKho,
+            method: 'GET',
+            success: function(data) {
+                console.log('Đã load lô thuốc của kho ' + maKho + ':', data);
+                loThuocList = data;
+
+                // Cập nhật lại tất cả các select đang có
+                updateAllMedicineSelects();
+            },
+            error: function(xhr, status, error) {
+                console.error('Lỗi load lô thuốc:', error);
+                alert('Không thể tải danh sách thuốc của kho này!');
+            }
+        });
+    }
+
+    // Hàm cập nhật tất cả các dropdown thuốc
+    function updateAllMedicineSelects() {
+        $('.medicine-select').each(function() {
+            const currentValue = $(this).val();
+            $(this).empty().append('<option value="">-- Chọn thuốc --</option>');
+
+            loThuocList.forEach(lo => {
+                $(this).append(`<option value="${lo.maLo}" data-tenthuoc="${lo.tenThuoc}" data-solo="${lo.soLo}" data-soluongcon="${lo.soLuongCon}" data-giaxuat="${lo.giaXuat}">${lo.tenThuoc} - Lô: ${lo.soLo} (Còn: ${lo.soLuongCon})</option>`);
+            });
+
+            // Giữ lại giá trị đã chọn nếu có
+            if (currentValue) {
+                $(this).val(currentValue);
+            }
+        });
+    }
+
+    // Hàm tìm kiếm bệnh nhân
+          function searchPatient() {
+        const keyword = $('#searchPatient').val().trim();
+        if (!keyword) return;
+
+        $.ajax({
+            url: '/Admin/PhieuCap/SearchPatient',
+            method: 'GET',
+            data: { keyword: keyword },
+            success: function(data) {
+                if (data) {
+                    // Đổ dữ liệu vào các nhãn hiển thị (Text)
+                    $('#patientCode').text(data.maBenhNhan);
+                    $('#patientName').text(data.tenBenhNhan);
+
+                    // ✅ QUAN TRỌNG: Đổ dữ liệu vào ô INPUT ẨN để lưu vào database
+                    $('#maBenhNhan').val(data.maBenhNhan);
+
+                    $('#patientInfo').fadeIn();
+                } else {
+                    alert('Không tìm thấy bệnh nhân!');
+                    $('#patientInfo').hide();
+                    $('#maBenhNhan').val('');
+                }
+            }
+        });
+    }
+        function executeCccdVerification() {
+        const val = $('#searchCCCDInput').val().trim();
+        console.log("🔍 Đang xác thực CCCD:", val);
+
+        if (val.length < 1) {
+            alert("Vui lòng nhập số CCCD!");
+            return;
+        }
+
+        $.ajax({
+            url: '/Admin/PhieuCap/SearchPatient',
+            method: 'GET',
+            data: { keyword: val },
+            success: function (data) {
+                console.log("📦 Dữ liệu nhận được:", data);
+
+                if (data && data.maBenhNhan) {
+                    // 1. Hiển thị thông tin lên giao diện
+                    $('#resPatientCode').text(data.maBenhNhan);
+                    $('#resPatientName').text(data.tenBenhNhan);
+
+                    // 2. Gán giá trị vào input thực tế của form
+                    $('#maBenhNhanHidden').val(data.maBenhNhan);
+
+                    // Đồng bộ với ô input hiển thị ở phần thông tin phiếu (nếu có)
+                    $('#maBenhNhan').val(data.maBenhNhan);
+
+                    // 3. Hiệu ứng hiện khung thông tin
+                    $('#patientResultArea').slideDown();
+                    console.log("✅ Xác thực thành công BN:", data.maBenhNhan);
+                } else {
+                    alert("Không tìm thấy bệnh nhân nào với CCCD/Mã này!");
+                    $('#patientResultArea').hide();
+                    $('#maBenhNhanHidden').val('');
+                }
+            },
+            error: function (xhr) {
+                console.error("❌ Lỗi AJAX:", xhr.responseText);
+                alert("Lỗi máy chủ khi truy vấn!");
+            }
+        });
+    }
+    // Hàm thêm dòng thuốc mới
+    function addMedicineRow() {
+        // Kiểm tra đã chọn kho chưa
+        if (!$('#maKho').val()) {
+            alert('Vui lòng chọn kho trước khi thêm thuốc!');
+            return;
+        }
+
+        medicineCounter++;
+
+        // Tạo options từ danh sách lô thuốc
+        let optionsHtml = '<option value="">-- Chọn thuốc --</option>';
+        loThuocList.forEach(lo => {
+            optionsHtml += `<option value="${lo.maLo}" data-tenthuoc="${lo.tenThuoc}" data-solo="${lo.soLo}" data-soluongcon="${lo.soLuongCon}" data-giaxuat="${lo.giaXuat}">${lo.tenThuoc} - Lô: ${lo.soLo} (Còn: ${lo.soLuongCon})</option>`;
+        });
+
+        const row = `<div class="medicine-item" data-id="${medicineCounter}">
+            <div class="form-group">
+                <label>Thuốc / Lô <span class="required">*</span></label>
+                <select name="medicines[${medicineCounter}].MaLo" class="medicine-select" onchange="updateMedicineInfo(${medicineCounter})" required>
+                    ${optionsHtml}
+                </select>
+                <div class="stock-info" id="stockInfo${medicineCounter}"></div>
+            </div>
+            <div class="form-group">
+                <label>Số lượng <span class="required">*</span></label>
+                <input type="number" name="medicines[${medicineCounter}].SoLuong" class="quantity-input" min="1" placeholder="0" onchange="validateStock(${medicineCounter}); calculateTotal();" required />
+            </div>
+            <div class="form-group">
+                <label>Đơn giá</label>
+                <input type="number" name="medicines[${medicineCounter}].DonGia" class="price-input" min="0" placeholder="0" readonly />
+            </div>
+            <div class="form-group">
+                <label>Thành tiền</label>
+                <input type="text" class="subtotal-display" readonly />
+            </div>
+            <button type="button" class="remove-medicine-btn" onclick="removeMedicineRow(${medicineCounter})">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>`;
+
+        $('#medicineItems').append(row);
+    }
+
+    // Hàm xóa dòng thuốc
+    function removeMedicineRow(id) {
+        $(`.medicine-item[data-id="${id}"]`).remove();
+        calculateTotal();
+    }
+
+    // Hàm cập nhật thông tin thuốc khi chọn
+    function updateMedicineInfo(id) {
+        const row = $(`.medicine-item[data-id="${id}"]`);
+        const selectedOption = row.find('.medicine-select option:selected');
+
+        const soLuongCon = parseInt(selectedOption.data('soluongcon')) || 0;
+        const giaXuat = parseInt(selectedOption.data('giaxuat')) || 0;
+
+        row.find('.price-input').val(giaXuat);
+        $(`#stockInfo${id}`).html(`Tồn kho: <strong>${soLuongCon}</strong>`);
+
+        calculateTotal();
+    }
+
+    // Hàm validate số lượng xuất không vượt quá tồn kho
+    function validateStock(id) {
+        const row = $(`.medicine-item[data-id="${id}"]`);
+        const selectedOption = row.find('.medicine-select option:selected');
+        const soLuongCon = parseInt(selectedOption.data('soluongcon')) || 0;
+        const soLuongXuat = parseInt(row.find('.quantity-input').val()) || 0;
+
+        if (soLuongXuat > soLuongCon) {
+            $(`#stockInfo${id}`).html(`<span class="stock-warning">Vượt quá tồn kho! (Còn: ${soLuongCon})</span>`);
+            row.find('.quantity-input').addClass('error');
+        } else {
+            $(`#stockInfo${id}`).html(`Tồn kho: <strong>${soLuongCon}</strong>`);
+            row.find('.quantity-input').removeClass('error');
+        }
+    }
+
+    // Hàm tính tổng
+    function calculateTotal() {
+        let totalQty = 0;
+        let totalAmount = 0;
+
+        $('.medicine-item').each(function() {
+            const qty = parseInt($(this).find('.quantity-input').val()) || 0;
+            const price = parseInt($(this).find('.price-input').val()) || 0;
+            const subtotal = qty * price;
+
+            $(this).find('.subtotal-display').val(subtotal.toLocaleString('vi-VN') + ' ₫');
+
+            totalQty += qty;
+            totalAmount += subtotal;
+        });
+
+        $('#totalQuantity').text(totalQty);
+        $('#totalAmount').text(totalAmount.toLocaleString('vi-VN') + ' ₫');
+    }
+
+    // Xử lý submit form
+    $('#phieuCapForm').on('submit', function(e) {
+        e.preventDefault();
+
+        let isValid = true;
+        $('.form-group').removeClass('error');
+
+        // Validate bệnh nhân
+        if (!$('#maBenhNhan').val()) {
+            $('#maBenhNhan').closest('.form-group').addClass('error');
+            alert('Vui lòng tìm và chọn bệnh nhân!');
+            isValid = false;
+        }
+
+        // Validate kho
+        if (!$('#maKho').val()) {
+            $('#maKho').closest('.form-group').addClass('error');
+            isValid = false;
+        }
+
+        // Validate danh sách thuốc
+        if ($('.medicine-item').length === 0) {
+            alert('Vui lòng thêm ít nhất một thuốc!');
+            isValid = false;
+        }
+
+        // Validate số lượng không vượt quá tồn kho
+        let hasStockError = false;
+        $('.medicine-item').each(function() {
+            const selectedOption = $(this).find('.medicine-select option:selected');
+            const soLuongCon = parseInt(selectedOption.data('soluongcon')) || 0;
+            const soLuongXuat = parseInt($(this).find('.quantity-input').val()) || 0;
+
+            if (soLuongXuat > soLuongCon) {
+                hasStockError = true;
+            }
+        });
+
+        if (hasStockError) {
+            alert('Có thuốc vượt quá tồn kho! Vui lòng kiểm tra lại.');
+            isValid = false;
+        }
+
+        if (!isValid) return;
+
+        // Tạo dữ liệu gửi lên server
+        const formData = {
+            maPhieuCap: $('#maPhieuCap').val(),
+            maBenhNhan: $('#maBenhNhan').val(),
+            maKho: $('#maKho').val(),
+            ngayCap: $('#ngayCap').val(),
+            nhanVienCap: $('#nhanVienCap').val(),
+            maDonThuoc: $('#maDonThuoc').val() || null,
+            ghiChu: $('#ghiChu').val(),
+            chiTiet: []
+        };
+
+        // Lấy danh sách thuốc
+        $('.medicine-item').each(function() {
+            const item = {
+                maLo: $(this).find('.medicine-select').val(),
+                soLuong: parseInt($(this).find('.quantity-input').val()),
+                donGia: parseInt($(this).find('.price-input').val())
+            };
+            formData.chiTiet.push(item);
+        });
+
+        console.log('Dữ liệu gửi đi:', formData);
+
+        // Gửi request tạo phiếu xuất
+        $.ajax({
+            url: '/Admin/PhieuCap/Create',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function(response) {
+                if (response.success) {
+                    alert('Tạo phiếu xuất thành công!');
+                    if (typeof closePanel === 'function') {
+                        closePanel(currentPanelLevel);
+                    }
+                    location.reload();
+                } else {
+                    alert('Lỗi: ' + response.message);
+                }
+            },
+            error: function(xhr) {
+                console.error('Lỗi:', xhr);
+                alert('Lỗi khi tạo phiếu xuất!');
+            }
+        });
+    });
+</script>
+<script type="text/javascript">
+    // Khai báo hàm vào đối tượng window để AdminIndex có thể gọi được
+    window.btnXacThucClick = function() {
+        const cccdValue = $('#inputCCCD').val().trim();
+        console.log("===> Đang thực hiện xác thực cho CCCD:", cccdValue);
+
+        if (!cccdValue) {
+            alert("Vui lòng nhập số CCCD!");
+            return;
+        }
+
+        $.ajax({
+            url: '/Admin/PhieuCap/SearchPatient',
+            method: 'GET',
+            data: { keyword: cccdValue },
+            success: function (res) {
+                console.log("===> Dữ liệu trả về từ Server:", res);
+
+                if (res && res.maBenhNhan) {
+                    // 1. Hiển thị thông tin lên vùng vàng
+                    $('#hienMaBN').text(res.maBenhNhan);
+                    $('#hienTenBN').text(res.tenBenhNhan);
+
+                    // 2. Gán giá trị vào input thực tế của form
+                    $('#hiddenMaBN').val(res.maBenhNhan); // Input ẩn trong vùng tìm kiếm
+                    $('#maBenhNhan').val(res.maBenhNhan); // Input hiển thị ở phần Thông tin phiếu (nếu có)
+
+                    // 3. Hiển thị khung
+                    $('#areaInfoBN').slideDown();
+                    console.log("✅ Thành công: Đã gán MaBenhNhan = " + res.maBenhNhan);
+                } else {
+                    alert("Không tìm thấy bệnh nhân có CCCD này!");
+                    $('#areaInfoBN').hide();
+                    $('#hiddenMaBN').val('');
+                }
+            },
+            error: function (xhr) {
+                console.error("❌ Lỗi AJAX:", xhr.statusText);
+                alert("Lỗi máy chủ: Không thể truy cập dữ liệu bệnh nhân.");
+            }
+        });
+    };
+</script>
