@@ -62,14 +62,17 @@
     </form>
 </div>
 
+<!-- Info Alert -->
+<div class="alert alert-info" style="margin: 20px 0;">
+    <i class="fas fa-info-circle"></i>
+    <strong>Lưu ý:</strong> Thuốc được tạo tự động khi nhập phiếu nhập kho. Vui lòng sử dụng chức năng <a href="#" onclick="loadPhieuNhapPanel(); return false;" style="font-weight: 600; text-decoration: underline;">Tạo phiếu nhập kho</a> để thêm thuốc mới vào hệ thống.
+</div>
+
 <!-- Action Bar -->
 <div class="action-bar">
     <div class="result-info">
         <i class="fas fa-info-circle"></i> Hiển thị @Model.Count() / @totalItems thuốc
     </div>
-    <a href="/Admin/Thuoc/Create" class="btn-add">
-        <i class="fas fa-plus-circle"></i> Thêm thuốc mới
-    </a>
 </div>
 
 <!-- Medicine Table -->
@@ -99,7 +102,12 @@
                     {
                         <tr>
                             <td><strong>@item.MaThuoc</strong></td>
-                            <td>@item.TenThuoc</td>
+                            <td>
+                                <a href="#" onclick="loadThuocDetailsPanel('@item.MaThuoc'); return false;" 
+                                   style="text-decoration: none; color: #1e3a5f; font-weight: 600;">
+                                    @item.TenThuoc
+                                </a>
+                            </td>
                             <td>@(item.HoatChat ?? "-")</td>
                             <td>@(item.NhomThuoc ?? "-")</td>
                             <td>@item.DonViTinh</td>
@@ -107,20 +115,41 @@
                             <td>
                                 @if (item.TrangThai == "KichHoat")
                                 {
-                                    <span class="badge badge-success">Kích hoạt</span>
+                                    <span class="badge badge-success">
+                                        <i class="fas fa-check-circle"></i> Kích hoạt
+                                    </span>
                                 }
                                 else
                                 {
-                                    <span class="badge badge-danger">Ngừng dùng</span>
+                                    <span class="badge badge-danger">
+                                        <i class="fas fa-ban"></i> Ngừng dùng
+                                    </span>
                                 }
                             </td>
                             <td style="text-align: center; white-space: nowrap;">
-                                <a href="/Admin/Thuoc/Details/@item.MaThuoc" class="btn-action btn-view" title="Xem chi tiết">
+                                <button onclick="loadThuocDetailsPanel('@item.MaThuoc')" class="btn-action btn-view" title="Xem chi tiết">
                                     <i class="fas fa-eye"></i>
-                                </a>
-                                <a href="/Admin/Thuoc/Edit/@item.MaThuoc" class="btn-action btn-edit" title="Sửa">
+                                </button>
+                                <button onclick="loadThuocEditPanel('@item.MaThuoc')" class="btn-action btn-edit" title="Sửa">
                                     <i class="fas fa-edit"></i>
-                                </a>
+                                </button>
+                                
+                                @if (item.TrangThai == "KichHoat")
+                                {
+                                    <button type="button" class="btn-action btn-delete" 
+                                            onclick="confirmDelete('@item.MaThuoc', '@item.TenThuoc')" 
+                                            title="Ngừng sử dụng">
+                                        <i class="fas fa-ban"></i>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn-action btn-success" 
+                                            onclick="confirmRestore('@item.MaThuoc', '@item.TenThuoc')" 
+                                            title="Kích hoạt lại">
+                                        <i class="fas fa-redo"></i>
+                                    </button>
+                                }
                             </td>
                         </tr>
                     }
@@ -131,6 +160,9 @@
                         <td colspan="8" style="text-align: center; padding: 50px;">
                             <i class="fas fa-inbox" style="font-size: 3rem; color: #dee2e6; margin-bottom: 15px;"></i>
                             <p style="color: #6c757d; margin: 0;">Không tìm thấy thuốc nào</p>
+                            <p style="color: #6c757d; font-size: 0.9rem; margin-top: 5px;">
+                                Hãy tạo <a href="#" onclick="loadPhieuNhapPanel(); return false;">phiếu nhập kho</a> để thêm thuốc mới
+                            </p>
                         </td>
                     </tr>
                 }
@@ -231,4 +263,448 @@
         e.preventDefault();
         loadPageWithParams({});
     });
+
+    // Delete (Ngừng sử dụng)
+    function confirmDelete(maThuoc, tenThuoc) {
+        if (confirm(`Bạn có chắc chắn muốn ngừng sử dụng thuốc "${tenThuoc}"?\n\nThuốc sẽ chuyển sang trạng thái "Ngừng sử dụng" và không thể kê đơn mới.`)) {
+            $.ajax({
+                url: `/Admin/Thuoc/Delete/${maThuoc}`,
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(data) {
+                    if (data.success) {
+                        showNotification(data.message, 'success');
+                        setTimeout(() => loadThuocContent('/Admin/Thuoc/Index'), 1500);
+                    } else {
+                        showNotification(data.message, 'error');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showNotification('Có lỗi xảy ra: ' + error, 'error');
+                }
+            });
+        }
+    }
+
+    // Restore (Kích hoạt lại)
+    function confirmRestore(maThuoc, tenThuoc) {
+        if (confirm(`Bạn có chắc chắn muốn kích hoạt lại thuốc "${tenThuoc}"?`)) {
+            $.ajax({
+                url: `/Admin/Thuoc/Restore/${maThuoc}`,
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(data) {
+                    if (data.success) {
+                        showNotification(data.message, 'success');
+                        setTimeout(() => loadThuocContent('/Admin/Thuoc/Index'), 1500);
+                    } else {
+                        showNotification(data.message, 'error');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showNotification('Có lỗi xảy ra: ' + error, 'error');
+                }
+            });
+        }
+    }
+
+    // Show notification
+    function showNotification(message, type) {
+        const notification = $('<div>')
+            .addClass(`alert alert-${type === 'success' ? 'success' : 'danger'}`)
+            .css({
+                'position': 'fixed',
+                'top': '20px',
+                'right': '20px',
+                'z-index': '9999',
+                'min-width': '300px',
+                'box-shadow': '0 4px 12px rgba(0,0,0,0.15)',
+                'animation': 'slideInRight 0.3s ease'
+            })
+            .html(`
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <span>${message}</span>
+            `);
+        
+        $('body').append(notification);
+        
+        setTimeout(() => {
+            notification.fadeOut(300, function() {
+                $(this).remove();
+            });
+        }, 3000);
+    }
 </script>
+
+<style>
+    /* ==================== FILTER CARD ==================== */
+    .filter-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .filter-row {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+    }
+
+    .filter-group {
+        flex: 1;
+        min-width: 200px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .filter-group label {
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .filter-group input,
+    .filter-group select {
+        padding: 10px 14px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        transition: all 0.3s;
+    }
+
+    .filter-group input:focus,
+    .filter-group select:focus {
+        border-color: #1e3a5f;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+    }
+
+    .btn-filter,
+    .btn-reset {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.95rem;
+    }
+
+    .btn-filter {
+        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
+        color: white;
+    }
+
+    .btn-filter:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
+    }
+
+    .btn-reset {
+        background: #6c757d;
+        color: white;
+    }
+
+    .btn-reset:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+    }
+
+    /* ==================== ALERT INFO ==================== */
+    .alert-info {
+        background: rgba(56, 189, 248, 0.1);
+        border-left: 4px solid #38bdf8;
+        padding: 15px 20px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .alert-info i {
+        font-size: 1.2rem;
+        color: #38bdf8;
+    }
+
+    .alert-info a {
+        color: #1e3a5f;
+        font-weight: 600;
+    }
+
+    .alert-info a:hover {
+        text-decoration: underline;
+    }
+
+    /* ==================== ACTION BAR ==================== */
+    .action-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .result-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+
+    /* ==================== MEDICINE TABLE ==================== */
+    .medicine-table-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .medicine-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .medicine-table thead {
+        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
+        color: white;
+    }
+
+    .medicine-table th {
+        padding: 16px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .medicine-table th.sortable {
+        cursor: pointer;
+        user-select: none;
+        position: relative;
+        padding-right: 30px;
+    }
+
+    .medicine-table th.sortable:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .medicine-table th.sortable::after {
+        content: "⇅";
+        position: absolute;
+        right: 10px;
+        opacity: 0.5;
+    }
+
+    .medicine-table th.sorted-asc::after {
+        content: "↑";
+        opacity: 1;
+    }
+
+    .medicine-table th.sorted-desc::after {
+        content: "↓";
+        opacity: 1;
+    }
+
+    .medicine-table tbody tr {
+        border-bottom: 1px solid #e9ecef;
+        transition: background 0.2s;
+    }
+
+    .medicine-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+
+    .medicine-table td {
+        padding: 14px 16px;
+        font-size: 0.95rem;
+    }
+
+    .price-cell {
+        font-weight: 600;
+        color: #11998e;
+    }
+
+    /* ==================== BADGES ==================== */
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .badge-success {
+        background: rgba(17, 153, 142, 0.15);
+        color: #11998e;
+        border: 1px solid rgba(17, 153, 142, 0.3);
+    }
+
+    .badge-danger {
+        background: rgba(251, 113, 133, 0.15);
+        color: #f43f5e;
+        border: 1px solid rgba(251, 113, 133, 0.3);
+    }
+
+    /* ==================== ACTION BUTTONS ==================== */
+    .btn-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s;
+        margin: 0 3px;
+    }
+
+    .btn-view {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-view:hover {
+        background: #5568d3;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-edit {
+        background: #f59e0b;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: #d97706;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
+    }
+
+    .btn-delete {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background: #dc2626;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-action.btn-success {
+        background: #10b981;
+        color: white;
+    }
+
+    .btn-action.btn-success:hover {
+        background: #059669;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+    }
+
+    /* ==================== PAGINATION ==================== */
+    .pagination-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .pagination-info {
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+
+    .pagination {
+        display: flex;
+        gap: 5px;
+    }
+
+    .pagination a,
+    .pagination span {
+        min-width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        color: #495057;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s;
+        border: 1px solid #dee2e6;
+        background: white;
+    }
+
+    .pagination a:hover {
+        background: #1e3a5f;
+        color: white;
+        border-color: #1e3a5f;
+        transform: translateY(-2px);
+    }
+
+    .pagination span.active {
+        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
+        color: white;
+        border-color: transparent;
+    }
+
+    /* ==================== ANIMATIONS ==================== */
+    @@keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    /* ==================== RESPONSIVE ==================== */
+    @@media (max-width: 768px) {
+        .filter-row {
+            flex-direction: column;
+        }
+
+        .filter-group {
+            min-width: 100%;
+        }
+
+        .medicine-table {
+            font-size: 0.85rem;
+        }
+
+        .medicine-table th,
+        .medicine-table td {
+            padding: 10px;
+        }
+
+        .pagination-container {
+            flex-direction: column;
+            gap: 15px;
+        }
+    }
+</style>

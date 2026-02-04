@@ -1,0 +1,484 @@
+@model QLPhanPhoiThuoc.Models.Entities.Thuoc
+
+<!-- Wrapper với scope riêng cho Edit -->
+<div class="thuoc-edit-scope">
+    <style>
+        /* ==================== SCOPED STYLES CHỈ CHO EDIT PANEL ==================== */
+        /* Tất cả styles đều được prefix với .thuoc-edit-scope để tránh xung đột */
+        
+        .thuoc-edit-scope {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        .thuoc-edit-scope .edit-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        .thuoc-edit-scope .edit-content {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 20px;
+        }
+
+        .thuoc-edit-scope .edit-left {
+            min-width: 0;
+        }
+
+        .thuoc-edit-scope .edit-right {
+            min-width: 0;
+        }
+
+        .thuoc-edit-scope .edit-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .thuoc-edit-scope .edit-card-body {
+            padding: 24px;
+        }
+
+        .thuoc-edit-scope .edit-section-title {
+            margin-bottom: 20px;
+            color: #1e3a5f;
+            border-bottom: 2px solid #1e3a5f;
+            padding-bottom: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .thuoc-edit-scope .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .thuoc-edit-scope .form-group {
+            margin-bottom: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .thuoc-edit-scope .form-label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .thuoc-edit-scope .form-label.required::after {
+            content: " *";
+            color: #ef4444;
+        }
+
+        .thuoc-edit-scope .form-control,
+        .thuoc-edit-scope .form-select {
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            width: 100%;
+            background: white;
+        }
+
+        .thuoc-edit-scope .form-control:focus,
+        .thuoc-edit-scope .form-select:focus {
+            border-color: #1e3a5f;
+            box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+            outline: none;
+        }
+
+        .thuoc-edit-scope .text-danger {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 4px;
+        }
+
+        .thuoc-edit-scope .form-text {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .thuoc-edit-scope .card-header-custom {
+            background: linear-gradient(135deg, #1e3a5f, #0f2847);
+            color: white;
+            padding: 16px 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .thuoc-edit-scope .card-header-blue {
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+            color: white;
+            padding: 16px 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .thuoc-edit-scope .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .thuoc-edit-scope .btn-action-full {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+        }
+
+        .thuoc-edit-scope .btn-primary-full {
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
+            color: white;
+        }
+
+        .thuoc-edit-scope .btn-primary-full:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
+        }
+
+        .thuoc-edit-scope .btn-outline-secondary-full {
+            background: transparent;
+            border: 2px solid #6b7280;
+            color: #6b7280;
+        }
+
+        .thuoc-edit-scope .btn-outline-secondary-full:hover {
+            background: #6b7280;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .thuoc-edit-scope .alert-info-custom {
+            background: rgba(56, 189, 248, 0.1);
+            border-left: 4px solid #0ea5e9;
+            padding: 14px;
+            border-radius: 8px;
+            margin-top: 16px;
+            font-size: 0.9rem;
+        }
+
+        .thuoc-edit-scope .alert-info-custom i {
+            margin-right: 8px;
+        }
+
+        .thuoc-edit-scope .guide-list {
+            margin: 0;
+            padding-left: 20px;
+            color: #374151;
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+
+        .thuoc-edit-scope textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* Responsive */
+        @@media (max-width: 992px) {
+            .thuoc-edit-scope .edit-content {
+                grid-template-columns: 1fr !important;
+            }
+
+            .thuoc-edit-scope .form-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            .thuoc-edit-scope .form-group[style*="grid-column"] {
+                grid-column: span 1 !important;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .thuoc-edit-scope .edit-wrapper {
+                padding: 0;
+            }
+
+            .thuoc-edit-scope .edit-card-body {
+                padding: 16px;
+            }
+
+            .thuoc-edit-scope .form-grid {
+                gap: 14px;
+            }
+        }
+    </style>
+
+    <div class="edit-wrapper">
+        <form id="editThuocForm" method="post" action="/Admin/Thuoc/Edit/@Model.MaThuoc">
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => model.MaThuoc)
+            
+            <div class="edit-content">
+                <!-- Left Column -->
+                <div class="edit-left">
+                    <!-- Thông tin cơ bản -->
+                    <div class="edit-card">
+                        <div class="edit-card-body">
+                            <h5 class="edit-section-title">
+                                <i class="fas fa-pills"></i> Thông tin cơ bản
+                            </h5>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label asp-for="MaThuoc" class="form-label">Mã thuốc</label>
+                                    <input asp-for="MaThuoc" class="form-control" disabled />
+                                    <small class="form-text">Mã thuốc không thể thay đổi</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="TenThuoc" class="form-label required">Tên thuốc</label>
+                                    <input asp-for="TenThuoc" class="form-control" placeholder="Nhập tên thuốc..." />
+                                    <span asp-validation-for="TenThuoc" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="HoatChat" class="form-label">Hoạt chất</label>
+                                    <input asp-for="HoatChat" class="form-control" placeholder="Paracetamol, Ibuprofen..." />
+                                    <span asp-validation-for="HoatChat" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="NhomThuoc" class="form-label">Nhóm thuốc</label>
+                                    <input asp-for="NhomThuoc" class="form-control" placeholder="Kháng sinh, hạ sốt..." />
+                                    <span asp-validation-for="NhomThuoc" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="DonViTinh" class="form-label required">Đơn vị tính</label>
+                                    <select asp-for="DonViTinh" class="form-select">
+                                        <option value="">-- Chọn đơn vị --</option>
+                                        <option value="Viên">Viên</option>
+                                        <option value="Vỉ">Vỉ</option>
+                                        <option value="Hộp">Hộp</option>
+                                        <option value="Chai">Chai</option>
+                                        <option value="Ống">Ống</option>
+                                        <option value="Túi">Túi</option>
+                                        <option value="Gói">Gói</option>
+                                        <option value="Lọ">Lọ</option>
+                                        <option value="ml">ml</option>
+                                        <option value="mg">mg</option>
+                                    </select>
+                                    <span asp-validation-for="DonViTinh" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="DuongDung" class="form-label">Đường dùng</label>
+                                    <select asp-for="DuongDung" class="form-select">
+                                        <option value="">-- Chọn đường dùng --</option>
+                                        <option value="Uống">Uống</option>
+                                        <option value="Tiêm">Tiêm</option>
+                                        <option value="Bôi">Bôi</option>
+                                        <option value="Nhỏ mắt">Nhỏ mắt</option>
+                                        <option value="Nhỏ tai">Nhỏ tai</option>
+                                        <option value="Xịt">Xịt</option>
+                                        <option value="Đặt">Đặt</option>
+                                    </select>
+                                    <span asp-validation-for="DuongDung" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group" style="grid-column: span 2;">
+                                    <label asp-for="DangBaoChe" class="form-label">Dạng bào chế</label>
+                                    <input asp-for="DangBaoChe" class="form-control" placeholder="VD: Viên nén, Dung dịch..." />
+                                    <span asp-validation-for="DangBaoChe" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Giá và tồn kho -->
+                    <div class="edit-card">
+                        <div class="edit-card-body">
+                            <h5 class="edit-section-title">
+                                <i class="fas fa-dollar-sign"></i> Giá và tồn kho
+                            </h5>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label asp-for="GiaNhap" class="form-label">Giá nhập (đ)</label>
+                                    <input asp-for="GiaNhap" class="form-control" type="number" step="1000" min="0" placeholder="0" />
+                                    <span asp-validation-for="GiaNhap" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="GiaXuat" class="form-label required">Giá xuất (đ)</label>
+                                    <input asp-for="GiaXuat" class="form-control" type="number" step="1000" min="0" placeholder="0" />
+                                    <span asp-validation-for="GiaXuat" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group" style="grid-column: span 2;">
+                                    <label asp-for="TonKhoToiThieu" class="form-label">Tồn kho tối thiểu</label>
+                                    <input asp-for="TonKhoToiThieu" class="form-control" type="number" min="0" placeholder="10" />
+                                    <span asp-validation-for="TonKhoToiThieu" class="text-danger"></span>
+                                    <small class="form-text">Hệ thống sẽ cảnh báo khi tồn kho thấp hơn giá trị này</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Thông tin bổ sung -->
+                    <div class="edit-card">
+                        <div class="edit-card-body">
+                            <h5 class="edit-section-title">
+                                <i class="fas fa-industry"></i> Thông tin bổ sung
+                            </h5>
+                            
+                            <div class="form-grid">
+                                <div class="form-group" style="grid-column: span 2;">
+                                    <label asp-for="NhaSanXuat" class="form-label">Nhà sản xuất</label>
+                                    <input asp-for="NhaSanXuat" class="form-control" placeholder="Tên nhà sản xuất..." />
+                                    <span asp-validation-for="NhaSanXuat" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group" style="grid-column: span 2;">
+                                    <label asp-for="MoTa" class="form-label">Mô tả</label>
+                                    <textarea asp-for="MoTa" class="form-control" rows="3" placeholder="Mô tả thêm về thuốc..."></textarea>
+                                    <span asp-validation-for="MoTa" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="edit-right">
+                    <!-- Trạng thái -->
+                    <div class="edit-card">
+                        <div class="card-header-custom">
+                            <i class="fas fa-toggle-on"></i> Trạng thái
+                        </div>
+                        <div class="edit-card-body">
+                            <div class="form-group">
+                                <label asp-for="TrangThai" class="form-label">Trạng thái hoạt động</label>
+                                <select asp-for="TrangThai" class="form-select">
+                                    <option value="KichHoat">Kích hoạt</option>
+                                    <option value="NgungSuDung">Ngừng sử dụng</option>
+                                </select>
+                                <span asp-validation-for="TrangThai" class="text-danger"></span>
+                            </div>
+
+                            <div class="alert-info-custom">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Lưu ý:</strong> Thuốc "Ngừng sử dụng" sẽ không được hiển thị khi kê đơn.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hướng dẫn -->
+                    <div class="edit-card">
+                        <div class="card-header-blue">
+                            <i class="fas fa-lightbulb"></i> Hướng dẫn
+                        </div>
+                        <div class="edit-card-body">
+                            <ul class="guide-list">
+                                <li>Các trường có dấu <span class="text-danger">*</span> là bắt buộc</li>
+                                <li>Giá xuất phải lớn hơn hoặc bằng giá nhập</li>
+                                <li>Tồn kho tối thiểu để hệ thống cảnh báo khi sắp hết</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="edit-card">
+                        <div class="edit-card-body">
+                            <div class="action-buttons">
+                                <button type="submit" class="btn-action-full btn-primary-full">
+                                    <i class="fas fa-save"></i> Lưu thay đổi
+                                </button>
+                                
+                                <button type="button" onclick="cancelEdit()" class="btn-action-full btn-outline-secondary-full">
+                                    <i class="fas fa-times"></i> Hủy bỏ
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Form validation
+        $('#editThuocForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            const giaNhap = parseFloat($('#GiaNhap').val()) || 0;
+            const giaXuat = parseFloat($('#GiaXuat').val()) || 0;
+            
+            if (giaXuat < giaNhap) {
+                alert('Giá xuất phải lớn hơn hoặc bằng giá nhập!');
+                $('#GiaXuat').focus();
+                return false;
+            }
+            
+            // Submit via AJAX
+            const formData = $(this).serialize();
+            
+            $.ajax({
+                url: $(this).attr('action'),
+                method: 'POST',
+                data: formData,
+                success: function(response) {
+                    if (typeof response === 'object') {
+                        if (response.success) {
+                            alert('Cập nhật thành công!');
+                            const currentPanel = panelStack[panelStack.length - 1];
+                            closePanel(currentPanel.level);
+                            loadThuocDetailsPanel('@Model.MaThuoc');
+                            loadThuocContent('/Admin/Thuoc/Index');
+                        } else {
+                            alert('Có lỗi xảy ra: ' + (response.message || 'Vui lòng thử lại'));
+                        }
+                    } else {
+                        const currentPanel = $('#panel-' + panelStack[panelStack.length - 1].level);
+                        currentPanel.find('.panel-body').html(response);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert('Có lỗi xảy ra: ' + error);
+                }
+            });
+        });
+
+        // Format number inputs
+        $('input[type="number"]').on('blur', function() {
+            const value = $(this).val();
+            if (value && !isNaN(value)) {
+                $(this).val(parseFloat(value));
+            }
+        });
+    });
+
+    function cancelEdit() {
+        const currentPanel = panelStack[panelStack.length - 1];
+        if (confirm('Bạn có chắc chắn muốn hủy bỏ các thay đổi?')) {
+            closePanel(currentPanel.level);
+        }
+    }
+</script>

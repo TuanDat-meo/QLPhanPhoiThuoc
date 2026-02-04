@@ -1,0 +1,266 @@
+@model QLPhanPhoiThuoc.Models.Entities.LoThuoc
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Nhãn lô thuốc - @Model.MaLo</title>
+    <style>
+        @@media print {
+            @@page {
+                size: 10cm 5cm;
+                margin: 0;
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .label-container {
+            width: 10cm;
+            height: 5cm;
+            background: white;
+            margin: 0 auto;
+            padding: 0.5cm;
+            box-sizing: border-box;
+            border: 2px solid #333;
+            position: relative;
+        }
+
+        .label-header {
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 0.2cm;
+            margin-bottom: 0.3cm;
+        }
+
+        .label-header h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e3a5f;
+        }
+
+        .label-header p {
+            margin: 2px 0 0 0;
+            font-size: 10px;
+            color: #666;
+        }
+
+        .label-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.2cm;
+        }
+
+        .label-field {
+            margin-bottom: 0.15cm;
+        }
+
+        .label-field.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .label-field label {
+            font-size: 9px;
+            color: #666;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 1px;
+        }
+
+        .label-field .value {
+            font-size: 11px;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .medicine-name {
+            font-size: 14px !important;
+            color: #1e3a5f !important;
+        }
+
+        .barcode-section {
+            text-align: center;
+            margin-top: 0.2cm;
+            padding-top: 0.2cm;
+            border-top: 1px dashed #ccc;
+        }
+
+        .barcode-section svg {
+            width: 100%;
+            height: 0.8cm;
+        }
+
+        .expiry-warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 0.1cm;
+            text-align: center;
+            margin-top: 0.2cm;
+            border-radius: 3px;
+        }
+
+        .expiry-warning.critical {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        .expiry-warning p {
+            margin: 0;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .print-button {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .btn-print {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #1e3a5f, #0f2847);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-print:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="print-button no-print">
+        <button class="btn-print" onclick="window.print()">
+            <i class="fas fa-print"></i> In nhãn
+        </button>
+    </div>
+
+    <div class="label-container">
+        <!-- Header -->
+        <div class="label-header">
+            <h2>NHÃN LÔ THUỐC</h2>
+            <p>Hệ thống Quản lý Phân phối Thuốc</p>
+        </div>
+
+        <!-- Body -->
+        <div class="label-body">
+            <!-- Tên thuốc -->
+            <div class="label-field full-width">
+                <label>TÊN THUỐC:</label>
+                <div class="value medicine-name">@Model.Thuoc.TenThuoc</div>
+            </div>
+
+            <!-- Hoạt chất -->
+            @if (!string.IsNullOrEmpty(Model.Thuoc.HoatChat))
+            {
+                <div class="label-field full-width">
+                    <label>HOẠT CHẤT:</label>
+                    <div class="value">@Model.Thuoc.HoatChat</div>
+                </div>
+            }
+
+            <!-- Mã lô -->
+            <div class="label-field">
+                <label>MÃ LÔ:</label>
+                <div class="value">@Model.MaLo</div>
+            </div>
+
+            <!-- Số lô -->
+            <div class="label-field">
+                <label>SỐ LÔ:</label>
+                <div class="value">@Model.SoLo</div>
+            </div>
+
+            <!-- Ngày sản xuất -->
+            <div class="label-field">
+                <label>NSX:</label>
+                <div class="value">@(Model.NgaySanXuat?.ToString("dd/MM/yyyy") ?? "N/A")</div>
+            </div>
+
+            <!-- Hạn sử dụng -->
+            <div class="label-field">
+                <label>HẠN SD:</label>
+                <div class="value">@Model.HanSuDung.ToString("dd/MM/yyyy")</div>
+            </div>
+
+            <!-- Số lượng -->
+            <div class="label-field">
+                <label>SỐ LƯỢNG:</label>
+                <div class="value">@Model.SoLuongCon / @Model.SoLuongNhap @Model.Thuoc.DonViTinh</div>
+            </div>
+
+            <!-- Kho -->
+            <div class="label-field">
+                <label>KHO:</label>
+                <div class="value">@Model.Kho.TenKho</div>
+            </div>
+        </div>
+
+        <!-- Warning nếu sắp hết hạn -->
+        @{
+            var now = DateTime.Now;
+            var daysLeft = (Model.HanSuDung - now).Days;
+            var isExpired = Model.HanSuDung < now;
+            var isExpiring = !isExpired && daysLeft <= 30;
+        }
+
+        @if (isExpired)
+        {
+            <div class="expiry-warning critical">
+                <p>⚠️ ĐÃ QUÁ HẠN SỬ DỤNG</p>
+            </div>
+        }
+        else if (isExpiring)
+        {
+            <div class="expiry-warning">
+                <p>⚠️ SẮP HẾT HẠN - CÒN @daysLeft NGÀY</p>
+            </div>
+        }
+
+        <!-- Barcode -->
+        <div class="barcode-section">
+            <svg id="barcode"></svg>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script>
+        // Generate barcode
+        JsBarcode("#barcode", "@Model.MaLo", {
+            format: "CODE128",
+            width: 2,
+            height: 40,
+            displayValue: true,
+            fontSize: 10,
+            margin: 0
+        });
+
+        // Auto print when page loads (optional)
+        // window.onload = function() {
+        //     setTimeout(function() {
+        //         window.print();
+        //     }, 500);
+        // };
+    </script>
+</body>
+</html>

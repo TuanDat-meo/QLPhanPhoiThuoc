@@ -1,0 +1,661 @@
+@{
+    var tongSoLo = ViewBag.TongSoLo ?? 0;
+    var loConHang = ViewBag.LoConHang ?? 0;
+    var loSapHetHan = ViewBag.LoSapHetHan ?? 0;
+    var loHetHan = ViewBag.LoHetHan ?? 0;
+    var thuocSapHet = ViewBag.ThuocSapHet as List<dynamic> ?? new List<dynamic>();
+    var thongKeTheoKho = ViewBag.ThongKeTheoKho as List<dynamic> ?? new List<dynamic>();
+    var giaTriTonKho = ViewBag.GiaTriTonKho ?? 0m;
+}
+
+<div class="tonkho-stats-container">
+    <!-- Header -->
+    <div class="stats-header">
+        <h2><i class="fas fa-chart-line"></i> Thống kê tồn kho chi tiết</h2>
+        <p class="subtitle">Cập nhật lúc: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</p>
+    </div>
+
+    <!-- Tổng quan -->
+    <div class="overview-cards">
+        <div class="stat-card-large">
+            <div class="card-icon all">
+                <i class="fas fa-boxes"></i>
+            </div>
+            <div class="card-content">
+                <h3>@tongSoLo</h3>
+                <p>Tổng số lô thuốc</p>
+                <div class="card-footer">
+                    <span class="percentage">100%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card-large">
+            <div class="card-icon active">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="card-content">
+                <h3>@loConHang</h3>
+                <p>Lô còn hàng</p>
+                <div class="card-footer">
+                    <span class="percentage">@string.Format("{0:0.0}%", tongSoLo > 0 ? (loConHang * 100.0 / tongSoLo) : 0)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card-large">
+            <div class="card-icon warning">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="card-content">
+                <h3>@loSapHetHan</h3>
+                <p>Lô sắp hết hạn</p>
+                <div class="card-footer">
+                    <span class="percentage text-warning">@string.Format("{0:0.0}%", tongSoLo > 0 ? (loSapHetHan * 100.0 / tongSoLo) : 0)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card-large">
+            <div class="card-icon danger">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            <div class="card-content">
+                <h3>@loHetHan</h3>
+                <p>Lô đã hết hạn</p>
+                <div class="card-footer">
+                    <span class="percentage text-danger">@string.Format("{0:0.0}%", tongSoLo > 0 ? (loHetHan * 100.0 / tongSoLo) : 0)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Giá trị tồn kho -->
+    <div class="value-section">
+        <div class="value-card">
+            <div class="value-icon">
+                <i class="fas fa-coins"></i>
+            </div>
+            <div class="value-content">
+                <h4>Tổng giá trị tồn kho</h4>
+                <h2>@string.Format("{0:N0}", giaTriTonKho) VNĐ</h2>
+                <p class="value-note">Giá trị dựa trên giá bán hiện tại</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2 cột: Top thuốc sắp hết + Thống kê theo kho -->
+    <div class="stats-grid">
+        <!-- Top thuốc sắp hết tồn kho -->
+        <div class="stats-section">
+            <div class="section-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Top 10 thuốc sắp hết tồn kho</h3>
+            </div>
+            <div class="table-container-small">
+                @if (thuocSapHet.Any())
+                {
+                    <table class="stats-table">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Tên thuốc</th>
+                                <th style="text-align: center;">Tồn kho</th>
+                                <th style="text-align: center;">Tối thiểu</th>
+                                <th style="text-align: center;">Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < thuocSapHet.Count; i++)
+                            {
+                                var item = thuocSapHet[i];
+                                var percent = item.TonKhoToiThieu > 0 ? (item.TonKho * 100.0 / item.TonKhoToiThieu) : 0;
+                                var statusClass = percent <= 30 ? "critical" : (percent <= 50 ? "warning" : "normal");
+
+                                <tr>
+                                    <td>@(i + 1)</td>
+                                    <td>
+                                        <div class="medicine-cell">
+                                            <strong>@item.TenThuoc</strong>
+                                            <small>@item.MaThuoc</small>
+                                        </div>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <span class="quantity-badge @statusClass">
+                                            @item.TonKho @item.DonViTinh
+                                        </span>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        @item.TonKhoToiThieu @item.DonViTinh
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <div class="progress-mini">
+                                            <div class="progress-fill-mini @statusClass" style="width: @Math.Min(percent, 100)%"></div>
+                                        </div>
+                                        <small class="progress-text">@string.Format("{0:0}%", percent)</small>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="empty-state-small">
+                        <i class="fas fa-check-circle"></i>
+                        <p>Tất cả thuốc đều đủ tồn kho</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Thống kê theo kho -->
+        <div class="stats-section">
+            <div class="section-header">
+                <h3><i class="fas fa-warehouse"></i> Thống kê theo kho</h3>
+            </div>
+            <div class="warehouse-stats">
+                @if (thongKeTheoKho.Any())
+                {
+                    @foreach (var kho in thongKeTheoKho)
+                    {
+                        <div class="warehouse-card">
+                            <div class="warehouse-header">
+                                <h4><i class="fas fa-warehouse"></i> @kho.TenKho</h4>
+                            </div>
+                            <div class="warehouse-stats-grid">
+                                <div class="warehouse-stat">
+                                    <div class="stat-number">@kho.SoLoThuoc</div>
+                                    <div class="stat-label">Số lô</div>
+                                </div>
+                                <div class="warehouse-stat">
+                                    <div class="stat-number">@kho.TongSoLuong</div>
+                                    <div class="stat-label">Tổng SL</div>
+                                </div>
+                                <div class="warehouse-stat warning">
+                                    <div class="stat-number">@kho.LoSapHetHan</div>
+                                    <div class="stat-label">Sắp hết hạn</div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="empty-state-small">
+                        <i class="fas fa-warehouse"></i>
+                        <p>Không có dữ liệu kho</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Biểu đồ (nếu cần) -->
+    <div class="chart-section">
+        <div class="section-header">
+            <h3><i class="fas fa-chart-pie"></i> Phân bố trạng thái lô thuốc</h3>
+        </div>
+        <div class="chart-container">
+            <canvas id="statusChart" width="400" height="200"></canvas>
+        </div>
+    </div>
+</div>
+
+<style>
+    .tonkho-stats-container {
+        padding: 24px;
+        background: #f8fafc;
+    }
+
+    .stats-header {
+        margin-bottom: 32px;
+    }
+
+    .stats-header h2 {
+        margin: 0 0 8px 0;
+        color: #1e293b;
+        font-size: 28px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .subtitle {
+        margin: 0;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .overview-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+        margin-bottom: 32px;
+    }
+
+    .stat-card-large {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        gap: 20px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s;
+        border: 1px solid #e2e8f0;
+    }
+
+    .stat-card-large:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        flex-shrink: 0;
+    }
+
+    .card-icon.all {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+
+    .card-icon.active {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+    }
+
+    .card-icon.warning {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+    }
+
+    .card-icon.danger {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+    }
+
+    .card-content {
+        flex: 1;
+    }
+
+    .card-content h3 {
+        margin: 0 0 8px 0;
+        font-size: 36px;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .card-content p {
+        margin: 0 0 12px 0;
+        color: #64748b;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .card-footer .percentage {
+        display: inline-block;
+        padding: 4px 12px;
+        background: #f1f5f9;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .text-warning {
+        color: #f59e0b !important;
+    }
+
+    .text-danger {
+        color: #ef4444 !important;
+    }
+
+    .value-section {
+        margin-bottom: 32px;
+    }
+
+    .value-card {
+        background: linear-gradient(135deg, #1e3a5f, #0f2847);
+        border-radius: 16px;
+        padding: 32px;
+        display: flex;
+        gap: 24px;
+        align-items: center;
+        box-shadow: 0 10px 20px rgba(30, 58, 95, 0.2);
+    }
+
+    .value-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 36px;
+        color: white;
+    }
+
+    .value-content h4 {
+        margin: 0 0 12px 0;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    .value-content h2 {
+        margin: 0 0 8px 0;
+        color: white;
+        font-size: 42px;
+        font-weight: 700;
+    }
+
+    .value-note {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 13px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+        margin-bottom: 32px;
+    }
+
+    .stats-section {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+    }
+
+    .section-header {
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .section-header h3 {
+        margin: 0;
+        color: #1e293b;
+        font-size: 18px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .table-container-small {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .stats-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .stats-table thead {
+        background: #f8fafc;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .stats-table th {
+        padding: 12px;
+        text-align: left;
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .stats-table td {
+        padding: 12px;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 14px;
+        color: #1e293b;
+    }
+
+    .medicine-cell {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .medicine-cell strong {
+        color: #1e293b;
+    }
+
+    .medicine-cell small {
+        color: #64748b;
+        font-size: 12px;
+    }
+
+    .quantity-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .quantity-badge.normal {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+    }
+
+    .quantity-badge.warning {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+    }
+
+    .quantity-badge.critical {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    .progress-mini {
+        width: 100%;
+        height: 8px;
+        background: #e2e8f0;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 4px;
+    }
+
+    .progress-fill-mini {
+        height: 100%;
+        transition: width 0.5s ease;
+        border-radius: 4px;
+    }
+
+    .progress-fill-mini.normal {
+        background: linear-gradient(90deg, #10b981, #059669);
+    }
+
+    .progress-fill-mini.warning {
+        background: linear-gradient(90deg, #f59e0b, #d97706);
+    }
+
+    .progress-fill-mini.critical {
+        background: linear-gradient(90deg, #ef4444, #dc2626);
+    }
+
+    .progress-text {
+        font-size: 11px;
+        color: #64748b;
+    }
+
+    .warehouse-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .warehouse-card {
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 16px;
+        background: #f8fafc;
+    }
+
+    .warehouse-header h4 {
+        margin: 0 0 16px 0;
+        color: #1e293b;
+        font-size: 15px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .warehouse-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+    }
+
+    .warehouse-stat {
+        text-align: center;
+        padding: 12px;
+        background: white;
+        border-radius: 8px;
+    }
+
+    .warehouse-stat.warning {
+        background: rgba(245, 158, 11, 0.05);
+    }
+
+    .warehouse-stat .stat-number {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 4px;
+    }
+
+    .warehouse-stat.warning .stat-number {
+        color: #f59e0b;
+    }
+
+    .warehouse-stat .stat-label {
+        font-size: 11px;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .empty-state-small {
+        text-align: center;
+        padding: 40px 20px;
+        color: #64748b;
+    }
+
+    .empty-state-small i {
+        font-size: 48px;
+        color: #cbd5e1;
+        margin-bottom: 12px;
+    }
+
+    .empty-state-small p {
+        margin: 0;
+        font-size: 14px;
+    }
+
+    .chart-section {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+    }
+
+    .chart-container {
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+    }
+
+    @@media (max-width: 1024px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .overview-cards {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .warehouse-stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Biểu đồ tròn phân bố trạng thái
+    const ctx = document.getElementById('statusChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Còn hàng', 'Sắp hết hạn', 'Đã hết hạn', 'Khác'],
+                datasets: [{
+                    data: [@loConHang, @loSapHetHan, @loHetHan, @(tongSoLo - loConHang - loSapHetHan - loHetHan)],
+                    backgroundColor: [
+                        'rgba(16, 185, 129, 0.8)',
+                        'rgba(245, 158, 11, 0.8)',
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(148, 163, 184, 0.8)'
+                    ],
+                    borderColor: [
+                        '#10b981',
+                        '#f59e0b',
+                        '#ef4444',
+                        '#94a3b8'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            padding: 20,
+                            font: {
+                                size: 13,
+                                weight: '600'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                let value = context.parsed || 0;
+                                let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                let percentage = ((value / total) * 100).toFixed(1);
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>

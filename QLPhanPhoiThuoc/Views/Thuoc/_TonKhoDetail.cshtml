@@ -1,0 +1,617 @@
+@model QLPhanPhoiThuoc.Models.Entities.LoThuoc
+@{
+    var now = DateTime.Now;
+    var daysUntilExpiry = (Model.HanSuDung - now).Days;
+    var isExpired = Model.HanSuDung < now;
+    var isExpiring = !isExpired && daysUntilExpiry <= 30;
+    var quantityPercent = Model.SoLuongNhap > 0 ? (Model.SoLuongCon * 100.0 / Model.SoLuongNhap) : 0;
+}
+
+<div class="lot-detail-container">
+    <!-- Header với status badge -->
+    <div class="detail-header">
+        <div class="header-info">
+            <h2>@Model.Thuoc.TenThuoc</h2>
+            <div class="header-badges">
+                <span class="badge-code">Mã lô: @Model.MaLo</span>
+                <span class="badge-lot">Số lô: @Model.SoLo</span>
+                @if (isExpired)
+                {
+                    <span class="badge-status expired">
+                        <i class="fas fa-times-circle"></i> Đã hết hạn
+                    </span>
+                }
+                else if (isExpiring)
+                {
+                    <span class="badge-status warning">
+                        <i class="fas fa-clock"></i> Sắp hết hạn
+                    </span>
+                }
+                else
+                {
+                    <span class="badge-status active">
+                        <i class="fas fa-check-circle"></i> Còn hạn
+                    </span>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Info Grid -->
+    <div class="detail-grid">
+        <!-- Thông tin thuốc -->
+        <div class="detail-section">
+            <h3><i class="fas fa-pills"></i> Thông tin thuốc</h3>
+            <div class="info-table">
+                <div class="info-row">
+                    <span class="label">Mã thuốc:</span>
+                    <span class="value">@Model.Thuoc.MaThuoc</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Tên thuốc:</span>
+                    <span class="value">@Model.Thuoc.TenThuoc</span>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.Thuoc.HoatChat))
+                {
+                    <div class="info-row">
+                        <span class="label">Hoạt chất:</span>
+                        <span class="value">@Model.Thuoc.HoatChat</span>
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(Model.Thuoc.HamLuong))
+                {
+                    <div class="info-row">
+                        <span class="label">Hàm lượng:</span>
+                        <span class="value">@Model.Thuoc.HamLuong</span>
+                    </div>
+                }
+                <div class="info-row">
+                    <span class="label">Đơn vị tính:</span>
+                    <span class="value">@Model.Thuoc.DonViTinh</span>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.Thuoc.NhaSanXuat))
+                {
+                    <div class="info-row">
+                        <span class="label">Nhà sản xuất:</span>
+                        <span class="value">@Model.Thuoc.NhaSanXuat</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Thông tin lô -->
+        <div class="detail-section">
+            <h3><i class="fas fa-box"></i> Thông tin lô hàng</h3>
+            <div class="info-table">
+                <div class="info-row">
+                    <span class="label">Mã lô:</span>
+                    <span class="value"><strong>@Model.MaLo</strong></span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Số lô:</span>
+                    <span class="value"><strong>@Model.SoLo</strong></span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Kho:</span>
+                    <span class="value">
+                        <i class="fas fa-warehouse"></i> @Model.Kho.TenKho
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Ngày sản xuất:</span>
+                    <span class="value">@(Model.NgaySanXuat?.ToString("dd/MM/yyyy") ?? "N/A")</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Hạn sử dụng:</span>
+                    <span class="value @(isExpired ? "text-danger" : (isExpiring ? "text-warning" : ""))">
+                        @Model.HanSuDung.ToString("dd/MM/yyyy")
+                        @if (isExpired)
+                        {
+                            <small>(Quá hạn @Math.Abs(daysUntilExpiry) ngày)</small>
+                        }
+                        else if (isExpiring)
+                        {
+                            <small>(Còn @daysUntilExpiry ngày)</small>
+                        }
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thông tin số lượng -->
+        <div class="detail-section">
+            <h3><i class="fas fa-chart-bar"></i> Thống kê số lượng</h3>
+            <div class="quantity-stats">
+                <div class="stat-item">
+                    <div class="stat-label">Số lượng nhập</div>
+                    <div class="stat-value">@Model.SoLuongNhap</div>
+                    <div class="stat-unit">@Model.Thuoc.DonViTinh</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Đã cấp phát</div>
+                    <div class="stat-value">@(Model.SoLuongNhap - Model.SoLuongCon)</div>
+                    <div class="stat-unit">@Model.Thuoc.DonViTinh</div>
+                </div>
+                <div class="stat-item highlight">
+                    <div class="stat-label">Còn lại</div>
+                    <div class="stat-value large">@Model.SoLuongCon</div>
+                    <div class="stat-unit">@Model.Thuoc.DonViTinh</div>
+                </div>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="quantity-progress-detail">
+                <div class="progress-label">
+                    <span>Tỷ lệ tồn kho</span>
+                    <span><strong>@string.Format("{0:0.0}%", quantityPercent)</strong></span>
+                </div>
+                <div class="progress-bar-large">
+                    @{
+                        var progressClass = quantityPercent <= 10 ? "critical" :
+                                           (quantityPercent <= 30 ? "warning" : "normal");
+                    }
+                    <div class="progress-fill-large @progressClass" style="width: @quantityPercent%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thông tin giá - chỉ hiển thị nếu có dữ liệu -->
+        <div class="detail-section">
+            <h3><i class="fas fa-dollar-sign"></i> Thông tin giá trị</h3>
+            <div class="price-info">
+                <div class="price-item">
+                    <span class="price-label">Số lượng nhập:</span>
+                    <span class="price-value">@Model.SoLuongNhap @Model.Thuoc.DonViTinh</span>
+                </div>
+                <div class="price-item">
+                    <span class="price-label">Số lượng còn:</span>
+                    <span class="price-value">@Model.SoLuongCon @Model.Thuoc.DonViTinh</span>
+                </div>
+                <div class="price-item highlight">
+                    <span class="price-label">Tỷ lệ sử dụng:</span>
+                    <span class="price-value large">@string.Format("{0:0.0}%", Model.SoLuongNhap > 0 ? ((Model.SoLuongNhap - Model.SoLuongCon) * 100.0 / Model.SoLuongNhap) : 0)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lịch sử xuất nhập -->
+    <div class="detail-section full-width">
+        <h3><i class="fas fa-history"></i> Thông tin lô hàng</h3>
+        <div class="history-timeline">
+            <div class="timeline-item">
+                <div class="timeline-marker import"></div>
+                <div class="timeline-content">
+                    <div class="timeline-header">
+                        <strong>Thông tin lô thuốc</strong>
+                        <span class="value">@(Model.NgaySanXuat?.ToString("dd/MM/yyyy") ?? "N/A")</span>
+                    </div>
+                    <div class="timeline-body">
+                        Lô thuốc <strong>@Model.SoLo</strong> được nhập với số lượng <strong>@Model.SoLuongNhap @Model.Thuoc.DonViTinh</strong> vào kho <strong>@Model.Kho.TenKho</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="detail-actions">
+        <button type="button" class="btn-action-detail btn-print" onclick="printLotDetail()">
+            <i class="fas fa-print"></i> In phiếu
+        </button>
+        <button type="button" class="btn-action-detail btn-export" onclick="exportLotDetail()">
+            <i class="fas fa-file-excel"></i> Xuất Excel
+        </button>
+        @if (isExpired || Model.SoLuongCon == 0)
+        {
+            <button type="button" class="btn-action-detail btn-warning" onclick="handleExpiredLot('@Model.MaLo')">
+                <i class="fas fa-exclamation-triangle"></i> Xử lý lô
+            </button>
+        }
+        <button type="button" class="btn-action-detail btn-secondary" onclick="closeLotDetailModal()">
+            <i class="fas fa-times"></i> Đóng
+        </button>
+    </div>
+</div>
+
+<style>
+    .lot-detail-container {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .detail-header {
+        margin-bottom: 24px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .header-info h2 {
+        margin: 0 0 12px 0;
+        color: #1e293b;
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .header-badges {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .badge-code, .badge-lot, .badge-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .badge-code {
+        background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+        color: #0369a1;
+    }
+
+    .badge-lot {
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        color: #92400e;
+    }
+
+    .badge-status.active {
+        background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+        color: #15803d;
+    }
+
+    .badge-status.warning {
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        color: #92400e;
+    }
+
+    .badge-status.expired {
+        background: linear-gradient(135deg, #fee2e2, #fecaca);
+        color: #991b1b;
+    }
+
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+
+    .detail-section {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .detail-section.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .detail-section h3 {
+        margin: 0 0 16px 0;
+        color: #1e293b;
+        font-size: 16px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .info-table {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-row .label {
+        color: #64748b;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .info-row .value {
+        color: #1e293b;
+        font-size: 14px;
+        font-weight: 600;
+        text-align: right;
+    }
+
+    .text-danger {
+        color: #dc2626 !important;
+    }
+
+    .text-warning {
+        color: #d97706 !important;
+    }
+
+    .quantity-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 16px;
+        background: white;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .stat-item.highlight {
+        background: linear-gradient(135deg, #1e3a5f, #0f2847);
+        color: white;
+        border: none;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: #64748b;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+
+    .stat-item.highlight .stat-label {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .stat-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 4px;
+    }
+
+    .stat-value.large {
+        font-size: 32px;
+    }
+
+    .stat-item.highlight .stat-value {
+        color: white;
+    }
+
+    .stat-unit {
+        font-size: 11px;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .stat-item.highlight .stat-unit {
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .quantity-progress-detail {
+        margin-top: 20px;
+    }
+
+    .progress-label {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 14px;
+        color: #64748b;
+    }
+
+    .progress-bar-large {
+        width: 100%;
+        height: 12px;
+        background: #e2e8f0;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+
+    .progress-fill-large {
+        height: 100%;
+        transition: width 0.5s ease;
+        border-radius: 6px;
+    }
+
+    .progress-fill-large.normal {
+        background: linear-gradient(90deg, #10b981, #059669);
+    }
+
+    .progress-fill-large.warning {
+        background: linear-gradient(90deg, #f59e0b, #d97706);
+    }
+
+    .progress-fill-large.critical {
+        background: linear-gradient(90deg, #ef4444, #dc2626);
+    }
+
+    .price-info {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .price-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 16px;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .price-item.highlight {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        border: none;
+    }
+
+    .price-label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #64748b;
+    }
+
+    .price-item.highlight .price-label {
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .price-value {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .price-value.large {
+        font-size: 20px;
+    }
+
+    .price-item.highlight .price-value {
+        color: white;
+    }
+
+    .history-timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-bottom: 24px;
+    }
+
+    .timeline-marker {
+        position: absolute;
+        left: -30px;
+        top: 4px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: white;
+        border: 3px solid #10b981;
+    }
+
+    .timeline-marker.import {
+        border-color: #10b981;
+    }
+
+    .timeline-marker.export {
+        border-color: #ef4444;
+    }
+
+    .timeline-content {
+        background: white;
+        padding: 12px 16px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .timeline-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+
+    .timeline-header strong {
+        color: #1e293b;
+        font-size: 14px;
+    }
+
+    .timeline-date {
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .timeline-body {
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .detail-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .btn-action-detail {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-print {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: white;
+    }
+
+    .btn-export {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+    }
+
+    .btn-secondary {
+        background: white;
+        color: #1e293b;
+        border: 1px solid #e2e8f0;
+    }
+
+    .btn-action-detail:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    @@media (max-width: 768px) {
+        .detail-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .quantity-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .detail-actions {
+            flex-direction: column;
+        }
+
+        .btn-action-detail {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<script>
+    function printLotDetail() {
+        window.print();
+    }
+
+    function exportLotDetail() {
+        const maLo = '@Model.MaLo';
+        window.location.href = `/Admin/Thuoc/ExportLotDetail/${maLo}`;
+    }
+</script>

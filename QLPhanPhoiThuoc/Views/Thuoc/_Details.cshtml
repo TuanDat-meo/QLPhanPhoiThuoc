@@ -1,0 +1,548 @@
+@model QLPhanPhoiThuoc.Models.Entities.Thuoc
+
+@{
+    var tonKho = ViewBag.TonKho ?? 0;
+}
+
+<!-- Wrapper với scope riêng cho Details -->
+<div class="thuoc-details-scope">
+    <style>
+        /* ==================== SCOPED STYLES CHỈ CHO DETAILS PANEL ==================== */
+        /* Tất cả styles đều được prefix với .thuoc-details-scope để tránh xung đột */
+        
+        .thuoc-details-scope {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        .thuoc-details-scope .details-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        .thuoc-details-scope .details-content {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 10px;
+        }
+
+        .thuoc-details-scope .details-left {
+            min-width: 0;
+        }
+
+        .thuoc-details-scope .details-right {
+            min-width: 0;
+        }
+
+        .thuoc-details-scope .detail-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .thuoc-details-scope .detail-card-body {
+            padding: 15px;
+        }
+
+        .thuoc-details-scope .detail-section-title {
+            margin-bottom: 20px;
+            color: #1e3a5f;
+            border-bottom: 2px solid #1e3a5f;
+            padding-bottom: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .thuoc-details-scope .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .thuoc-details-scope .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .thuoc-details-scope .detail-item-label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+
+        .thuoc-details-scope .detail-item-value {
+            color: #111827;
+            font-size: 1rem;
+        }
+
+        .thuoc-details-scope .price-value {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #1e3a5f;
+        }
+
+        .thuoc-details-scope .price-value.highlight {
+            color: #10b981;
+        }
+
+        .thuoc-details-scope .lot-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .thuoc-details-scope .lot-item {
+            padding: 14px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border-left: 4px solid #10b981;
+            transition: all 0.2s ease;
+        }
+
+        .thuoc-details-scope .lot-item:hover {
+            background: #f3f4f6;
+            transform: translateX(4px);
+        }
+
+        .thuoc-details-scope .lot-item.lot-expiring {
+            border-left-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .thuoc-details-scope .lot-item.lot-expired {
+            border-left-color: #ef4444;
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .thuoc-details-scope .lot-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .thuoc-details-scope .lot-details {
+            font-size: 0.875rem;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        .thuoc-details-scope .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .thuoc-details-scope .btn-action-full {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .thuoc-details-scope .btn-primary-full {
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
+            color: white;
+        }
+
+        .thuoc-details-scope .btn-primary-full:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
+        }
+
+        .thuoc-details-scope .btn-danger-full {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .thuoc-details-scope .btn-danger-full:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .thuoc-details-scope .btn-success-full {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .thuoc-details-scope .btn-success-full:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .thuoc-details-scope .btn-outline-full {
+            background: transparent;
+            border: 2px solid #1e3a5f;
+            color: #1e3a5f;
+        }
+
+        .thuoc-details-scope .btn-outline-full:hover {
+            background: #1e3a5f;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .thuoc-details-scope .card-header-custom {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 16px 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .thuoc-details-scope .card-header-dark {
+            background: linear-gradient(135deg, #1e3a5f, #0f2847);
+            color: white;
+            padding: 16px 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .thuoc-details-scope .empty-state {
+            text-align: center;
+            color: #9ca3af;
+            padding: 30px 20px;
+        }
+
+        .thuoc-details-scope .empty-state i {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .thuoc-details-scope .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .thuoc-details-scope .badge-success {
+            background: rgba(17, 153, 142, 0.15);
+            color: #11998e;
+            border: 1px solid rgba(17, 153, 142, 0.3);
+        }
+
+        .thuoc-details-scope .badge-danger {
+            background: rgba(251, 113, 133, 0.15);
+            color: #f43f5e;
+            border: 1px solid rgba(251, 113, 133, 0.3);
+        }
+
+        /* Responsive */
+        @@media (max-width: 992px) {
+            .thuoc-details-scope .details-content {
+                grid-template-columns: 1fr !important;
+            }
+
+            .thuoc-details-scope .detail-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .thuoc-details-scope .details-wrapper {
+                padding: 0;
+            }
+
+            .thuoc-details-scope .detail-card-body {
+                padding: 16px;
+            }
+
+            .thuoc-details-scope .detail-grid {
+                gap: 14px;
+            }
+        }
+    </style>
+
+    <div class="details-wrapper">
+        <div class="details-content">
+            <!-- Left Column -->
+            <div class="details-left">
+                <!-- Thông tin cơ bản -->
+                <div class="detail-card">
+                    <div class="detail-card-body">
+                        <h5 class="detail-section-title">
+                            <i class="fas fa-pills"></i> Thông tin cơ bản
+                        </h5>
+                        
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <span class="detail-item-label">Mã thuốc:</span>
+                                <span class="detail-item-value"><strong>@Model.MaThuoc</strong></span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-item-label">Tên thuốc:</span>
+                                <span class="detail-item-value"><strong>@Model.TenThuoc</strong></span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-item-label">Hoạt chất:</span>
+                                <span class="detail-item-value">@(Model.HoatChat ?? "Chưa cập nhật")</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-item-label">Nhóm thuốc:</span>
+                                <span class="detail-item-value">@(Model.NhomThuoc ?? "Chưa cập nhật")</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-item-label">Đơn vị tính:</span>
+                                <span class="detail-item-value">@Model.DonViTinh</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-item-label">Đường dùng:</span>
+                                <span class="detail-item-value">@(Model.DuongDung ?? "Chưa cập nhật")</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-item-label">Dạng bào chế:</span>
+                                <span class="detail-item-value">@(Model.DangBaoChe ?? "Chưa cập nhật")</span>
+                            </div>
+
+                            <div class="detail-item">
+                                <span class="detail-item-label">Trạng thái:</span>
+                                <span class="detail-item-value">
+                                    @if (Model.TrangThai == "KichHoat")
+                                    {
+                                        <span class="badge badge-success">
+                                            <i class="fas fa-check-circle"></i> Đang sử dụng
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-danger">
+                                            <i class="fas fa-ban"></i> Ngừng sử dụng
+                                        </span>
+                                    }
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Giá và tồn kho -->
+                <div class="detail-card">
+                    <div class="detail-card-body">
+                        <h5 class="detail-section-title">
+                            <i class="fas fa-dollar-sign"></i> Giá và tồn kho
+                        </h5>
+                        
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <span class="detail-item-label">Giá nhập:</span>
+                                <span class="price-value">@Model.GiaNhap.ToString("N0") đ</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-item-label">Giá xuất:</span>
+                                <span class="price-value highlight">@Model.GiaXuat.ToString("N0") đ</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-item-label">Tồn kho hiện tại:</span>
+                                <span class="detail-item-value" style="font-weight: 600; color: @(tonKho <= Model.TonKhoToiThieu ? "#ef4444" : "#10b981")">
+                                    @tonKho @Model.DonViTinh
+                                    @if (tonKho <= Model.TonKhoToiThieu)
+                                    {
+                                        <i class="fas fa-exclamation-triangle" style="color: #ef4444;" title="Tồn kho thấp"></i>
+                                    }
+                                </span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-item-label">Tồn kho tối thiểu:</span>
+                                <span class="detail-item-value">@Model.TonKhoToiThieu @Model.DonViTinh</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thông tin bổ sung -->
+                <div class="detail-card">
+                    <div class="detail-card-body">
+                        <h5 class="detail-section-title">
+                            <i class="fas fa-industry"></i> Thông tin bổ sung
+                        </h5>
+                        
+                        <div class="detail-grid">
+                            <div class="detail-item" style="grid-column: span 2;">
+                                <span class="detail-item-label">Nhà sản xuất:</span>
+                                <span class="detail-item-value">@(Model.NhaSanXuat ?? "Chưa cập nhật")</span>
+                            </div>
+                            
+                            <div class="detail-item" style="grid-column: span 2;">
+                                <span class="detail-item-label">Mô tả:</span>
+                                <span class="detail-item-value">@(Model.MoTa ?? "Không có mô tả")</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="details-right">
+                <!-- Tồn kho theo lô -->
+                <div class="detail-card">
+                    <div class="card-header-custom">
+                        <i class="fas fa-warehouse"></i> Tồn kho theo lô
+                    </div>
+                    <div class="detail-card-body">
+                        @if (Model.LoThuocs != null && Model.LoThuocs.Any())
+                        {
+                            <div class="lot-list">
+                                @foreach (var lot in Model.LoThuocs.Where(l => l.TrangThai == "ConHang").OrderBy(l => l.HanSuDung))
+                                {
+                                    var daysToExpire = (lot.HanSuDung - DateTime.Now).Days;
+                                    var isExpiring = daysToExpire <= 30;
+                                    var isExpired = daysToExpire < 0;
+                                    
+                                    <div class="lot-item @(isExpired ? "lot-expired" : isExpiring ? "lot-expiring" : "")">
+                                        <div class="lot-header">
+                                            <strong>Lô: @lot.SoLo</strong>
+                                            <span style="color: #1e3a5f;">
+                                                @lot.SoLuongCon @Model.DonViTinh
+                                            </span>
+                                        </div>
+                                        <div class="lot-details">
+                                            <div>Kho: @lot.Kho.TenKho</div>
+                                            <div style="margin-top: 4px;">
+                                                HSD: @lot.HanSuDung.ToString("dd/MM/yyyy")
+                                                @if (isExpired)
+                                                {
+                                                    <span style="color: #ef4444; font-weight: 600;">
+                                                        (Đã hết hạn)
+                                                    </span>
+                                                }
+                                                else if (isExpiring)
+                                                {
+                                                    <span style="color: #f59e0b; font-weight: 600;">
+                                                        (Còn @daysToExpire ngày)
+                                                    </span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <div>Chưa có lô thuốc nào</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="detail-card">
+                    <div class="card-header-dark">
+                        <i class="fas fa-bolt"></i> Thao tác nhanh
+                    </div>
+                    <div class="detail-card-body">
+                        <div class="action-buttons">
+                            <button onclick="loadThuocEditPanel('@Model.MaThuoc')" class="btn-action-full btn-primary-full">
+                                <i class="fas fa-edit"></i> Chỉnh sửa thông tin
+                            </button>
+                            
+                            @if (Model.TrangThai == "KichHoat")
+                            {
+                                <button type="button" class="btn-action-full btn-danger-full" 
+                                        onclick="confirmDelete('@Model.MaThuoc', '@Model.TenThuoc')">
+                                    <i class="fas fa-ban"></i> Ngừng sử dụng
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn-action-full btn-success-full" 
+                                        onclick="confirmRestore('@Model.MaThuoc', '@Model.TenThuoc')">
+                                    <i class="fas fa-redo"></i> Kích hoạt lại
+                                </button>
+                            }
+                            
+                            <hr style="margin: 10px 0; border: none; border-top: 1px solid #e5e7eb;">
+                            
+                            <button onclick="loadPhieuNhapPanel()" class="btn-action-full btn-outline-full">
+                                <i class="fas fa-file-import"></i> Tạo phiếu nhập
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmDelete(maThuoc, tenThuoc) {
+        if (confirm(`Bạn có chắc chắn muốn ngừng sử dụng thuốc "${tenThuoc}"?\n\nThuốc sẽ chuyển sang trạng thái "Ngừng sử dụng".`)) {
+            $.ajax({
+                url: `/Admin/Thuoc/Delete/${maThuoc}`,
+                method: 'POST',
+                data: { __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
+                success: function(data) {
+                    if (data.success) {
+                        alert(data.message);
+                        closePanel(panelStack[panelStack.length - 1].level);
+                        loadThuocContent('/Admin/Thuoc/Index');
+                    } else {
+                        alert(data.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert('Có lỗi xảy ra: ' + error);
+                }
+            });
+        }
+    }
+
+    function confirmRestore(maThuoc, tenThuoc) {
+        if (confirm(`Bạn có chắc chắn muốn kích hoạt lại thuốc "${tenThuoc}"?`)) {
+            $.ajax({
+                url: `/Admin/Thuoc/Restore/${maThuoc}`,
+                method: 'POST',
+                data: { __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
+                success: function(data) {
+                    if (data.success) {
+                        alert(data.message);
+                        const currentPanel = panelStack[panelStack.length - 1];
+                        closePanel(currentPanel.level);
+                        loadThuocDetailsPanel(maThuoc);
+                    } else {
+                        alert(data.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert('Có lỗi xảy ra: ' + error);
+                }
+            });
+        }
+    }
+</script>
