@@ -1,0 +1,179 @@
+@model IEnumerable<dynamic>
+@using System.Linq
+@{
+    // ViewBag variables từ controller
+    var search = ViewBag.Search ?? "";
+    var filter = ViewBag.Filter ?? "all";
+    var currentPage = ViewBag.CurrentPage ?? 1;
+    var totalPages = ViewBag.TotalPages ?? 1;
+    var totalItems = ViewBag.TotalItems ?? 0;
+}
+
+<style>
+    /* Copy toàn bộ CSS từ TonKho.cshtml vào đây */
+    .stock-container {
+        padding: 25px;
+        background: #f8f9fa;
+        min-height: 100vh;
+    }
+    
+    /* ... rest of CSS ... */
+</style>
+
+<!-- Copy toàn bộ HTML content từ TonKho.cshtml vào đây -->
+<div class="stock-container">
+    <!-- Search & Filter Form -->
+    <form id="tonKhoFilterForm" method="get">
+        <input type="text" name="search" value="@search" placeholder="Tìm kiếm..." />
+        <select name="filter">
+            <option value="all" selected="@(filter == "all")">Tất cả</option>
+            <option value="expiring" selected="@(filter == "expiring")">Sắp hết hạn</option>
+            <option value="expired" selected="@(filter == "expired")">Đã hết hạn</option>
+            <option value="active" selected="@(filter == "active")">Còn hàng</option>
+        </select>
+        <button type="submit">Lọc</button>
+    </form>
+
+    <!-- Data Table -->
+    <table class="stock-table">
+        <thead>
+            <tr>
+                <th>Mã lô</th>
+                <th>Tên thuốc</th>
+                <th>Số lô</th>
+                <th>Hạn sử dụng</th>
+                <th>Số lượng còn</th>
+                <th>Trạng thái</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.MaLo</td>
+                        <td>@item.Thuoc.TenThuoc</td>
+                        <td>@item.SoLo</td>
+                        <td>@item.HanSuDung.ToString("dd/MM/yyyy")</td>
+                        <td>@item.SoLuongCon</td>
+                        <td>
+                            @if (item.TrangThai == "ConHang")
+                            {
+                                <span class="badge badge-success">Còn hàng</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-danger">Hết hàng</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 50px;">
+                        <p>Không có dữ liệu</p>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    @if (totalPages > 1)
+    {
+        <div class="pagination-container">
+            <div class="pagination-info">
+                Trang @currentPage / @totalPages
+            </div>
+            <div class="pagination">
+                @if (currentPage > 1)
+                {
+                    <a href="#" onclick="loadTonKhoPage(1); return false;">
+                        <i class="fas fa-angle-double-left"></i>
+                    </a>
+                    <a href="#" onclick="loadTonKhoPage(@(currentPage - 1)); return false;">
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+                }
+
+                @for (int i = Math.Max(1, currentPage - 2); i <= Math.Min(totalPages, currentPage + 2); i++)
+                {
+                    if (i == currentPage)
+                    {
+                        <span class="active">@i</span>
+                    }
+                    else
+                    {
+                        <a href="#" onclick="loadTonKhoPage(@i); return false;">@i</a>
+                    }
+                }
+
+                @if (currentPage < totalPages)
+                {
+                    <a href="#" onclick="loadTonKhoPage(@(currentPage + 1)); return false;">
+                        <i class="fas fa-angle-right"></i>
+                    </a>
+                    <a href="#" onclick="loadTonKhoPage(@totalPages); return false;">
+                        <i class="fas fa-angle-double-right"></i>
+                    </a>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<script>
+    // ===== AJAX FUNCTIONS FOR TON KHO =====
+    
+    // Load specific page
+    function loadTonKhoPage(pageNum) {
+        const form = document.getElementById('tonKhoFilterForm');
+        const formData = new FormData(form);
+        const params = new URLSearchParams(formData);
+        params.set('page', pageNum);
+        
+        loadThuocContent('/Admin/Thuoc/TonKho?' + params.toString());
+    }
+
+    // Filter form submit handler
+    document.getElementById('tonKhoFilterForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const params = new URLSearchParams(formData);
+        params.set('page', 1); // Reset to first page on new filter
+        
+        loadThuocContent('/Admin/Thuoc/TonKho?' + params.toString());
+    });
+
+    // Quick filter chips (nếu có)
+    document.querySelectorAll('.filter-chip').forEach(function(chip) {
+        chip.addEventListener('click', function() {
+            // Remove active class from all chips
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            
+            // Add active to clicked chip
+            this.classList.add('active');
+            
+            // Get filter value
+            const filterValue = this.dataset.filter;
+            
+            // Load content with filter
+            loadThuocContent('/Admin/Thuoc/TonKho?filter=' + filterValue);
+        });
+    });
+
+    // Auto-hide alerts after 5 seconds
+    setTimeout(function() {
+        document.querySelectorAll('.alert').forEach(function(alert) {
+            alert.style.transition = 'opacity 0.5s';
+            alert.style.opacity = '0';
+            setTimeout(function() {
+                alert.remove();
+            }, 500);
+        });
+    }, 5000);
+</script>

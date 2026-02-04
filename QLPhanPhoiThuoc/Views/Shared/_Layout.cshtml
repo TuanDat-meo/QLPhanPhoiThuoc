@@ -1,3 +1,13 @@
+@{
+    // Lấy thông tin user từ Claims
+    var userName = User.Identity?.Name ?? "User";
+    var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "User";
+    var tenNhanVien = User.FindFirst("TenNhanVien")?.Value ?? User.FindFirst("TenBenhNhan")?.Value ?? userName;
+    var chucVu = User.FindFirst("ChucVu")?.Value ?? userRole;
+    
+    // Lấy số thông báo chưa đọc từ ViewBag (nếu có)
+    var soThongBaoChuaDoc = ViewBag.SoThongBaoChuaDoc ?? 0;
+}
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -214,58 +224,33 @@
             padding: 12px 16px;
             font-weight: 700;
             color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .dropdown-divider {
-            margin: 8px 0;
-            opacity: 0.1;
+        /* Mobile Menu Toggle */
+        .navbar-toggler {
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: var(--transition);
         }
+
+            .navbar-toggler:hover {
+                background: rgba(255, 255, 255, 0.2);
+            }
+
+            .navbar-toggler i {
+                color: white;
+                font-size: 1.3rem;
+            }
 
         /* ========== MAIN CONTENT ========== */
         .main-content {
-            min-height: calc(100vh - var(--navbar-height) - 120px);
-            padding: 30px 0;
-        }
-
-        /* ========== LOADING OVERLAY ========== */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
-        }
-
-            .loading-overlay.show {
-                opacity: 1;
-                visibility: visible;
-            }
-
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid #f0f0f0;
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @@keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
+            min-height: calc(100vh - 140px);
+            padding: 0;
         }
 
         /* ========== FOOTER ========== */
@@ -279,36 +264,63 @@
 
             footer h6 {
                 color: white;
-                font-weight: 700;
+                font-weight: 600;
                 margin-bottom: 15px;
             }
 
+            footer p {
+                color: rgba(255, 255, 255, 0.9);
+            }
+
             footer a {
-                color: rgba(255, 255, 255, 0.8);
+                color: rgba(255, 255, 255, 0.9);
                 text-decoration: none;
-                transition: color 0.3s;
+                transition: var(--transition);
             }
 
                 footer a:hover {
                     color: white;
+                    text-decoration: underline;
                 }
 
-            footer .small {
-                opacity: 0.9;
+        /* ========== LOADING OVERLAY ========== */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+            .loading-overlay.show {
+                opacity: 1;
+                visibility: visible;
             }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border-width: 0.3rem;
+            border-color: var(--primary);
+            border-right-color: transparent;
+        }
 
         /* ========== RESPONSIVE ========== */
-        @@media (max-width: 991px) {
+        @@media (max-width: 768px) {
             .navbar-custom .navbar-brand {
-                font-size: 1.2rem;
+                font-size: 1.1rem;
             }
 
-                .navbar-custom .navbar-brand i {
-                    font-size: 1.5rem;
-                }
-
             .user-dropdown {
-                padding: 6px 15px;
+                padding: 6px 12px;
             }
 
             .user-avatar {
@@ -317,101 +329,20 @@
                 font-size: 0.95rem;
             }
 
-            .user-info {
-                display: none;
-            }
-
-            .main-content {
-                padding: 20px 0;
-            }
-        }
-
-        @@media (max-width: 576px) {
-            .navbar-custom {
-                padding: 10px 0;
-            }
-
-            .navbar-custom .navbar-brand {
-                font-size: 1.1rem;
+            .user-name {
+                font-size: 0.85rem;
             }
 
             footer {
                 padding: 30px 0 15px;
             }
         }
-
-        /* ========== UTILITY CLASSES ========== */
-        .card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
-            transition: var(--transition);
-        }
-
-            .card:hover {
-                box-shadow: 0 5px 30px rgba(0, 0, 0, 0.15);
-                transform: translateY(-2px);
-            }
-
-        .card-header {
-            background: linear-gradient(135deg, rgba(30, 58, 95, 0.05) 0%, rgba(15, 40, 71, 0.05) 100%);
-            border-bottom: 2px solid rgba(30, 58, 95, 0.1);
-            padding: 15px 20px;
-            font-weight: 600;
-        }
-
-        .btn-primary {
-            background: var(--primary-gradient);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: var(--transition);
-        }
-
-            .btn-primary:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(30, 58, 95, 0.3);
-            }
-
-        .btn-success {
-            background: var(--success-gradient);
-            border: none;
-        }
-
-        .btn-warning {
-            background: var(--warning-gradient);
-            border: none;
-            color: white;
-        }
-
-        .btn-info {
-            background: var(--info-gradient);
-            border: none;
-        }
-
-        /* ========== NAVBAR TOGGLER ========== */
-        .navbar-toggler {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            padding: 8px 12px;
-            border-radius: 8px;
-        }
-
-            .navbar-toggler:focus {
-                box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
-            }
-
-        .navbar-toggler i {
-            color: white;
-            font-size: 1.2rem;
-        }
     </style>
 </head>
 <body>
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner">
+        <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Đang tải...</span>
         </div>
     </div>
@@ -437,7 +368,10 @@
                         <li class="nav-item me-3">
                             <a class="nav-link position-relative" href="#" title="Thông báo">
                                 <i class="fas fa-bell"></i>
-                                <span class="notification-badge">5</span>
+                                @if (soThongBaoChuaDoc > 0)
+                                {
+                                    <span class="notification-badge">@soThongBaoChuaDoc</span>
+                                }
                             </a>
                         </li>
 
@@ -446,23 +380,18 @@
                             <a class="nav-link dropdown-toggle user-dropdown p-1" href="#" id="userDropdown"
                                role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <span class="user-avatar">
-                                    @{
-                                        var userName = User.Identity.Name ?? "U";
-                                    }
-                                    @(userName.Substring(0, 1).ToUpper())
+                                    @(tenNhanVien.Substring(0, 1).ToUpper())
                                 </span>
                                 <span class="user-info">
-                                    <span class="user-name">@User.Identity.Name</span>
-                                    <span class="user-role">
-                                        @(User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "User")
-                                    </span>
+                                    <span class="user-name">@tenNhanVien</span>
+                                    <span class="user-role">@chucVu</span>
                                 </span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li>
                                     <h6 class="dropdown-header">
                                         <i class="fas fa-user-shield"></i>
-                                        @(User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "User")
+                                        @userRole
                                     </h6>
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
@@ -536,7 +465,7 @@
                         <i class="fas fa-phone me-2"></i>Hotline: 1900-xxxx
                     </p>
                     <p class="small mb-0">
-                        <i class="fas fa-envelope me-2"></i>Email: info@phongkhamabc.vn
+                        <i class="fas fa-envelope me-2"></i>Email: info@phongkham.com
                     </p>
                 </div>
                 <div class="col-md-4 mb-3">
@@ -547,7 +476,7 @@
             </div>
             <hr style="border-color: rgba(255,255,255,0.2);">
             <p class="mb-0 small">
-                &copy; 2026 Hệ thống Quản lý Phòng khám. All rights reserved.
+                &copy; @DateTime.Now.Year Hệ thống Quản lý Phòng khám. All rights reserved.
             </p>
             <p class="mb-0 small opacity-75">
                 Phát triển bởi Nhóm CNTT | Version 1.0.0
@@ -627,9 +556,39 @@
         document.addEventListener('click', function(event) {
             const dropdown = document.querySelector('.dropdown-menu.show');
             if (dropdown && !event.target.closest('.dropdown')) {
-                bootstrap.Dropdown.getInstance(document.querySelector('[data-bs-toggle="dropdown"]'))?.hide();
+                const dropdownToggle = new bootstrap.Dropdown(document.querySelector('#userDropdown'));
+                dropdownToggle.hide();
             }
         });
+
+        // Show success/error messages from TempData
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>
+            showToast('@TempData["SuccessMessage"]', 'success');
+            </text>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <text>
+            showToast('@TempData["ErrorMessage"]', 'error');
+            </text>
+        }
+
+        @if (TempData["InfoMessage"] != null)
+        {
+            <text>
+            showToast('@TempData["InfoMessage"]', 'info');
+            </text>
+        }
+
+        @if (TempData["WarningMessage"] != null)
+        {
+            <text>
+            showToast('@TempData["WarningMessage"]', 'warning');
+            </text>
+        }
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

@@ -1,0 +1,234 @@
+@model IEnumerable<QLPhanPhoiThuoc.Models.Entities.Thuoc>
+
+@{
+    var search = ViewBag.Search ?? "";
+    var nhomThuocSelected = ViewBag.NhomThuocSelected ?? "";
+    var trangThaiSelected = ViewBag.TrangThaiSelected ?? "";
+    var sortBy = ViewBag.SortBy ?? "TenThuoc";
+    var sortOrder = ViewBag.SortOrder ?? "asc";
+    var currentPage = ViewBag.CurrentPage ?? 1;
+    var totalPages = ViewBag.TotalPages ?? 1;
+    var totalItems = ViewBag.TotalItems ?? 0;
+    var pageSize = ViewBag.PageSize ?? 20;
+    var nhomThuocs = ViewBag.NhomThuocs as List<string> ?? new List<string>();
+}
+
+<!-- Filter Card -->
+<div class="filter-card">
+    <form id="filterForm" method="get">
+        <div class="filter-row">
+            <div class="filter-group">
+                <label><i class="fas fa-search"></i> Tìm kiếm</label>
+                <input type="text" name="search" value="@search" placeholder="Tên thuốc, mã thuốc, hoạt chất..." />
+            </div>
+
+            <div class="filter-group">
+                <label><i class="fas fa-layer-group"></i> Nhóm thuốc</label>
+                <select name="nhomThuoc">
+                    <option value="">Tất cả</option>
+                    @foreach (var nhom in nhomThuocs)
+                    {
+                        <option value="@nhom" selected="@(nhom == nhomThuocSelected)">@nhom</option>
+                    }
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label><i class="fas fa-toggle-on"></i> Trạng thái</label>
+                <select name="trangThai">
+                    <option value="">Tất cả</option>
+                    <option value="KichHoat" selected="@(trangThaiSelected == "KichHoat")">Kích hoạt</option>
+                    <option value="NgungSuDung" selected="@(trangThaiSelected == "NgungSuDung")">Ngừng sử dụng</option>
+                </select>
+            </div>
+
+            <div class="filter-group" style="min-width: auto;">
+                <label>&nbsp;</label>
+                <button type="submit" class="btn-filter">
+                    <i class="fas fa-filter"></i> Lọc
+                </button>
+            </div>
+
+            <div class="filter-group" style="min-width: auto;">
+                <label>&nbsp;</label>
+                <button type="button" class="btn-reset" onclick="resetFilter()">
+                    <i class="fas fa-redo"></i> Đặt lại
+                </button>
+            </div>
+        </div>
+
+        <input type="hidden" name="sortBy" value="@sortBy" />
+        <input type="hidden" name="sortOrder" value="@sortOrder" />
+    </form>
+</div>
+
+<!-- Action Bar -->
+<div class="action-bar">
+    <div class="result-info">
+        <i class="fas fa-info-circle"></i> Hiển thị @Model.Count() / @totalItems thuốc
+    </div>
+    <a href="/Admin/Thuoc/Create" class="btn-add">
+        <i class="fas fa-plus-circle"></i> Thêm thuốc mới
+    </a>
+</div>
+
+<!-- Medicine Table -->
+<div class="medicine-table-card">
+    <div class="table-responsive">
+        <table class="medicine-table">
+            <thead>
+                <tr>
+                    <th class="sortable @(sortBy == "MaThuoc" ? (sortOrder == "asc" ? "sorted-asc" : "sorted-desc") : "")" 
+                        onclick="sortTable('MaThuoc')">Mã thuốc</th>
+                    <th class="sortable @(sortBy == "TenThuoc" ? (sortOrder == "asc" ? "sorted-asc" : "sorted-desc") : "")" 
+                        onclick="sortTable('TenThuoc')">Tên thuốc</th>
+                    <th>Hoạt chất</th>
+                    <th class="sortable @(sortBy == "NhomThuoc" ? (sortOrder == "asc" ? "sorted-asc" : "sorted-desc") : "")" 
+                        onclick="sortTable('NhomThuoc')">Nhóm</th>
+                    <th>Đơn vị</th>
+                    <th class="sortable @(sortBy == "GiaXuat" ? (sortOrder == "asc" ? "sorted-asc" : "sorted-desc") : "")" 
+                        onclick="sortTable('GiaXuat')">Giá xuất</th>
+                    <th>Trạng thái</th>
+                    <th style="text-align: center;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><strong>@item.MaThuoc</strong></td>
+                            <td>@item.TenThuoc</td>
+                            <td>@(item.HoatChat ?? "-")</td>
+                            <td>@(item.NhomThuoc ?? "-")</td>
+                            <td>@item.DonViTinh</td>
+                            <td class="price-cell">@item.GiaXuat.ToString("N0") đ</td>
+                            <td>
+                                @if (item.TrangThai == "KichHoat")
+                                {
+                                    <span class="badge badge-success">Kích hoạt</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-danger">Ngừng dùng</span>
+                                }
+                            </td>
+                            <td style="text-align: center; white-space: nowrap;">
+                                <a href="/Admin/Thuoc/Details/@item.MaThuoc" class="btn-action btn-view" title="Xem chi tiết">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="/Admin/Thuoc/Edit/@item.MaThuoc" class="btn-action btn-edit" title="Sửa">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 50px;">
+                            <i class="fas fa-inbox" style="font-size: 3rem; color: #dee2e6; margin-bottom: 15px;"></i>
+                            <p style="color: #6c757d; margin: 0;">Không tìm thấy thuốc nào</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    @if (totalPages > 1)
+    {
+        <div class="pagination-container">
+            <div class="pagination-info">
+                Trang @currentPage / @totalPages
+            </div>
+            <div class="pagination">
+                @if (currentPage > 1)
+                {
+                    <a href="#" onclick="loadPage(1); return false;">
+                        <i class="fas fa-angle-double-left"></i>
+                    </a>
+                    <a href="#" onclick="loadPage(@(currentPage - 1)); return false;">
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+                }
+
+                @for (int i = Math.Max(1, currentPage - 2); i <= Math.Min(totalPages, currentPage + 2); i++)
+                {
+                    if (i == currentPage)
+                    {
+                        <span class="active">@i</span>
+                    }
+                    else
+                    {
+                        <a href="#" onclick="loadPage(@i); return false;">@i</a>
+                    }
+                }
+
+                @if (currentPage < totalPages)
+                {
+                    <a href="#" onclick="loadPage(@(currentPage + 1)); return false;">
+                        <i class="fas fa-angle-right"></i>
+                    </a>
+                    <a href="#" onclick="loadPage(@totalPages); return false;">
+                        <i class="fas fa-angle-double-right"></i>
+                    </a>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<script>
+    function sortTable(column) {
+        const currentSort = '@sortBy';
+        const currentOrder = '@sortOrder';
+        let newOrder = 'asc';
+
+        if (currentSort === column && currentOrder === 'asc') {
+            newOrder = 'desc';
+        }
+
+        loadPageWithParams({ sortBy: column, sortOrder: newOrder, page: 1 });
+    }
+
+    function loadPage(pageNum) {
+        loadPageWithParams({ page: pageNum });
+    }
+
+    function resetFilter() {
+        loadPageWithParams({ search: '', nhomThuoc: '', trangThai: '', page: 1 });
+    }
+
+    function loadPageWithParams(params) {
+        const form = document.getElementById('filterForm');
+        const formData = new FormData(form);
+        
+        const urlParams = new URLSearchParams();
+        for (let [key, value] of formData.entries()) {
+            if (params[key] !== undefined) {
+                urlParams.set(key, params[key]);
+            } else {
+                urlParams.set(key, value);
+            }
+        }
+        
+        // Add params not in form
+        for (let [key, value] of Object.entries(params)) {
+            if (!formData.has(key)) {
+                urlParams.set(key, value);
+            }
+        }
+
+        loadThuocContent('/Admin/Thuoc/Index?' + urlParams.toString());
+    }
+
+    // Form submit handler
+    document.getElementById('filterForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        loadPageWithParams({});
+    });
+</script>
