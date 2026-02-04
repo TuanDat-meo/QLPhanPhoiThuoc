@@ -11,10 +11,12 @@ namespace QLPhanPhoiThuoc.Controllers
     public class DonThuocController : Controller
     {
         private readonly BenhVienDbContext _benhVienContext;
+        private readonly ILogger<DonThuocController> _logger;
 
-        public DonThuocController(BenhVienDbContext benhVienContext)
+        public DonThuocController(BenhVienDbContext benhVienContext, ILogger<DonThuocController> logger)
         {
             _benhVienContext = benhVienContext;
+            _logger = logger;
         }
 
         // ==================== QUẢN LÝ ĐƠN THUỐC ====================
@@ -68,143 +70,203 @@ namespace QLPhanPhoiThuoc.Controllers
         public async Task<IActionResult> DanhSachDonThuoc(string loaiDon = "", string trangThai = "",
             DateTime? tuNgay = null, DateTime? denNgay = null, string timKiem = "")
         {
-            var maNhanVien = User.FindFirstValue("MaNhanVien");
-            var chucVu = User.FindFirstValue("ChucVu");
-
-            var query = _benhVienContext.DonThuocs
-                .Include(d => d.BenhNhan)
-                .Include(d => d.NhanVien)
-                .Include(d => d.ChanDoan)
-                .Include(d => d.ChiTietDonThuocs)
-                    .ThenInclude(ct => ct.Thuoc)
-                .AsQueryable();
-
-            // Kiểm tra quyền truy cập
-            // Nếu không phải Admin hoặc DuocSi, chỉ xem đơn do mình kê
-            if (chucVu != "Admin" && chucVu != "DuocSi")
+            try
             {
-                query = query.Where(d => d.MaNhanVien == maNhanVien);
-            }
+                var maNhanVien = User.FindFirstValue("MaNhanVien");
+                var chucVu = User.FindFirstValue("ChucVu");
 
-            // Lọc theo loại đơn
-            if (!string.IsNullOrEmpty(loaiDon))
-            {
-                query = query.Where(d => d.LoaiDon == loaiDon);
-            }
+                var query = _benhVienContext.DonThuocs
+                    .Include(d => d.BenhNhan)
+                    .Include(d => d.NhanVien)
+                    .Include(d => d.ChanDoan)
+                    .Include(d => d.ChiTietDonThuocs)
+                        .ThenInclude(ct => ct.Thuoc)
+                    .AsQueryable();
 
-            // Lọc theo trạng thái
-            if (!string.IsNullOrEmpty(trangThai))
-            {
-                query = query.Where(d => d.TrangThai == trangThai);
-            }
-
-            // Lọc theo khoảng thời gian
-            if (tuNgay.HasValue)
-            {
-                query = query.Where(d => d.NgayKeDon >= tuNgay.Value);
-            }
-
-            if (denNgay.HasValue)
-            {
-                query = query.Where(d => d.NgayKeDon <= denNgay.Value);
-            }
-
-            // Tìm kiếm
-            if (!string.IsNullOrEmpty(timKiem))
-            {
-                query = query.Where(d =>
-                    d.MaDonThuoc.Contains(timKiem) ||
-                    d.BenhNhan.TenBenhNhan.Contains(timKiem) ||
-                    d.BenhNhan.MaBenhNhan.Contains(timKiem) ||
-                    d.NhanVien.TenNhanVien.Contains(timKiem)
-                );
-            }
-
-            var donThuocs = await query
-                .OrderByDescending(d => d.NgayKeDon)
-                .Select(d => new
+                // Kiểm tra quyền truy cập
+                if (chucVu != "Admin" && chucVu != "DuocSi")
                 {
-                    d.MaDonThuoc,
-                    d.NgayKeDon,
-                    d.LoaiDon,
-                    d.TrangThai,
-                    BenhNhan = d.BenhNhan.TenBenhNhan,
-                    MaBenhNhan = d.BenhNhan.MaBenhNhan,
-                    BacSi = d.NhanVien.TenNhanVien,
-                    SoLoaiThuoc = d.ChiTietDonThuocs.Count(),
-                    TongSoLuong = d.ChiTietDonThuocs.Sum(ct => ct.SoLuong),
-                    ChanDoan = d.ChanDoan != null ? d.ChanDoan.ChanDoanSoBo : ""
-                })
-                .ToListAsync();
+                    query = query.Where(d => d.MaNhanVien == maNhanVien);
+                }
 
-            return Json(new { success = true, data = donThuocs });
+                // Lọc theo loại đơn
+                if (!string.IsNullOrEmpty(loaiDon))
+                {
+                    query = query.Where(d => d.LoaiDon == loaiDon);
+                }
+
+                // Lọc theo trạng thái
+                if (!string.IsNullOrEmpty(trangThai))
+                {
+                    query = query.Where(d => d.TrangThai == trangThai);
+                }
+
+                // Lọc theo khoảng thời gian
+                if (tuNgay.HasValue)
+                {
+                    query = query.Where(d => d.NgayKeDon >= tuNgay.Value);
+                }
+
+                if (denNgay.HasValue)
+                {
+                    var denNgayEnd = denNgay.Value.Date.AddDays(1).AddSeconds(-1);
+                    query = query.Where(d => d.NgayKeDon <= denNgayEnd);
+                }
+
+                // Tìm kiếm
+                if (!string.IsNullOrEmpty(timKiem))
+                {
+                    query = query.Where(d =>
+                        d.MaDonThuoc.Contains(timKiem) ||
+                        d.BenhNhan.TenBenhNhan.Contains(timKiem) ||
+                        d.BenhNhan.MaBenhNhan.Contains(timKiem) ||
+                        d.NhanVien.TenNhanVien.Contains(timKiem)
+                    );
+                }
+
+                var donThuocs = await query
+                    .OrderByDescending(d => d.NgayKeDon)
+                    .Select(d => new
+                    {
+                        d.MaDonThuoc,
+                        d.NgayKeDon,
+                        d.LoaiDon,
+                        d.TrangThai,
+                        BenhNhan = d.BenhNhan.TenBenhNhan,
+                        MaBenhNhan = d.BenhNhan.MaBenhNhan,
+                        BacSi = d.NhanVien.TenNhanVien,
+                        MaBacSi = d.NhanVien.MaNhanVien,
+                        SoLoaiThuoc = d.ChiTietDonThuocs.Count(),
+                        TongSoLuong = d.ChiTietDonThuocs.Sum(ct => ct.SoLuong),
+                        ChanDoan = d.ChanDoan != null ? d.ChanDoan.ChanDoanSoBo : "",
+                        d.MaChanDoan
+                    })
+                    .ToListAsync();
+
+                return Json(new { success = true, data = donThuocs });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading danh sách đơn thuốc");
+                return Json(new { success = false, message = "Lỗi khi tải danh sách đơn thuốc: " + ex.Message });
+            }
         }
 
         // GET: /DonThuoc/ChiTietDonThuoc - Xem chi tiết đơn thuốc
         [HttpGet]
         public async Task<IActionResult> ChiTietDonThuoc(string maDonThuoc)
         {
-            var maNhanVien = User.FindFirstValue("MaNhanVien");
-            var chucVu = User.FindFirstValue("ChucVu");
-
-            var donThuoc = await _benhVienContext.DonThuocs
-                .Include(d => d.BenhNhan)
-                .Include(d => d.NhanVien)
-                .Include(d => d.ChanDoan)
-                .Include(d => d.ChiTietDonThuocs)
-                    .ThenInclude(ct => ct.Thuoc)
-                .FirstOrDefaultAsync(d => d.MaDonThuoc == maDonThuoc);
-
-            if (donThuoc == null)
+            try
             {
-                return Json(new { success = false, message = "Không tìm thấy đơn thuốc" });
+                var maNhanVien = User.FindFirstValue("MaNhanVien");
+                var chucVu = User.FindFirstValue("ChucVu");
+
+                var donThuoc = await _benhVienContext.DonThuocs
+                    .Include(d => d.BenhNhan)
+                        .ThenInclude(b => b.TheBHYTs)
+                    .Include(d => d.NhanVien)
+                    .Include(d => d.ChanDoan)
+                    .Include(d => d.ChiTietDonThuocs)
+                        .ThenInclude(ct => ct.Thuoc)
+                    .FirstOrDefaultAsync(d => d.MaDonThuoc == maDonThuoc);
+
+                if (donThuoc == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy đơn thuốc" });
+                }
+
+                // Kiểm tra quyền truy cập
+                if (chucVu != "Admin" && chucVu != "DuocSi" && donThuoc.MaNhanVien != maNhanVien)
+                {
+                    return Json(new { success = false, message = "Bạn không có quyền xem đơn thuốc này" });
+                }
+
+                // Tính tổng tiền
+                decimal tongTien = 0;
+                foreach (var ct in donThuoc.ChiTietDonThuocs)
+                {
+                    tongTien += ct.Thuoc.GiaXuat * ct.SoLuong;
+                }
+
+                // Kiểm tra BHYT - Lấy thẻ còn hạn đầu tiên
+                var theBHYT = donThuoc.BenhNhan.TheBHYTs?
+                    .Where(t => t.NgayHetHan >= DateTime.Now && t.TrangThai == "ConHan")
+                    .OrderByDescending(t => t.NgayHetHan)
+                    .FirstOrDefault();
+
+                decimal tienBHYT = 0;
+                decimal tienBNTra = tongTien;
+
+                if (theBHYT != null)
+                {
+                    // Tính tiền BHYT chi trả
+                    foreach (var ct in donThuoc.ChiTietDonThuocs)
+                    {
+                        if (ct.Thuoc.LaThuocBHYT == "Yes")
+                        {
+                            var giaThuoc = ct.Thuoc.GiaXuat * ct.SoLuong;
+                            tienBHYT += giaThuoc * (ct.Thuoc.TyLeBHYTChiTra / 100) * (theBHYT.MucHuong / 100);
+                        }
+                    }
+                    tienBNTra = tongTien - tienBHYT;
+                }
+
+                var result = new
+                {
+                    donThuoc.MaDonThuoc,
+                    donThuoc.NgayKeDon,
+                    donThuoc.LoaiDon,
+                    donThuoc.TrangThai,
+                    BenhNhan = new
+                    {
+                        donThuoc.BenhNhan.MaBenhNhan,
+                        donThuoc.BenhNhan.TenBenhNhan,
+                        donThuoc.BenhNhan.NgaySinh,
+                        donThuoc.BenhNhan.GioiTinh,
+                        donThuoc.BenhNhan.SoDienThoai,
+                        donThuoc.BenhNhan.DiaChi,
+                        CoTheBHYT = theBHYT != null,
+                        SoTheBHYT = theBHYT?.SoTheBHYT,
+                        MucHuong = theBHYT?.MucHuong,
+                        NgayHetHanBHYT = theBHYT?.NgayHetHan
+                    },
+                    BacSi = new
+                    {
+                        donThuoc.NhanVien.MaNhanVien,
+                        donThuoc.NhanVien.TenNhanVien,
+                        donThuoc.NhanVien.ChucVu
+                    },
+                    ChanDoan = donThuoc.ChanDoan != null ? donThuoc.ChanDoan.ChanDoanSoBo : "",
+                    GhiChu = donThuoc.ChanDoan != null ? donThuoc.ChanDoan.GhiChu : "",
+                    ChiTiet = donThuoc.ChiTietDonThuocs.Select(ct => new
+                    {
+                        ct.MaDonThuoc,
+                        ct.MaThuoc,
+                        TenThuoc = ct.Thuoc.TenThuoc,
+                        HamLuong = ct.Thuoc.HamLuong,
+                        DonViTinh = ct.Thuoc.DonViTinh,
+                        ct.SoLuong,
+                        DonGia = ct.Thuoc.GiaXuat,
+                        ThanhTien = ct.Thuoc.GiaXuat * ct.SoLuong,
+                        ct.LieuDung,
+                        ct.SoNgayDung,
+                        ct.CachDung,
+                        ct.GhiChu,
+                        LaThuocBHYT = ct.Thuoc.LaThuocBHYT == "Yes",
+                        TyLeBHYT = ct.Thuoc.TyLeBHYTChiTra
+                    }).ToList(),
+                    TongTien = tongTien,
+                    TienBHYTChiTra = tienBHYT,
+                    TienBenhNhanTra = tienBNTra
+                };
+
+                return Json(new { success = true, data = result });
             }
-
-            // Kiểm tra quyền truy cập
-            if (chucVu != "Admin" && chucVu != "DuocSi" && donThuoc.MaNhanVien != maNhanVien)
+            catch (Exception ex)
             {
-                return Json(new { success = false, message = "Bạn không có quyền xem đơn thuốc này" });
+                _logger.LogError(ex, "Error loading chi tiết đơn thuốc {MaDonThuoc}", maDonThuoc);
+                return Json(new { success = false, message = "Lỗi khi tải chi tiết đơn thuốc: " + ex.Message });
             }
-
-            var result = new
-            {
-                donThuoc.MaDonThuoc,
-                donThuoc.NgayKeDon,
-                donThuoc.LoaiDon,
-                donThuoc.TrangThai,
-                BenhNhan = new
-                {
-                    donThuoc.BenhNhan.MaBenhNhan,
-                    donThuoc.BenhNhan.TenBenhNhan,
-                    donThuoc.BenhNhan.NgaySinh,
-                    donThuoc.BenhNhan.GioiTinh,
-                    donThuoc.BenhNhan.SoDienThoai,
-                    donThuoc.BenhNhan.DiaChi
-                },
-                BacSi = new
-                {
-                    donThuoc.NhanVien.MaNhanVien,
-                    donThuoc.NhanVien.TenNhanVien,
-                    donThuoc.NhanVien.ChucVu
-                },
-                ChanDoan = donThuoc.ChanDoan != null ? donThuoc.ChanDoan.ChanDoanSoBo : "",
-                GhiChu = donThuoc.ChanDoan != null ? donThuoc.ChanDoan.GhiChu : "",
-                ChiTiet = donThuoc.ChiTietDonThuocs.Select(ct => new
-                {
-                    ct.MaDonThuoc,
-                    ct.MaThuoc,
-                    TenThuoc = ct.Thuoc.TenThuoc,
-                    HamLuong = ct.Thuoc.HamLuong,
-                    DonViTinh = ct.Thuoc.DonViTinh,
-                    ct.SoLuong,
-                    ct.LieuDung,
-                    ct.SoNgayDung,
-                    ct.CachDung,
-                    ct.GhiChu
-                }).ToList()
-            };
-
-            return Json(new { success = true, data = result });
         }
 
         // POST: /DonThuoc/TaoDonThuoc - Tạo đơn thuốc mới
@@ -234,21 +296,12 @@ namespace QLPhanPhoiThuoc.Controllers
                 var thuocKhongDu = new List<string>();
                 foreach (var item in model.ChiTiet)
                 {
-                    // Tính tồn kho = Tổng nhập - Tổng cấp
-                    var tongNhap = await _benhVienContext.ChiTietPhieuNhaps
-                        .Where(ct => ct.LoThuoc.MaThuoc == item.MaThuoc)
-                        .SumAsync(ct => ct.SoLuongNhap);
-
-                    var tongCap = await _benhVienContext.ChiTietPhieuCaps
-                        .Where(ct => ct.LoThuoc.MaThuoc == item.MaThuoc)
-                        .SumAsync(ct => ct.SoLuongCap);
-
-                    var tonKho = tongNhap - tongCap;
+                    var tonKho = await GetTonKhoThuoc(item.MaThuoc);
 
                     if (tonKho < item.SoLuong)
                     {
                         var thuoc = await _benhVienContext.Thuocs.FindAsync(item.MaThuoc);
-                        thuocKhongDu.Add($"{thuoc.TenThuoc} (Tồn: {tonKho}, Cần: {item.SoLuong})");
+                        thuocKhongDu.Add($"{thuoc?.TenThuoc} (Tồn: {tonKho}, Cần: {item.SoLuong})");
                     }
                 }
 
@@ -300,16 +353,19 @@ namespace QLPhanPhoiThuoc.Controllers
 
                 await _benhVienContext.SaveChangesAsync();
 
+                _logger.LogInformation("Đã tạo đơn thuốc mới: {MaDonThuoc} cho bệnh nhân {MaBenhNhan}", maDonThuoc, model.MaBenhNhan);
+
                 return Json(new
                 {
                     success = true,
                     message = "Tạo đơn thuốc thành công",
-                    maDonThuoc
+                    maDonThuoc = maDonThuoc
                 });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+                _logger.LogError(ex, "Error creating đơn thuốc");
+                return Json(new { success = false, message = "Lỗi khi tạo đơn thuốc: " + ex.Message });
             }
         }
 
@@ -332,19 +388,19 @@ namespace QLPhanPhoiThuoc.Controllers
                     return Json(new { success = false, message = "Không tìm thấy đơn thuốc" });
                 }
 
-                // Kiểm tra quyền cập nhật
+                // Kiểm tra quyền
                 if (chucVu != "Admin" && donThuoc.MaNhanVien != maNhanVien)
                 {
-                    return Json(new { success = false, message = "Bạn không có quyền cập nhật đơn thuốc này" });
+                    return Json(new { success = false, message = "Bạn không có quyền sửa đơn thuốc này" });
                 }
 
-                // Chỉ cho phép cập nhật nếu đơn chưa cấp phát
+                // Chỉ cho phép sửa khi đơn chưa cấp phát
                 if (donThuoc.TrangThai != "ChoCapPhat")
                 {
-                    return Json(new { success = false, message = "Chỉ có thể cập nhật đơn thuốc đang chờ cấp phát" });
+                    return Json(new { success = false, message = "Chỉ có thể sửa đơn thuốc chưa cấp phát" });
                 }
 
-                // Validate dữ liệu
+                // Validate
                 if (model.ChiTiet == null || !model.ChiTiet.Any())
                 {
                     return Json(new { success = false, message = "Vui lòng thêm ít nhất một loại thuốc" });
@@ -354,21 +410,12 @@ namespace QLPhanPhoiThuoc.Controllers
                 var thuocKhongDu = new List<string>();
                 foreach (var item in model.ChiTiet)
                 {
-                    // Tính tồn kho = Tổng nhập - Tổng cấp
-                    var tongNhap = await _benhVienContext.ChiTietPhieuNhaps
-                        .Where(ct => ct.LoThuoc.MaThuoc == item.MaThuoc)
-                        .SumAsync(ct => ct.SoLuongNhap);
-
-                    var tongCap = await _benhVienContext.ChiTietPhieuCaps
-                        .Where(ct => ct.LoThuoc.MaThuoc == item.MaThuoc)
-                        .SumAsync(ct => ct.SoLuongCap);
-
-                    var tonKho = tongNhap - tongCap;
+                    var tonKho = await GetTonKhoThuoc(item.MaThuoc);
 
                     if (tonKho < item.SoLuong)
                     {
                         var thuoc = await _benhVienContext.Thuocs.FindAsync(item.MaThuoc);
-                        thuocKhongDu.Add($"{thuoc.TenThuoc} (Tồn: {tonKho}, Cần: {item.SoLuong})");
+                        thuocKhongDu.Add($"{thuoc?.TenThuoc} (Tồn: {tonKho}, Cần: {item.SoLuong})");
                     }
                 }
 
@@ -382,7 +429,7 @@ namespace QLPhanPhoiThuoc.Controllers
                     });
                 }
 
-                // Cập nhật thông tin đơn thuốc
+                // Cập nhật thông tin đơn
                 donThuoc.LoaiDon = model.LoaiDon;
                 donThuoc.MaChanDoan = model.MaChanDoan;
 
@@ -408,22 +455,21 @@ namespace QLPhanPhoiThuoc.Controllers
 
                 await _benhVienContext.SaveChangesAsync();
 
-                return Json(new
-                {
-                    success = true,
-                    message = "Cập nhật đơn thuốc thành công"
-                });
+                _logger.LogInformation("Đã cập nhật đơn thuốc: {MaDonThuoc}", model.MaDonThuoc);
+
+                return Json(new { success = true, message = "Cập nhật đơn thuốc thành công" });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+                _logger.LogError(ex, "Error updating đơn thuốc {MaDonThuoc}", model.MaDonThuoc);
+                return Json(new { success = false, message = "Lỗi khi cập nhật đơn thuốc: " + ex.Message });
             }
         }
 
-        // POST: /DonThuoc/XoaDonThuoc - Xóa đơn thuốc
+        // POST: /DonThuoc/HuyDonThuoc - Hủy đơn thuốc
         [HttpPost]
         [Authorize(Roles = "Admin,BacSi")]
-        public async Task<IActionResult> XoaDonThuoc(string maDonThuoc)
+        public async Task<IActionResult> HuyDonThuoc(string maDonThuoc, string lyDoHuy = "")
         {
             try
             {
@@ -431,7 +477,6 @@ namespace QLPhanPhoiThuoc.Controllers
                 var chucVu = User.FindFirstValue("ChucVu");
 
                 var donThuoc = await _benhVienContext.DonThuocs
-                    .Include(d => d.ChiTietDonThuocs)
                     .FirstOrDefaultAsync(d => d.MaDonThuoc == maDonThuoc);
 
                 if (donThuoc == null)
@@ -439,98 +484,108 @@ namespace QLPhanPhoiThuoc.Controllers
                     return Json(new { success = false, message = "Không tìm thấy đơn thuốc" });
                 }
 
-                // Kiểm tra quyền xóa
+                // Kiểm tra quyền
                 if (chucVu != "Admin" && donThuoc.MaNhanVien != maNhanVien)
                 {
-                    return Json(new { success = false, message = "Bạn không có quyền xóa đơn thuốc này" });
+                    return Json(new { success = false, message = "Bạn không có quyền hủy đơn thuốc này" });
                 }
 
-                // Chỉ cho phép xóa nếu đơn chưa cấp phát
-                if (donThuoc.TrangThai != "ChoCapPhat")
+                // Chỉ cho phép hủy khi đơn chưa cấp phát
+                if (donThuoc.TrangThai == "DaCapPhat")
                 {
-                    return Json(new { success = false, message = "Chỉ có thể xóa đơn thuốc đang chờ cấp phát" });
+                    return Json(new { success = false, message = "Không thể hủy đơn thuốc đã cấp phát" });
                 }
 
-                // Xóa chi tiết đơn thuốc
-                _benhVienContext.ChiTietDonThuocs.RemoveRange(donThuoc.ChiTietDonThuocs);
-
-                // Xóa đơn thuốc
-                _benhVienContext.DonThuocs.Remove(donThuoc);
+                donThuoc.TrangThai = "DaHuy";
 
                 await _benhVienContext.SaveChangesAsync();
 
-                return Json(new { success = true, message = "Xóa đơn thuốc thành công" });
+                _logger.LogInformation("Đã hủy đơn thuốc: {MaDonThuoc}, Lý do: {LyDo}", maDonThuoc, lyDoHuy);
+
+                return Json(new { success = true, message = "Hủy đơn thuốc thành công" });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+                _logger.LogError(ex, "Error canceling đơn thuốc {MaDonThuoc}", maDonThuoc);
+                return Json(new { success = false, message = "Lỗi khi hủy đơn thuốc: " + ex.Message });
+            }
+        }
+
+        // GET: /DonThuoc/GetDonThuocToEdit - Lấy thông tin đơn để sửa
+        [HttpGet]
+        [Authorize(Roles = "Admin,BacSi")]
+        public async Task<IActionResult> GetDonThuocToEdit(string maDonThuoc)
+        {
+            try
+            {
+                var maNhanVien = User.FindFirstValue("MaNhanVien");
+                var chucVu = User.FindFirstValue("ChucVu");
+
+                var donThuoc = await _benhVienContext.DonThuocs
+                    .Include(d => d.BenhNhan)
+                    .Include(d => d.ChiTietDonThuocs)
+                        .ThenInclude(ct => ct.Thuoc)
+                    .FirstOrDefaultAsync(d => d.MaDonThuoc == maDonThuoc);
+
+                if (donThuoc == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy đơn thuốc" });
+                }
+
+                // Kiểm tra quyền
+                if (chucVu != "Admin" && donThuoc.MaNhanVien != maNhanVien)
+                {
+                    return Json(new { success = false, message = "Bạn không có quyền sửa đơn thuốc này" });
+                }
+
+                if (donThuoc.TrangThai != "ChoCapPhat")
+                {
+                    return Json(new { success = false, message = "Chỉ có thể sửa đơn thuốc chưa cấp phát" });
+                }
+
+                var result = new
+                {
+                    donThuoc.MaDonThuoc,
+                    donThuoc.MaBenhNhan,
+                    TenBenhNhan = donThuoc.BenhNhan.TenBenhNhan,
+                    donThuoc.LoaiDon,
+                    donThuoc.MaChanDoan,
+                    ChiTiet = donThuoc.ChiTietDonThuocs.Select(ct => new
+                    {
+                        ct.MaThuoc,
+                        TenThuoc = ct.Thuoc.TenThuoc,
+                        ct.SoLuong,
+                        ct.LieuDung,
+                        ct.SoNgayDung,
+                        ct.CachDung,
+                        ct.GhiChu
+                    }).ToList()
+                };
+
+                return Json(new { success = true, data = result });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting đơn thuốc to edit {MaDonThuoc}", maDonThuoc);
+                return Json(new { success = false, message = "Lỗi: " + ex.Message });
             }
         }
 
         // ==================== CẤP PHÁT THUỐC ====================
 
-        // POST: /DonThuoc/KiemTraTonKho - Kiểm tra tồn kho trước khi cấp phát
-        [HttpPost]
-        public async Task<IActionResult> KiemTraTonKho([FromBody] KiemTraTonKhoModel model)
-        {
-            try
-            {
-                var ketQua = new List<object>();
-
-                foreach (var item in model.DanhSach)
-                {
-                    var thuoc = await _benhVienContext.Thuocs.FindAsync(item.MaThuoc);
-
-                    // Tính tồn kho = Tổng nhập - Tổng cấp
-                    var tongNhap = await _benhVienContext.ChiTietPhieuNhaps
-                        .Where(ct => ct.LoThuoc.MaThuoc == item.MaThuoc)
-                        .SumAsync(ct => ct.SoLuongNhap);
-
-                    var tongCap = await _benhVienContext.ChiTietPhieuCaps
-                        .Where(ct => ct.LoThuoc.MaThuoc == item.MaThuoc)
-                        .SumAsync(ct => ct.SoLuongCap);
-
-                    var tonKho = tongNhap - tongCap;
-
-                    ketQua.Add(new
-                    {
-                        maThuoc = item.MaThuoc,
-                        tenThuoc = thuoc.TenThuoc,
-                        soLuongYeuCau = item.SoLuong,
-                        tonKho = tonKho,
-                        duKho = tonKho >= item.SoLuong
-                    });
-                }
-
-                var tatCaDuKho = ketQua.All(k => (bool)((dynamic)k).duKho);
-
-                return Json(new
-                {
-                    success = true,
-                    tatCaDuKho,
-                    chiTiet = ketQua
-                });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
-            }
-        }
-
-        // POST: /DonThuoc/CapPhat - Cấp phát thuốc
+        // POST: /DonThuoc/CapPhatThuoc - Cấp phát thuốc
         [HttpPost]
         [Authorize(Roles = "Admin,DuocSi")]
-        public async Task<IActionResult> CapPhat([FromBody] CapPhatThuocModel model)
+        public async Task<IActionResult> CapPhatThuoc([FromBody] CapPhatThuocModel model)
         {
+            using var transaction = await _benhVienContext.Database.BeginTransactionAsync();
             try
             {
-                var maNhanVien = User.FindFirstValue("MaNhanVien");
-
                 var donThuoc = await _benhVienContext.DonThuocs
-                    .Include(d => d.ChiTietDonThuocs)
-                        .ThenInclude(ct => ct.Thuoc)
                     .Include(d => d.BenhNhan)
                         .ThenInclude(b => b.TheBHYTs)
+                    .Include(d => d.ChiTietDonThuocs)
+                        .ThenInclude(ct => ct.Thuoc)
                     .FirstOrDefaultAsync(d => d.MaDonThuoc == model.MaDonThuoc);
 
                 if (donThuoc == null)
@@ -540,27 +595,51 @@ namespace QLPhanPhoiThuoc.Controllers
 
                 if (donThuoc.TrangThai != "ChoCapPhat")
                 {
-                    return Json(new { success = false, message = "Đơn thuốc này đã được cấp phát hoặc đã hủy" });
+                    return Json(new { success = false, message = "Đơn thuốc này đã được xử lý" });
                 }
 
-                // Kiểm tra tồn kho cho từng loại thuốc
+                // Kiểm tra tồn kho và lấy lô thuốc
                 var thuocKhongDu = new List<string>();
+                var danhSachLo = new Dictionary<string, List<LoThuoc>>();
+
                 foreach (var chiTiet in donThuoc.ChiTietDonThuocs)
                 {
-                    // Tính tồn kho = Tổng nhập - Tổng cấp
-                    var tongNhap = await _benhVienContext.ChiTietPhieuNhaps
-                        .Where(ct => ct.LoThuoc.MaThuoc == chiTiet.MaThuoc)
-                        .SumAsync(ct => ct.SoLuongNhap);
+                    var loThuocs = await _benhVienContext.LoThuocs
+                        .Where(l => l.MaThuoc == chiTiet.MaThuoc &&
+                                    l.HanSuDung > DateTime.Now &&
+                                    l.TrangThai == "ConHang")
+                        .OrderBy(l => l.HanSuDung)
+                        .ToListAsync();
 
-                    var tongCap = await _benhVienContext.ChiTietPhieuCaps
-                        .Where(ct => ct.LoThuoc.MaThuoc == chiTiet.MaThuoc)
-                        .SumAsync(ct => ct.SoLuongCap);
-
-                    var tonKho = tongNhap - tongCap;
-
-                    if (tonKho < chiTiet.SoLuong)
+                    // Tính tồn kho từng lô
+                    var loConTon = new List<LoThuoc>();
+                    foreach (var lo in loThuocs)
                     {
-                        thuocKhongDu.Add($"{chiTiet.Thuoc.TenThuoc} (Tồn: {tonKho}, Cần: {chiTiet.SoLuong})");
+                        var daNhap = await _benhVienContext.ChiTietPhieuNhaps
+                            .Where(ct => ct.MaLo == lo.MaLo)
+                            .SumAsync(ct => ct.SoLuongNhap);
+
+                        var daCap = await _benhVienContext.ChiTietPhieuCaps
+                            .Where(ct => ct.MaLo == lo.MaLo)
+                            .SumAsync(ct => ct.SoLuongCap);
+
+                        var tonLo = daNhap - daCap;
+                        if (tonLo > 0)
+                        {
+                            // Sử dụng property tạm để lưu số lượng tồn
+                            lo.SoLuongNhap = tonLo;
+                            loConTon.Add(lo);
+                        }
+                    }
+
+                    var tongTon = loConTon.Sum(l => l.SoLuongNhap);
+                    if (tongTon < chiTiet.SoLuong)
+                    {
+                        thuocKhongDu.Add($"{chiTiet.Thuoc.TenThuoc} (Tồn: {tongTon}, Cần: {chiTiet.SoLuong})");
+                    }
+                    else
+                    {
+                        danhSachLo[chiTiet.MaThuoc] = loConTon;
                     }
                 }
 
@@ -569,134 +648,106 @@ namespace QLPhanPhoiThuoc.Controllers
                     return Json(new
                     {
                         success = false,
-                        message = "Một số thuốc không đủ số lượng trong kho",
+                        message = "Không đủ thuốc để cấp phát",
                         details = thuocKhongDu
                     });
                 }
 
-                // Lấy kho mặc định
-                var kho = await _benhVienContext.Khos
-                    .FirstOrDefaultAsync(k => k.TrangThai == "HoatDong");
+                // Lấy kho mặc định (có thể cấu hình)
+                var khoMacDinh = await _benhVienContext.Khos
+                    .Where(k => k.TrangThai == "HoatDong")
+                    .FirstOrDefaultAsync();
 
-                if (kho == null)
+                if (khoMacDinh == null)
                 {
-                    return Json(new { success = false, message = "Không tìm thấy kho để cấp phát" });
+                    return Json(new { success = false, message = "Không tìm thấy kho hoạt động" });
                 }
 
                 // Tạo phiếu cấp phát
                 var maPhieuCap = await GenerateMaPhieuCapPhat();
-                decimal tongTien = 0;
-
-                var phieuCapPhat = new PhieuCapPhat
+                var phieuCap = new PhieuCapPhat
                 {
                     MaPhieuCap = maPhieuCap,
                     MaDonThuoc = model.MaDonThuoc,
                     MaBenhNhan = donThuoc.MaBenhNhan,
-                    MaKho = kho.MaKho,
+                    MaKho = khoMacDinh.MaKho,
+                    NhanVienCap = User.FindFirstValue("MaNhanVien"),
                     NgayCap = DateTime.Now,
-                    NhanVienCap = maNhanVien,
-                    TongTien = 0, // Sẽ cập nhật sau
-                    GhiChu = model.GhiChu,
+                    TongTien = 0, // Sẽ tính sau
                     TrangThai = "DaCapPhat",
+                    GhiChu = model.GhiChu,
                     NgayTao = DateTime.Now
                 };
 
-                _benhVienContext.PhieuCapPhats.Add(phieuCapPhat);
+                _benhVienContext.PhieuCapPhats.Add(phieuCap);
 
-                // Tạo chi tiết phiếu cấp phát theo FIFO
+                decimal tongTienPhieu = 0;
+
+                // Cấp phát từng loại thuốc
                 foreach (var chiTiet in donThuoc.ChiTietDonThuocs)
                 {
-                    var thuoc = chiTiet.Thuoc;
-                    var donGia = thuoc.GiaXuat;
-                    var thanhTien = chiTiet.SoLuong * donGia;
-                    tongTien += thanhTien;
-
                     var soLuongCanCap = chiTiet.SoLuong;
+                    var loThuocs = danhSachLo[chiTiet.MaThuoc];
 
-                    // Lấy danh sách lô theo FIFO (lô cũ nhất trước)
-                    // Tính số lượng còn lại của mỗi lô = Nhập - Cấp
-                    var loThuocIds = await _benhVienContext.ChiTietPhieuNhaps
-                        .Include(ct => ct.PhieuNhap)
-                        .Where(ct => ct.LoThuoc.MaThuoc == chiTiet.MaThuoc && ct.LoThuoc.TrangThai == "ConHang")
-                        .OrderBy(ct => ct.PhieuNhap.NgayNhap) // Sắp xếp theo ngày nhập của phiếu nhập
-                        .Select(ct => ct.MaLo)
-                        .Distinct() // Tránh lấy trùng mã lô nếu một lô có nhiều dòng chi tiết
-                        .ToListAsync();
-
-                    foreach (var maLo in loThuocIds)
+                    foreach (var lo in loThuocs)
                     {
                         if (soLuongCanCap <= 0) break;
 
-                        // Tính số lượng còn của lô này
-                        var nhapLo = await _benhVienContext.ChiTietPhieuNhaps
-                            .Where(ct => ct.MaLo == maLo)
-                            .SumAsync(ct => ct.SoLuongNhap);
+                        var soLuongCap = Math.Min(soLuongCanCap, lo.SoLuongNhap);
 
-                        var capLo = await _benhVienContext.ChiTietPhieuCaps
-                            .Where(ct => ct.MaLo == maLo)
-                            .SumAsync(ct => ct.SoLuongCap);
-
-                        var conLaiLo = nhapLo - capLo;
-
-                        if (conLaiLo <= 0) continue;
-
-                        var soLuongCapTuLo = Math.Min(soLuongCanCap, conLaiLo);
-
-                        // Tạo chi tiết phiếu cấp
-                        var chiTietPhieuCap = new ChiTietPhieuCap
+                        var chiTietCap = new ChiTietPhieuCap
                         {
                             MaPhieuCap = maPhieuCap,
-                            MaLo = maLo,
-                            SoLuongCap = soLuongCapTuLo,
-                            DonGiaCap = donGia
-                            // ThanhTien sẽ được tính tự động bởi computed column
+                            MaLo = lo.MaLo,
+                            SoLuongCap = soLuongCap,
+                            DonGiaCap = chiTiet.Thuoc.GiaXuat
                         };
 
-                        _benhVienContext.ChiTietPhieuCaps.Add(chiTietPhieuCap);
-
-                        soLuongCanCap -= soLuongCapTuLo;
-
-                        // Cập nhật trạng thái lô nếu hết hàng
-                        var loThuoc = await _benhVienContext.LoThuocs.FindAsync(maLo);
-                        if (loThuoc != null && (nhapLo - capLo - soLuongCapTuLo) <= 0)
-                        {
-                            loThuoc.TrangThai = "HetHang";
-                        }
+                        _benhVienContext.ChiTietPhieuCaps.Add(chiTietCap);
+                        tongTienPhieu += soLuongCap * chiTiet.Thuoc.GiaXuat;
+                        soLuongCanCap -= soLuongCap;
                     }
                 }
 
-                // Cập nhật tổng tiền phiếu cấp phát
-                phieuCapPhat.TongTien = tongTien;
+                phieuCap.TongTien = tongTienPhieu;
 
                 // Cập nhật trạng thái đơn thuốc
                 donThuoc.TrangThai = "DaCapPhat";
 
                 // Tạo hóa đơn
                 var maHoaDon = await GenerateMaHoaDon();
+                decimal tongTien = tongTienPhieu;
                 decimal tienBHYT = 0;
 
-                // Kiểm tra bảo hiểm
-                var theBHYT = donThuoc.BenhNhan.TheBHYTs
-                    .FirstOrDefault(t => t.TrangThai == "ConHan" &&
-                                        t.NgayBatDau <= DateTime.Now &&
-                                        t.NgayHetHan >= DateTime.Now);
+                // Lấy thẻ BHYT còn hạn
+                var theBHYT = donThuoc.BenhNhan.TheBHYTs?
+                    .Where(t => t.NgayHetHan >= DateTime.Now && t.TrangThai == "ConHan")
+                    .OrderByDescending(t => t.NgayHetHan)
+                    .FirstOrDefault();
 
                 if (theBHYT != null)
                 {
-                    tienBHYT = tongTien * theBHYT.MucHuong / 100;
+                    foreach (var chiTiet in donThuoc.ChiTietDonThuocs)
+                    {
+                        if (chiTiet.Thuoc.LaThuocBHYT == "Yes")
+                        {
+                            var thanhTien = chiTiet.Thuoc.GiaXuat * chiTiet.SoLuong;
+                            tienBHYT += thanhTien * (chiTiet.Thuoc.TyLeBHYTChiTra / 100) * (theBHYT.MucHuong / 100);
+                        }
+                    }
                 }
-
-                decimal tienBenhNhan = tongTien - tienBHYT;
 
                 var hoaDon = new HoaDon
                 {
                     MaHoaDon = maHoaDon,
                     MaBenhNhan = donThuoc.MaBenhNhan,
-                    MaDonThuoc = model.MaDonThuoc,
+                    MaDonThuoc = donThuoc.MaDonThuoc,
                     NgayTaoHoaDon = DateTime.Now,
                     TongTien = tongTien,
                     TienBHYTChiTra = tienBHYT,
-                    TienBenhNhanCanTra = tienBenhNhan,
+                    TienBenhNhanCanTra = tongTien - tienBHYT,
+                    TienDaTra = 0,
+                    HinhThucThanhToan = "",
                     TrangThaiThanhToan = "ChuaTra",
                     NgayTao = DateTime.Now
                 };
@@ -704,142 +755,152 @@ namespace QLPhanPhoiThuoc.Controllers
                 _benhVienContext.HoaDons.Add(hoaDon);
 
                 await _benhVienContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                _logger.LogInformation("Đã cấp phát thuốc cho đơn: {MaDonThuoc}, Phiếu cấp: {MaPhieuCap}",
+                    model.MaDonThuoc, maPhieuCap);
 
                 return Json(new
                 {
                     success = true,
                     message = "Cấp phát thuốc thành công",
-                    maPhieuCap,
-                    maHoaDon,
-                    tongTien,
-                    tienBenhNhan
+                    maPhieuCap = maPhieuCap,
+                    maHoaDon = maHoaDon,
+                    tongTien = tongTien,
+                    tienBHYT = tienBHYT,
+                    tienBNTra = tongTien - tienBHYT
                 });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+                await transaction.RollbackAsync();
+                _logger.LogError(ex, "Error cấp phát thuốc cho đơn {MaDonThuoc}", model.MaDonThuoc);
+                return Json(new { success = false, message = "Lỗi khi cấp phát thuốc: " + ex.Message });
             }
         }
 
-        // ==================== HÓA ĐƠN & THANH TOÁN ====================
-
-        // GET: /DonThuoc/HoaDon - Xem hóa đơn
-        [HttpGet]
-        public async Task<IActionResult> HoaDon(string maHoaDon)
+        // GET: /DonThuoc/KiemTraTonKho - Kiểm tra tồn kho
+        [HttpPost]
+        public async Task<IActionResult> KiemTraTonKho([FromBody] KiemTraTonKhoModel model)
         {
             try
             {
-                var hoaDon = await _benhVienContext.HoaDons
-                    .Include(h => h.BenhNhan)
-                        .ThenInclude(b => b.TheBHYTs)
-                    .Include(h => h.DonThuoc)
-                        .ThenInclude(d => d.ChiTietDonThuocs)
-                            .ThenInclude(ct => ct.Thuoc)
-                    .FirstOrDefaultAsync(h => h.MaHoaDon == maHoaDon);
+                var result = new List<object>();
 
-                if (hoaDon == null)
+                foreach (var item in model.DanhSach)
                 {
-                    return Json(new { success = false, message = "Không tìm thấy hóa đơn" });
+                    var thuoc = await _benhVienContext.Thuocs.FindAsync(item.MaThuoc);
+                    if (thuoc == null) continue;
+
+                    var tonKho = await GetTonKhoThuoc(item.MaThuoc);
+                    var conLai = tonKho - item.SoLuong;
+
+                    result.Add(new
+                    {
+                        item.MaThuoc,
+                        TenThuoc = thuoc.TenThuoc,
+                        TonKho = tonKho,
+                        SoLuongYeuCau = item.SoLuong,
+                        ConLai = conLai,
+                        DuThuoc = conLai >= 0,
+                        CanCanhBao = conLai < thuoc.TonKhoToiThieu
+                    });
                 }
-
-                var theBHYT = hoaDon.BenhNhan.TheBHYTs
-                    .FirstOrDefault(t => t.TrangThai == "ConHan");
-
-                var result = new
-                {
-                    hoaDon.MaHoaDon,
-                    NgayLap = hoaDon.NgayTaoHoaDon,
-                    hoaDon.TongTien,
-                    TyLeBaoHiem = theBHYT?.MucHuong ?? 0,
-                    TienBaoHiemChiTra = hoaDon.TienBHYTChiTra,
-                    hoaDon.TienBenhNhanCanTra,
-                    hoaDon.TrangThaiThanhToan,
-                    BenhNhan = new
-                    {
-                        hoaDon.BenhNhan.MaBenhNhan,
-                        hoaDon.BenhNhan.TenBenhNhan,
-                        MaTheBHYT = theBHYT?.SoTheBHYT
-                    },
-                    ChiTiet = hoaDon.DonThuoc.ChiTietDonThuocs.Select(ct => new
-                    {
-                        ct.MaThuoc,
-                        TenThuoc = ct.Thuoc.TenThuoc,
-                        ct.SoLuong,
-                        DonGia = ct.Thuoc.GiaXuat, // SỬA: Bỏ .HasValue và .Value
-                        ThanhTien = ct.SoLuong * ct.Thuoc.GiaXuat
-                    }).ToList()
-                };
 
                 return Json(new { success = true, data = result });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+                _logger.LogError(ex, "Error kiểm tra tồn kho");
+                return Json(new { success = false, message = "Lỗi: " + ex.Message });
             }
         }
 
-        // POST: /DonThuoc/ThanhToan - Thanh toán hóa đơn
-        [HttpPost]
-        [Authorize(Roles = "Admin,DuocSi")]
-        public async Task<IActionResult> ThanhToan([FromBody] ThanhToanModel model)
+        // GET: /DonThuoc/ThongKeDonThuoc - Thống kê đơn thuốc
+        [HttpGet]
+        public async Task<IActionResult> ThongKeDonThuoc(DateTime? tuNgay, DateTime? denNgay)
         {
             try
             {
-                var hoaDon = await _benhVienContext.HoaDons
-                    .FirstOrDefaultAsync(h => h.MaHoaDon == model.MaHoaDon);
+                var query = _benhVienContext.DonThuocs.AsQueryable();
 
-                if (hoaDon == null)
+                if (tuNgay.HasValue)
+                    query = query.Where(d => d.NgayKeDon >= tuNgay.Value);
+
+                if (denNgay.HasValue)
                 {
-                    return Json(new { success = false, message = "Không tìm thấy hóa đơn" });
+                    var denNgayEnd = denNgay.Value.Date.AddDays(1).AddSeconds(-1);
+                    query = query.Where(d => d.NgayKeDon <= denNgayEnd);
                 }
 
-                if (hoaDon.TrangThaiThanhToan == "DaTra")
-                {
-                    return Json(new { success = false, message = "Hóa đơn này đã được thanh toán" });
-                }
+                var tongDon = await query.CountAsync();
+                var donChoCapPhat = await query.CountAsync(d => d.TrangThai == "ChoCapPhat");
+                var donDaCapPhat = await query.CountAsync(d => d.TrangThai == "DaCapPhat");
+                var donDaHuy = await query.CountAsync(d => d.TrangThai == "DaHuy");
 
-                // Kiểm tra số tiền thanh toán
-                if (model.SoTienThanhToan < hoaDon.TienBenhNhanCanTra)
-                {
-                    return Json(new { success = false, message = "Số tiền thanh toán không đủ" });
-                }
+                var donNoiTru = await query.CountAsync(d => d.LoaiDon == "NoiTru");
+                var donNgoaiTru = await query.CountAsync(d => d.LoaiDon == "NgoaiTru");
 
-                // Cập nhật trạng thái thanh toán
-                hoaDon.TrangThaiThanhToan = "DaTra";
-                hoaDon.HinhThucThanhToan = model.HinhThucThanhToan;
-                hoaDon.TienDaTra = model.SoTienThanhToan;
-
-                // Tạo phiếu thu tiền
-                var maPhieuThu = await GenerateMaPhieuThu();
-                var phieuThu = new PhieuThuTien
-                {
-                    MaPhieuThu = maPhieuThu,
-                    MaHoaDon = model.MaHoaDon,
-                    NgayThu = DateTime.Now,
-                    SoTienThu = model.SoTienThanhToan,
-                    HinhThucThanhToan = model.HinhThucThanhToan,
-                    NhanVienThu = User.FindFirstValue("MaNhanVien"),
-                    TrangThai = "DaXacNhan",
-                    NgayTao = DateTime.Now
-                };
-
-                _benhVienContext.PhieuThuTiens.Add(phieuThu);
-
-                await _benhVienContext.SaveChangesAsync();
-
-                var soTienThua = model.SoTienThanhToan - hoaDon.TienBenhNhanCanTra;
+                // Thống kê theo thời gian
+                var theoNgay = await query
+                    .GroupBy(d => d.NgayKeDon.Date)
+                    .Select(g => new
+                    {
+                        Ngay = g.Key,
+                        SoDon = g.Count()
+                    })
+                    .OrderBy(x => x.Ngay)
+                    .ToListAsync();
 
                 return Json(new
                 {
                     success = true,
-                    message = "Thanh toán thành công",
-                    maPhieuThu,
-                    soTienThua = soTienThua > 0 ? soTienThua : 0
+                    data = new
+                    {
+                        TongDon = tongDon,
+                        DonChoCapPhat = donChoCapPhat,
+                        DonDaCapPhat = donDaCapPhat,
+                        DonDaHuy = donDaHuy,
+                        DonNoiTru = donNoiTru,
+                        DonNgoaiTru = donNgoaiTru,
+                        TheoNgay = theoNgay
+                    }
                 });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+                _logger.LogError(ex, "Error thống kê đơn thuốc");
+                return Json(new { success = false, message = "Lỗi: " + ex.Message });
+            }
+        }
+
+        // GET: /DonThuoc/InDonThuoc - In đơn thuốc
+        [HttpGet]
+        public async Task<IActionResult> InDonThuoc(string maDonThuoc)
+        {
+            try
+            {
+                var donThuoc = await _benhVienContext.DonThuocs
+                    .Include(d => d.BenhNhan)
+                        .ThenInclude(b => b.TheBHYTs)
+                    .Include(d => d.NhanVien)
+                    .Include(d => d.ChanDoan)
+                    .Include(d => d.ChiTietDonThuocs)
+                        .ThenInclude(ct => ct.Thuoc)
+                    .FirstOrDefaultAsync(d => d.MaDonThuoc == maDonThuoc);
+
+                if (donThuoc == null)
+                {
+                    return NotFound("Không tìm thấy đơn thuốc");
+                }
+
+                ViewBag.DonThuoc = donThuoc;
+                return View();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in đơn thuốc {MaDonThuoc}", maDonThuoc);
+                return BadRequest("Lỗi: " + ex.Message);
             }
         }
 
@@ -861,15 +922,15 @@ namespace QLPhanPhoiThuoc.Controllers
             // Load danh sách bệnh nhân
             var benhNhans = await _benhVienContext.BenhNhans
                 .Where(b => b.TrangThai == "HoatDong")
-                .Select(b => new { b.MaBenhNhan, b.TenBenhNhan })
+                .Select(b => new { b.MaBenhNhan, b.TenBenhNhan, b.NgaySinh, b.GioiTinh })
                 .OrderBy(b => b.TenBenhNhan)
                 .ToListAsync();
             ViewBag.BenhNhans = benhNhans;
 
             // Load danh sách chẩn đoán
             var chanDoans = await _benhVienContext.ChanDoans
-                .Select(c => new { c.MaChanDoan, c.ChanDoanSoBo })
-                .OrderBy(c => c.ChanDoanSoBo)
+                .Select(c => new { c.MaChanDoan, c.ChanDoanSoBo, c.MaBenhNhan })
+                .OrderByDescending(c => c.MaChanDoan)
                 .ToListAsync();
             ViewBag.ChanDoans = chanDoans;
 
@@ -882,7 +943,10 @@ namespace QLPhanPhoiThuoc.Controllers
                     t.TenThuoc,
                     t.HamLuong,
                     t.DonViTinh,
-                    DonGia = t.GiaXuat
+                    DonGia = t.GiaXuat,
+                    t.LaThuocBHYT,
+                    t.TyLeBHYTChiTra,
+                    t.TonKhoToiThieu
                 })
                 .OrderBy(t => t.TenThuoc)
                 .ToListAsync();
@@ -899,28 +963,21 @@ namespace QLPhanPhoiThuoc.Controllers
 
             ViewBag.DonChoCapPhat = donChoCapPhat;
             ViewBag.DonDaCapPhat = donDaCapPhat;
+        }
 
-            // Load danh sách bệnh nhân và thuốc
-            var benhNhans = await _benhVienContext.BenhNhans
-                .Where(b => b.TrangThai == "HoatDong")
-                .Select(b => new { b.MaBenhNhan, b.TenBenhNhan })
-                .OrderBy(b => b.TenBenhNhan)
-                .ToListAsync();
-            ViewBag.BenhNhans = benhNhans;
+        private async Task<int> GetTonKhoThuoc(string maThuoc)
+        {
+            // Tổng nhập
+            var tongNhap = await _benhVienContext.ChiTietPhieuNhaps
+                .Where(ct => ct.LoThuoc.MaThuoc == maThuoc)
+                .SumAsync(ct => ct.SoLuongNhap);
 
-            var thuocs = await _benhVienContext.Thuocs
-                .Where(t => t.TrangThai == "KichHoat")
-                .Select(t => new
-                {
-                    t.MaThuoc,
-                    t.TenThuoc,
-                    t.HamLuong,
-                    t.DonViTinh,
-                    DonGia = t.GiaXuat
-                })
-                .OrderBy(t => t.TenThuoc)
-                .ToListAsync();
-            ViewBag.Thuocs = thuocs;
+            // Tổng cấp
+            var tongCap = await _benhVienContext.ChiTietPhieuCaps
+                .Where(ct => ct.LoThuoc.MaThuoc == maThuoc)
+                .SumAsync(ct => ct.SoLuongCap);
+
+            return tongNhap - tongCap;
         }
 
         private async Task<string> GenerateMaDonThuoc()
@@ -948,15 +1005,6 @@ namespace QLPhanPhoiThuoc.Controllers
                 .Where(h => h.MaHoaDon.StartsWith($"HD{today}"))
                 .CountAsync();
             return $"HD{today}{(count + 1):D4}";
-        }
-
-        private async Task<string> GenerateMaPhieuThu()
-        {
-            var today = DateTime.Now.ToString("yyyyMMdd");
-            var count = await _benhVienContext.PhieuThuTiens
-                .Where(p => p.MaPhieuThu.StartsWith($"PT{today}"))
-                .CountAsync();
-            return $"PT{today}{(count + 1):D4}";
         }
     }
 
@@ -1003,12 +1051,5 @@ namespace QLPhanPhoiThuoc.Controllers
     {
         public string MaDonThuoc { get; set; }
         public string GhiChu { get; set; }
-    }
-
-    public class ThanhToanModel
-    {
-        public string MaHoaDon { get; set; }
-        public string HinhThucThanhToan { get; set; }
-        public decimal SoTienThanhToan { get; set; }
     }
 }
