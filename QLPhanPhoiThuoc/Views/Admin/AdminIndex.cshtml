@@ -661,15 +661,14 @@
                     <i class="fas fa-chevron-right menu-arrow"></i>
                 </div>
                 <div class="menu-submenu">
-                    <a href="#" class="submenu-item" data-tab="invoice-list">
-                        <i class="fas fa-circle"></i>
+                    <a href="#" class="submenu-item" data-url="/Admin/HoaDon/_DSHoaDon"> <i class="fas fa-circle"></i>
                         <span>Danh sách hóa đơn</span>
                     </a>
-                    <a href="#" class="submenu-item" data-tab="invoice-pending">
+                    <a href="#" class="submenu-item" data-url="/Admin/HoaDon/_HoaDonChoThanhToan">
                         <i class="fas fa-circle"></i>
                         <span>Chờ thanh toán</span>
                     </a>
-                    <a href="#" class="submenu-item" data-tab="invoice-paid">
+                    <a href="#" class="submenu-item" data-url="/Admin/HoaDon/_HoaDonDaThanhToan">
                         <i class="fas fa-circle"></i>
                         <span>Đã thanh toán</span>
                     </a>
@@ -792,6 +791,21 @@
                 </div>
             </div>
         </div>
+
+        @* Invoices Section *@
+        <div id="invoices" class="content-section">
+            <div class="medicine-container"> <div class="page-header">
+                    <h2 style="margin: 0; font-size: 1.8rem; font-weight: 700;">Quản lý hóa đơn</h2>
+                    <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 0.95rem;">Theo dõi thanh toán và doanh thu</p>
+                </div>
+                <div id="invoiceContent">
+                    <p style="text-align: center; padding: 50px; color: #6c757d;">Đang tải dữ liệu...</p>
+                </div>
+            </div>
+        </div>
+
+
+
     </main>
 </div>
 
@@ -849,8 +863,15 @@
 
             // Load content nếu có URL
             if (url) {
-                loadThuocContent(url);
-            }
+                    // Kiểm tra URL để gọi hàm tương ứng
+                    if (url.includes('/HoaDon/')) {
+                        loadInvoiceContent(url);
+                    } else if (url.includes('/BenhNhan/')) {
+                        loadPatientsContent(url);
+                    } else {
+                        loadThuocContent(url); // Mặc định hoặc cho Thuốc
+                    }
+                }
         });
     });
 
@@ -908,28 +929,26 @@
             }
         });
     }
+    // Load Hoa Don Content
+    function loadInvoiceContent(url) {
+        showLoading();
+        showSection('invoices'); // Chuyển sang tab Hóa đơn
 
-        function loadPatientsContent(url) {
-            showLoading();
-                showSection('patients');
-
-            $.ajax({
-                url: url,
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                success: function(data) {
-                    $('#patientsContent').html(data);
-                    hideLoading();
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error loading content:', error);
-                    $('#patientsContent').html('<div class="alert alert-danger">Lỗi khi tải nội dung: ' + error + '</div>');
-                    hideLoading();
-                }
-            });
-        }
+        $.ajax({
+            url: url,
+            method: 'GET',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            success: function(data) {
+                $('#invoiceContent').html(data);
+                hideLoading();
+            },
+            error: function(xhr, status, error) {
+                console.error('Error loading invoices:', error);
+                $('#invoiceContent').html('<div class="alert alert-danger">Lỗi tải dữ liệu hóa đơn</div>');
+                hideLoading();
+            }
+        });
+    }
 
     // Loading functions
     function showLoading() {
