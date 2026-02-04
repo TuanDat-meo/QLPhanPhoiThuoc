@@ -26,7 +26,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.SameSite = SameSiteMode.Strict;
     });
 
-// 3. Add Session (nếu cần)
+// Add Session
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -34,17 +34,17 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// 4. Add Controllers với Views
+// Add Controllers with Views
 builder.Services.AddControllersWithViews(options =>
 {
-    // Add global filters nếu cần
+    // Add global filters if needed
     // options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
 });
 
-// 5. Add Razor Pages (nếu dùng)
+// Add Razor Pages
 builder.Services.AddRazorPages();
 
-// 6. Add CORS (nếu có API)
+// Add CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -54,13 +54,13 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader());
 });
 
-// 7. Add HttpContextAccessor để truy cập HttpContext trong services
+// Add HttpContextAccessor
 builder.Services.AddHttpContextAccessor();
 
-// 8. Add Memory Cache
+// Add Memory Cache
 builder.Services.AddMemoryCache();
 
-// 9. Add Response Compression (optional - tối ưu performance)
+// Add Response Compression
 builder.Services.AddResponseCompression(options =>
 {
     options.EnableForHttps = true;
@@ -80,11 +80,11 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Home/Error");
-    
+    app.UseHsts();
 }
 
-// 2. HTTPS Redirection
-//app.UseHttpsRedirection();
+// 2. HTTPS Redirection (commented out for development)
+// app.UseHttpsRedirection();
 
 // 3. Static Files
 app.UseStaticFiles();
@@ -95,19 +95,23 @@ app.UseResponseCompression();
 // 5. Routing
 app.UseRouting();
 
-// 6. CORS (nếu đã add)
+// 6. CORS
 app.UseCors("AllowAll");
 
+// 7. Session
 app.UseSession();
 
 // 8. Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Default route
+//// 9. Map Controllers with Area support
+//app.MapControllerRoute(
+//    name: "areas",
+//    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Account}/{action=Login}/{id?}");
-
 
 app.Run();
