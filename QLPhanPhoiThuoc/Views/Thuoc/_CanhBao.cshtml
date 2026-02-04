@@ -1,0 +1,510 @@
+@{
+    var thuocSapHet = ViewBag.ThuocSapHet as List<dynamic> ?? new List<dynamic>();
+    var thuocSapHetHan = ViewBag.ThuocSapHetHan as List<QLPhanPhoiThuoc.Models.Entities.LoThuoc> ?? new List<QLPhanPhoiThuoc.Models.Entities.LoThuoc>();
+    var thuocHetHan = ViewBag.ThuocHetHan as List<QLPhanPhoiThuoc.Models.Entities.LoThuoc> ?? new List<QLPhanPhoiThuoc.Models.Entities.LoThuoc>();
+    var now = DateTime.Now;
+}
+
+<div class="warning-container">
+    <!-- Thống kê tổng quan -->
+    <div class="warning-stats">
+        <div class="stat-card stat-danger">
+            <div class="stat-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-content">
+                <h3>@thuocHetHan.Count</h3>
+                <p>Lô thuốc đã hết hạn</p>
+            </div>
+        </div>
+
+        <div class="stat-card stat-warning">
+            <div class="stat-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+                <h3>@thuocSapHetHan.Count</h3>
+                <p>Lô thuốc sắp hết hạn</p>
+            </div>
+        </div>
+
+        <div class="stat-card stat-info">
+            <div class="stat-icon">
+                <i class="fas fa-box-open"></i>
+            </div>
+            <div class="stat-content">
+                <h3>@thuocSapHet.Count</h3>
+                <p>Thuốc sắp hết tồn kho</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thuốc đã hết hạn -->
+    <div class="warning-section">
+        <div class="section-header danger">
+            <div class="header-left">
+                <i class="fas fa-exclamation-circle"></i>
+                <h3>Lô thuốc đã hết hạn</h3>
+            </div>
+            <span class="badge badge-danger">@thuocHetHan.Count lô</span>
+        </div>
+
+        @if (thuocHetHan.Any())
+        {
+            <div class="table-responsive">
+                <table class="warning-table">
+                    <thead>
+                        <tr>
+                            <th>Mã lô</th>
+                            <th>Tên thuốc</th>
+                            <th>Số lô</th>
+                            <th>Kho</th>
+                            <th>Ngày hết hạn</th>
+                            <th>Đã quá hạn</th>
+                            <th>Số lượng còn</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var lot in thuocHetHan)
+                        {
+                            var daysExpired = (now - lot.HanSuDung).Days;
+                            <tr class="row-danger">
+                                <td><strong>@lot.MaLo</strong></td>
+                                <td>@lot.Thuoc.TenThuoc</td>
+                                <td>@lot.SoLo</td>
+                                <td>@lot.Kho.TenKho</td>
+                                <td>@lot.HanSuDung.ToString("dd/MM/yyyy")</td>
+                                <td class="text-danger">
+                                    <strong>@daysExpired ngày</strong>
+                                </td>
+                                <td>
+                                    <span class="quantity-badge danger">@lot.SoLuongCon</span>
+                                </td>
+                                <td>
+                                    <span class="status-badge status-expired">
+                                        <i class="fas fa-times-circle"></i> Hết hạn
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fas fa-check-circle"></i>
+                <p>Không có lô thuốc nào đã hết hạn</p>
+            </div>
+        }
+    </div>
+
+    <!-- Thuốc sắp hết hạn (30 ngày) -->
+    <div class="warning-section">
+        <div class="section-header warning">
+            <div class="header-left">
+                <i class="fas fa-clock"></i>
+                <h3>Lô thuốc sắp hết hạn (30 ngày tới)</h3>
+            </div>
+            <span class="badge badge-warning">@thuocSapHetHan.Count lô</span>
+        </div>
+
+        @if (thuocSapHetHan.Any())
+        {
+            <div class="table-responsive">
+                <table class="warning-table">
+                    <thead>
+                        <tr>
+                            <th>Mã lô</th>
+                            <th>Tên thuốc</th>
+                            <th>Số lô</th>
+                            <th>Kho</th>
+                            <th>Ngày hết hạn</th>
+                            <th>Còn lại</th>
+                            <th>Số lượng còn</th>
+                            <th>Mức độ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var lot in thuocSapHetHan)
+                        {
+                            var daysRemaining = (lot.HanSuDung - now).Days;
+                            var urgencyClass = daysRemaining <= 7 ? "row-danger" : (daysRemaining <= 15 ? "row-warning" : "row-info");
+                            var urgencyLevel = daysRemaining <= 7 ? "Rất gấp" : (daysRemaining <= 15 ? "Gấp" : "Lưu ý");
+                            var urgencyBadge = daysRemaining <= 7 ? "urgent-critical" : (daysRemaining <= 15 ? "urgent-high" : "urgent-medium");
+
+                            <tr class="@urgencyClass">
+                                <td><strong>@lot.MaLo</strong></td>
+                                <td>@lot.Thuoc.TenThuoc</td>
+                                <td>@lot.SoLo</td>
+                                <td>@lot.Kho.TenKho</td>
+                                <td>@lot.HanSuDung.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    <strong>@daysRemaining ngày</strong>
+                                </td>
+                                <td>
+                                    <span class="quantity-badge warning">@lot.SoLuongCon</span>
+                                </td>
+                                <td>
+                                    <span class="urgency-badge @urgencyBadge">
+                                        @urgencyLevel
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fas fa-check-circle"></i>
+                <p>Không có lô thuốc nào sắp hết hạn trong 30 ngày tới</p>
+            </div>
+        }
+    </div>
+
+    <!-- Thuốc sắp hết tồn kho -->
+    <div class="warning-section">
+        <div class="section-header info">
+            <div class="header-left">
+                <i class="fas fa-box-open"></i>
+                <h3>Thuốc sắp hết tồn kho</h3>
+            </div>
+            <span class="badge badge-info">@thuocSapHet.Count thuốc</span>
+        </div>
+
+        @if (thuocSapHet.Any())
+        {
+            <div class="table-responsive">
+                <table class="warning-table">
+                    <thead>
+                        <tr>
+                            <th>Mã thuốc</th>
+                            <th>Tên thuốc</th>
+                            <th>Đơn vị</th>
+                            <th>Tồn kho hiện tại</th>
+                            <th>Tồn kho tối thiểu</th>
+                            <th>Chênh lệch</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in thuocSapHet)
+                        {
+                            var diff = item.Thuoc.TonKhoToiThieu - item.TonKho;
+                            var statusClass = item.TonKho == 0 ? "row-danger" : (item.TonKho < item.Thuoc.TonKhoToiThieu / 2 ? "row-warning" : "row-info");
+                            var statusText = item.TonKho == 0 ? "Hết hàng" : (item.TonKho < item.Thuoc.TonKhoToiThieu / 2 ? "Rất thấp" : "Dưới mức");
+                            var statusBadge = item.TonKho == 0 ? "status-out" : (item.TonKho < item.Thuoc.TonKhoToiThieu / 2 ? "status-critical" : "status-low");
+
+                            <tr class="@statusClass">
+                                <td><strong>@item.Thuoc.MaThuoc</strong></td>
+                                <td>@item.Thuoc.TenThuoc</td>
+                                <td>@item.Thuoc.DonViTinh</td>
+                                <td>
+                                    <span class="quantity-badge @(item.TonKho == 0 ? "danger" : "warning")">
+                                        @item.TonKho
+                                    </span>
+                                </td>
+                                <td>@item.Thuoc.TonKhoToiThieu</td>
+                                <td class="text-danger">
+                                    <strong>-@diff</strong>
+                                </td>
+                                <td>
+                                    <span class="status-badge @statusBadge">
+                                        <i class="fas fa-exclamation-triangle"></i> @statusText
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fas fa-check-circle"></i>
+                <p>Tất cả thuốc đều đủ tồn kho</p>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .warning-container {
+        padding: 20px 0;
+    }
+
+    .warning-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border-left: 4px solid;
+    }
+
+    .stat-card.stat-danger {
+        border-left-color: #dc3545;
+    }
+
+    .stat-card.stat-warning {
+        border-left-color: #ffc107;
+    }
+
+    .stat-card.stat-info {
+        border-left-color: #17a2b8;
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+    }
+
+    .stat-danger .stat-icon {
+        background: #fff5f5;
+        color: #dc3545;
+    }
+
+    .stat-warning .stat-icon {
+        background: #fffbf0;
+        color: #ffc107;
+    }
+
+    .stat-info .stat-icon {
+        background: #f0f9ff;
+        color: #17a2b8;
+    }
+
+    .stat-content h3 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    .stat-content p {
+        margin: 5px 0 0 0;
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+
+    .warning-section {
+        background: white;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .section-header {
+        padding: 20px 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .section-header.danger {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+        border-bottom: none;
+    }
+
+    .section-header.warning {
+        background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+        color: #333;
+        border-bottom: none;
+    }
+
+    .section-header.info {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        color: white;
+        border-bottom: none;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .header-left i {
+        font-size: 1.5rem;
+    }
+
+    .header-left h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .warning-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .warning-table thead th {
+        padding: 15px;
+        background: #f8f9fa;
+        font-weight: 600;
+        text-align: left;
+        color: #495057;
+        border-bottom: 2px solid #dee2e6;
+        font-size: 0.9rem;
+    }
+
+    .warning-table tbody td {
+        padding: 15px;
+        border-bottom: 1px solid #f0f0f0;
+        vertical-align: middle;
+    }
+
+    .warning-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+
+    .row-danger {
+        background: #fff5f5 !important;
+    }
+
+    .row-warning {
+        background: #fffbf0 !important;
+    }
+
+    .row-info {
+        background: #f0f9ff !important;
+    }
+
+    .quantity-badge {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .quantity-badge.danger {
+        background: #dc3545;
+        color: white;
+    }
+
+    .quantity-badge.warning {
+        background: #ffc107;
+        color: #333;
+    }
+
+    .urgency-badge {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    .urgency-badge.urgent-critical {
+        background: #dc3545;
+        color: white;
+    }
+
+    .urgency-badge.urgent-high {
+        background: #ffc107;
+        color: #333;
+    }
+
+    .urgency-badge.urgent-medium {
+        background: #17a2b8;
+        color: white;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    .status-badge.status-expired {
+        background: #dc3545;
+        color: white;
+    }
+
+    .status-badge.status-out {
+        background: #dc3545;
+        color: white;
+    }
+
+    .status-badge.status-critical {
+        background: #ff6b6b;
+        color: white;
+    }
+
+    .status-badge.status-low {
+        background: #ffc107;
+        color: #333;
+    }
+
+    .empty-state {
+        padding: 60px 20px;
+        text-align: center;
+        color: #6c757d;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: #28a745;
+        margin-bottom: 15px;
+    }
+
+    .empty-state p {
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    .text-danger {
+        color: #dc3545;
+    }
+
+    .badge {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .badge-danger {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+    }
+
+    .badge-warning {
+        background: rgba(0, 0, 0, 0.15);
+        color: #333;
+    }
+
+    .badge-info {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+    }
+</style>

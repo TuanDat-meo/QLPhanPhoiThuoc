@@ -258,52 +258,69 @@
         border-radius: 12px;
         padding: 20px;
         margin-bottom: 20px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
 
     .filter-row {
         display: flex;
         gap: 15px;
         flex-wrap: wrap;
-        align-items: end;
+        align-items: flex-end;
     }
 
     .filter-group {
         flex: 1;
         min-width: 200px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
     }
 
     .filter-group label {
-        display: block;
-        margin-bottom: 5px;
         font-weight: 600;
         color: #495057;
         font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
     .filter-group input,
     .filter-group select {
-        width: 100%;
-        padding: 10px 15px;
-        border: 1px solid #dee2e6;
+        padding: 10px 14px;
+        border: 2px solid #e9ecef;
         border-radius: 8px;
         font-size: 0.95rem;
         transition: all 0.3s;
     }
 
-    .btn-filter {
-        background: #1e3a5f;
-        color: white;
+    .filter-group input:focus,
+    .filter-group select:focus {
+        border-color: #1e3a5f;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+    }
+
+    .btn-filter,
+    .btn-reset {
+        padding: 10px 20px;
         border: none;
-        padding: 10px 25px;
         border-radius: 8px;
-        cursor: pointer;
         font-weight: 600;
+        cursor: pointer;
         transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.95rem;
+    }
+
+    .btn-filter {
+        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
+        color: white;
     }
 
     .btn-filter:hover {
-        background: #0f2847;
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
     }
@@ -311,12 +328,11 @@
     .btn-reset {
         background: #6c757d;
         color: white;
-        border: none;
-        padding: 10px 25px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: 600;
-        transition: all 0.3s;
+    }
+
+    .btn-reset:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
     }
 
     .action-bar {
@@ -326,37 +342,44 @@
         margin-bottom: 20px;
     }
 
-    .btn-add {
-        background: linear-gradient(135deg, #38ef7d 0%, #11998e 100%);
-        color: white;
-        border: none;
-        padding: 12px 30px;
-        border-radius: 8px;
-        font-weight: 600;
-        text-decoration: none;
-        display: inline-flex;
+    .result-info {
+        display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+
+    .btn-add {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
         transition: all 0.3s;
-        box-shadow: 0 4px 12px rgba(56, 239, 125, 0.3);
     }
 
     .btn-add:hover {
         transform: translateY(-2px);
-        color: white;
+        box-shadow: 0 4px 12px rgba(17, 153, 142, 0.3);
         text-decoration: none;
+        color: white;
     }
 
     .medicine-table-card {
         background: white;
         border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
     }
 
     .medicine-table {
         width: 100%;
-        margin: 0;
+        border-collapse: collapse;
     }
 
     .medicine-table thead {
@@ -364,96 +387,127 @@
         color: white;
     }
 
-    .medicine-table thead th {
-        padding: 15px;
-        font-weight: 600;
+    .medicine-table th {
+        padding: 16px;
         text-align: left;
-        white-space: nowrap;
-        border: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .medicine-table th.sortable {
+        cursor: pointer;
+        user-select: none;
+        position: relative;
+        padding-right: 30px;
+    }
+
+    .medicine-table th.sortable:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .medicine-table th.sortable::after {
+        content: "⇅";
+        position: absolute;
+        right: 10px;
+        opacity: 0.5;
+    }
+
+    .medicine-table th.sorted-asc::after {
+        content: "↑";
+        opacity: 1;
+    }
+
+    .medicine-table th.sorted-desc::after {
+        content: "↓";
+        opacity: 1;
     }
 
     .medicine-table tbody tr {
         border-bottom: 1px solid #e9ecef;
-        transition: all 0.2s;
+        transition: background 0.2s;
     }
 
     .medicine-table tbody tr:hover {
         background: #f8f9fa;
     }
 
-    .medicine-table tbody td {
-        padding: 15px;
-        vertical-align: middle;
+    .medicine-table td {
+        padding: 14px 16px;
+        font-size: 0.95rem;
     }
 
-    .sortable {
-        cursor: pointer;
-        user-select: none;
-        position: relative;
-        padding-right: 25px !important;
-    }
-
-    .sortable::after {
-        content: '⇅';
-        position: absolute;
-        right: 10px;
-        opacity: 0.5;
-    }
-
-    .sortable.sorted-asc::after {
-        content: '↑';
-        opacity: 1;
-    }
-
-    .sortable.sorted-desc::after {
-        content: '↓';
-        opacity: 1;
+    .price-cell {
+        font-weight: 600;
+        color: #11998e;
     }
 
     .badge {
-        padding: 5px 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 12px;
         border-radius: 20px;
         font-size: 0.85rem;
         font-weight: 600;
     }
 
     .badge-success {
-        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-        color: white;
+        background: rgba(17, 153, 142, 0.15);
+        color: #11998e;
+        border: 1px solid rgba(17, 153, 142, 0.3);
     }
 
     .badge-danger {
-        background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
-        color: white;
+        background: rgba(251, 113, 133, 0.15);
+        color: #f43f5e;
+        border: 1px solid rgba(251, 113, 133, 0.3);
     }
 
     .btn-action {
-        display: inline-block;
-        padding: 6px 10px;
-        margin: 0 2px;
-        border: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
         border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.2s;
         text-decoration: none;
+        transition: all 0.3s;
+        margin: 0 3px;
     }
 
     .btn-view {
-        background: linear-gradient(135deg, #38bdf8 0%, #7dd3fc 100%);
+        background: #667eea;
         color: white;
     }
 
+    .btn-view:hover {
+        background: #5568d3;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+    }
+
     .btn-edit {
-        background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+        background: #f59e0b;
         color: white;
+    }
+
+    .btn-edit:hover {
+        background: #d97706;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
     }
 
     .pagination-container {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 15px 20px;
+        padding: 20px;
         border-top: 1px solid #e9ecef;
+    }
+
+    .pagination-info {
+        color: #6c757d;
+        font-size: 0.95rem;
     }
 
     .pagination {
@@ -463,51 +517,61 @@
 
     .pagination a,
     .pagination span {
-        padding: 8px 12px;
-        border-radius: 6px;
-        text-decoration: none;
+        min-width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
         color: #495057;
-        transition: all 0.2s;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s;
+        border: 1px solid #dee2e6;
+        background: white;
     }
 
     .pagination a:hover {
         background: #1e3a5f;
         color: white;
+        border-color: #1e3a5f;
+        transform: translateY(-2px);
     }
 
     .pagination span.active {
-        background: #1e3a5f;
+        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
         color: white;
-        font-weight: 600;
+        border-color: transparent;
     }
 </style>
 
 <!-- Loading Overlay -->
-<div class="loading-overlay" id="loadingOverlay">
+<div id="loadingOverlay" class="loading-overlay">
     <div class="spinner"></div>
 </div>
 
-<!-- Main Container -->
 <div class="admin-container">
-    <!-- Sidebar -->
+    <!-- Sidebar Navigation -->
     <aside class="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-title">Menu quản trị</div>
-            <div class="sidebar-subtitle">@tenNhanVien</div>
+            <h3 class="sidebar-title">
+                <i class="fas fa-hospital"></i> Bệnh viện
+            </h3>
+            <p class="sidebar-subtitle">@tenNhanVien - @chucVu</p>
         </div>
 
         <div class="menu-accordion">
-            <!-- Tổng quan -->
+            <!-- Dashboard -->
             <div class="menu-group">
-                <div class="menu-group-header active" data-section="dashboard" onclick="loadDashboard()">
+                <div class="menu-group-header" data-section="dashboard">
                     <div class="menu-header-content">
                         <i class="fas fa-tachometer-alt"></i>
-                        <span>Tổng quan</span>
+                        <span>Dashboard</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Quản lý thuốc -->
+            <!-- Thuốc -->
             <div class="menu-group">
                 <div class="menu-group-header" data-section="medicines">
                     <div class="menu-header-content">
@@ -517,24 +581,51 @@
                     <i class="fas fa-chevron-right menu-arrow"></i>
                 </div>
                 <div class="menu-submenu">
-                    <a class="submenu-item" data-url="/Admin/Thuoc/Index" onclick="loadThuocContent(this.dataset.url); return false;">
+                    <a href="#" class="submenu-item" data-url="/Admin/Thuoc/Index">
                         <i class="fas fa-circle"></i>
                         <span>Danh sách thuốc</span>
                     </a>
-                    <a class="submenu-item" data-url="/Admin/Thuoc/TonKho" onclick="loadThuocContent(this.dataset.url); return false;">
+                    <a href="#" class="submenu-item" data-url="/Admin/Thuoc/LoThuoc">
                         <i class="fas fa-circle"></i>
                         <span>Tồn kho</span>
                     </a>
-                    <a class="submenu-item" data-url="/Admin/Thuoc/ThongKe" onclick="loadThuocContent(this.dataset.url); return false;">
-                        <i class="fas fa-circle"></i>
-                        <span>Thống kê</span>
-                    </a>
-                    <a class="submenu-item" data-url="/Admin/Thuoc/CanhBao" onclick="loadThuocContent(this.dataset.url); return false;">
+                    <a href="#" class="submenu-item" data-url="/Admin/Thuoc/CanhBao">
                         <i class="fas fa-circle"></i>
                         <span>Cảnh báo</span>
                     </a>
+                    <a href="#" class="submenu-item" data-url="/Admin/Thuoc/ThongKe">
+                        <i class="fas fa-circle"></i>
+                        <span>Thống kê</span>
+                    </a>
                 </div>
             </div>
+
+            <!-- Bệnh nhân -->
+            <div class="menu-group">
+                <div class="menu-group-header" data-section="patients">
+                    <div class="menu-header-content">
+                        <i class="fas fa-user-injured"></i>
+                        <span>Bệnh nhân</span>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </div>
+                <div class="menu-submenu">
+                    <a href="#" class="submenu-item" data-tab="patient-list">
+                        <i class="fas fa-circle"></i>
+                        <span>Danh sách</span>
+                    </a>
+                    <a href="#" class="submenu-item" data-tab="patient-add">
+                        <i class="fas fa-circle"></i>
+                        <span>Thêm bệnh nhân</span>
+                    </a>
+                    <a href="#" class="submenu-item" data-tab="patient-bhyt">
+                        <i class="fas fa-circle"></i>
+                        <span>BHYT</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Đơn thuốc -->
             <div class="menu-group">
                 <div class="menu-group-header" data-section="prescriptions">
                     <div class="menu-header-content">
@@ -546,15 +637,16 @@
                 <div class="menu-submenu">
                     <a href="#" class="submenu-item" data-tab="prescription-list">
                         <i class="fas fa-circle"></i>
-                        <span>Danh sách đơn thuốc</span>
+                        <span>Danh sách đơn</span>
                     </a>
-                    <a href="#" class="submenu-item" data-tab="prescription-create">
+                    <a href="#" class="submenu-item" data-tab="prescription-pending">
                         <i class="fas fa-circle"></i>
-                        <span>Tạo đơn thuốc mới</span>
+                        <span>Chờ cấp phát</span>
+                        <span class="menu-badge">5</span>
                     </a>
-                    <a href="#" class="submenu-item" data-tab="prescription-history">
+                    <a href="#" class="submenu-item" data-tab="prescription-completed">
                         <i class="fas fa-circle"></i>
-                        <span>Lịch sử kê đơn</span>
+                        <span>Đã hoàn thành</span>
                     </a>
                 </div>
             </div>
@@ -733,17 +825,18 @@
                 $header.addClass('active');
                 
                 // Show corresponding section
-                if (section) {
-                    showSection(section);
+                if (section === 'dashboard') {
+                    loadDashboard();
                 }
             }
         });
 
-        // Submenu item click
+        // Submenu item click - CẢI TIẾN ĐỂ HỖ TRỢ AJAX LOADING
         $('.submenu-item').click(function(e) {
             e.preventDefault();
             
             const $item = $(this);
+            const url = $item.data('url');
             
             // Update active states
             $('.submenu-item').removeClass('active');
@@ -753,6 +846,11 @@
             const $header = $item.closest('.menu-group').find('.menu-group-header');
             $('.menu-group-header').removeClass('active');
             $header.addClass('active');
+
+            // Load content nếu có URL
+            if (url) {
+                loadThuocContent(url);
+            }
         });
     });
 
@@ -788,7 +886,7 @@
         });
     }
 
-    // Load Thuoc Content (Index, TonKho, ThongKe, CanhBao)
+    // Load Thuoc Content (Index, TonKho, ThongKe, CanhBao) - GLOBAL FUNCTION
     function loadThuocContent(url) {
         showLoading();
         showSection('medicines');
@@ -805,7 +903,7 @@
             },
             error: function(xhr, status, error) {
                 console.error('Error loading content:', error);
-                $('#medicineContent').html('<div class="alert alert-danger">Lỗi khi tải nội dung</div>');
+                $('#medicineContent').html('<div class="alert alert-danger">Lỗi khi tải nội dung: ' + error + '</div>');
                 hideLoading();
             }
         });

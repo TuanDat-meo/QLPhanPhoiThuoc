@@ -319,16 +319,17 @@ namespace QLPhanPhoiThuoc.Controllers.Admin
 
         // ==================== QUẢN LÝ LÔ THUỐC ====================
 
-        // GET: Admin/Thuoc/LoThuoc
+        // Trong ThuocController.cs
         [HttpGet("LoThuoc")]
-        public async Task<IActionResult> LoThuoc(string search = "", string filter = "all", int page = 1, int pageSize = 20)
+        public async Task<IActionResult> LoThuoc(string search = "", string filter = "all",
+                                                  int page = 1, int pageSize = 20)
         {
             var query = _context.LoThuocs
                 .Include(l => l.Thuoc)
                 .Include(l => l.Kho)
                 .AsQueryable();
 
-            // Search
+            // Search filter
             if (!string.IsNullOrEmpty(search))
             {
                 search = search.Trim();
@@ -337,11 +338,13 @@ namespace QLPhanPhoiThuoc.Controllers.Admin
                                         l.MaLo.Contains(search));
             }
 
-            // Filter
+            // Status filter
             var now = DateTime.Now;
             query = filter switch
             {
-                "expiring" => query.Where(l => l.HanSuDung <= now.AddDays(30) && l.HanSuDung >= now && l.TrangThai == "ConHang"),
+                "expiring" => query.Where(l => l.HanSuDung <= now.AddDays(30) &&
+                                              l.HanSuDung >= now &&
+                                              l.TrangThai == "ConHang"),
                 "expired" => query.Where(l => l.HanSuDung < now),
                 "active" => query.Where(l => l.TrangThai == "ConHang"),
                 _ => query
@@ -349,11 +352,12 @@ namespace QLPhanPhoiThuoc.Controllers.Admin
 
             var totalItems = await query.CountAsync();
             var items = await query
-                .OrderBy(l => l.HanSuDung)
+                .OrderBy(l => l.HanSuDung)  // Sắp xếp theo hạn sử dụng
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
+            // Set ViewBag
             ViewBag.Search = search;
             ViewBag.Filter = filter;
             ViewBag.CurrentPage = page;
@@ -362,10 +366,14 @@ namespace QLPhanPhoiThuoc.Controllers.Admin
             ViewBag.TotalItems = totalItems;
             ViewBag.TenNhanVien = User.FindFirstValue("TenNhanVien") ?? "Admin";
 
+            // AJAX support
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("_TonKho", items);
+            }
+
             return View(items);
         }
-
-        // ==================== CẢNH BÁO ====================
 
         // GET: Admin/Thuoc/CanhBao
         [HttpGet("CanhBao")]
