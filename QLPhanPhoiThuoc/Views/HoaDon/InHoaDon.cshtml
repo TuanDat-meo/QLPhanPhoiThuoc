@@ -1,0 +1,191 @@
+﻿@model QLPhanPhoiThuoc.Models.Entities.HoaDon
+@{
+    Layout = null; // Quan trọng: Không dùng Layout chung
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>In Hóa Đơn - @Model.MaHoaDon</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14px;
+            background: #fff;
+        }
+        .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header-title {
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .meta-info {
+            font-style: italic;
+        }
+        .table-invoice th {
+            background-color: #f8f9fa !important;
+            border-bottom: 2px solid #000 !important;
+            text-align: center;
+        }
+        .signature-section {
+            margin-top: 50px;
+        }
+
+        /* CSS CHUYÊN DỤNG CHO MÁY IN */
+        @@media print {
+            .no-print {
+                display: none !important;
+            }
+            .invoice-container {
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            /* Đảm bảo nền bảng in ra màu xám nếu có */
+            table { 
+                -webkit-print-color-adjust: exact; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container mt-3 mb-4 no-print text-center">
+        <button onclick="window.print()" class="btn btn-primary btn-lg me-2">
+            <i class="fas fa-print"></i> In Ngay
+        </button>
+        <button onclick="window.close()" class="btn btn-secondary btn-lg">
+            <i class="fas fa-times"></i> Đóng
+        </button>
+    </div>
+
+    <div class="invoice-container">
+        <div class="row mb-4">
+            <div class="col-4 text-center">
+                <strong>PHÒNG KHÁM HDB</strong><br />
+                <small>450-451 Lê Văn Việt, Phường Tăng Nhơn Phú A, Tăng Nhơn Phú A, Thủ Đức, Thành phố Hồ Chí Minh</small><br />
+                <small>Hotline: +84336608117</small>
+            </div>
+            <div class="col-8 text-center">
+                <h1 class="header-title">HÓA ĐƠN THANH TOÁN</h1>
+                <p>Mã hóa đơn: <strong>@Model.MaHoaDon</strong></p>
+                <p class="meta-info">Ngày lập: @Model.NgayTao.ToString("dd/MM/yyyy HH:mm")</p>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row mb-4">
+            <div class="col-6">
+                <p><strong>Bệnh nhân:</strong> @(Model.BenhNhan?.TenBenhNhan ?? "Khách lẻ")</p>
+                <p><strong>Năm sinh:</strong> @(Model.BenhNhan?.NgaySinh?.ToString("yyyy") ?? "---") - 
+                   <strong>Giới tính:</strong> @(Model.BenhNhan?.GioiTinh ?? "---")</p>
+                <p><strong>Địa chỉ:</strong> @(Model.BenhNhan?.DiaChi ?? "---")</p>
+            </div>
+            <div class="col-6">
+                <p><strong>Bác sĩ kê đơn:</strong> @(Model.DonThuoc?.NhanVien?.TenNhanVien ?? "---")</p>
+                <p><strong>Chẩn đoán:</strong> @(Model.DonThuoc?.ChanDoanSoBo ?? "---")</p>
+                <p><strong>Mã đơn thuốc:</strong> @Model.MaDonThuoc</p>
+            </div>
+        </div>
+
+        <table class="table table-bordered table-invoice mb-4">
+            <thead>
+                <tr>
+                    <th style="width: 50px;">STT</th>
+                    <th>Tên thuốc / Dịch vụ</th>
+                    <th style="width: 80px;">ĐVT</th>
+                    <th style="width: 80px;">SL</th>
+                    <th style="width: 120px;">Đơn giá</th>
+                    <th style="width: 120px;">Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.DonThuoc?.ChiTietDonThuocs != null)
+                {
+                    int stt = 1;
+                    foreach (var item in Model.DonThuoc.ChiTietDonThuocs)
+                    {
+                        var donGia = item.Thuoc?.GiaXuat ?? 0;
+                        var thanhTien = donGia * item.SoLuong;
+                                <tr>
+                                    <td class="text-center">@stt</td>
+                                    <td>
+                                @item.Thuoc?.TenThuoc
+                                        <div class="small text-muted fst-italic">@item.CachDung</div>
+                                    </td>
+                                    <td class="text-center">@item.Thuoc?.DonViTinh</td>
+                                    <td class="text-center">@item.SoLuong</td>
+                                    <td class="text-end">@donGia.ToString("N0")</td>
+                                    <td class="text-end">@thanhTien.ToString("N0")</td>
+                                </tr>
+                        stt++;
+                    }
+                }
+            </tbody>
+        </table>
+
+        <div class="row">
+            <div class="col-6">
+                <p><strong>Ghi chú:</strong> @(Model.GhiChu ?? "Không có")</p>
+            </div>
+            <div class="col-6">
+                <table class="table table-borderless table-sm text-end">
+                    <tr>
+                        <td>Tổng cộng:</td>
+                        <td class="fw-bold">@Model.TongTien.ToString("N0") đ</td>
+                    </tr>
+                    <tr>
+                        <td>BHYT chi trả:</td>
+                        <td>- @Model.TienBHYTChiTra.ToString("N0") đ</td>
+                    </tr>
+                    <tr class="fs-5 border-top border-dark">
+                        <td class="pt-2"><strong>THÀNH TIỀN:</strong></td>
+                        <td class="pt-2 text-danger fw-bold">@Model.TienBenhNhanCanTra.ToString("N0") đ</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="row signature-section text-center">
+            <div class="col-6">
+                <p><strong>Người lập phiếu</strong></p>
+                <p class="fst-italic">(Ký, họ tên)</p>
+                <br /><br /><br />
+                <p>@ViewBag.TenNhanVien</p> </div>
+            <div class="col-6">
+                <p><strong>Người nộp tiền</strong></p>
+                <p class="fst-italic">(Ký, họ tên)</p>
+                <br /><br /><br />
+                <p>@(Model.BenhNhan?.TenBenhNhan)</p>
+            </div>
+        </div>
+
+        <div class="text-center mt-5 fst-italic no-print">
+            <small>Cảm ơn quý khách đã sử dụng dịch vụ!</small>
+        </div>
+    </div>
+
+    <script>
+        // Tự động bật hộp thoại in khi trang tải xong
+        window.onload = function() {
+            setTimeout(function() {
+                window.print();
+            }, 500);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+﻿@model QLPhanPhoiThuoc.Models.Entities.NhanVien
+
+<div class="card border-0 shadow-sm animate-fadeIn">
+    <div class="card-body p-4">
+        <form id="createEmployeeForm" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-md-3 text-center border-end bg-light rounded-start py-3">
+                    <div class="mb-3">
+                        <label class="form-label d-block fw-bold text-uppercase text-primary">Ảnh đại diện</label>
+                        <div class="position-relative d-inline-block">
+                            <img id="previewAvatar" src="/images/default-avatar.png" class="rounded-circle img-thumbnail shadow-sm" style="width: 140px; height: 140px; object-fit: cover;">
+                            <label for="fileInput" class="btn btn-sm btn-primary position-absolute bottom-0 end-0 rounded-circle">
+                                <i class="fas fa-camera"></i>
+                            </label>
+                            <input type="file" id="fileInput" name="ImageFile" hidden accept="image/*" onchange="previewImage(this)">
+                        </div>
+                        <div class="small text-muted mt-2">Nên dùng ảnh vuông</div>
+                    </div>
+                </div>
+
+                <div class="col-md-9 ps-4">
+                    <h6 class="text-uppercase text-primary border-bottom pb-2 mb-3">
+                        <i class="fas fa-user-plus me-2"></i>Thông tin cá nhân
+                    </h6>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Mã nhân viên <span class="text-danger">*</span></label>
+                            <input type="text" name="MaNhanVien" class="form-control" placeholder="Vd: NV001" required>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold">Họ và tên <span class="text-danger">*</span></label>
+                            <input type="text" name="TenNhanVien" class="form-control" placeholder="Nhập họ tên đầy đủ" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Ngày sinh</label>
+                            <input type="date" name="NgaySinh" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">CCCD/CMND <span class="text-danger">*</span></label>
+                            <input type="text" name="CCCD" class="form-control" placeholder="Số Căn cước công dân" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Giới tính</label>
+                            <select name="GioiTinh" class="form-select">
+                                <option value="Nam">Nam</option>
+                                <option value="Nu">Nữ</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Số điện thoại</label>
+                            <input type="tel" name="SoDienThoai" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email <span class="text-danger">*</span></label>
+                            <input type="email" name="Email" class="form-control" required>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Địa chỉ</label>
+                            <input type="text" name="DiaChi" class="form-control" placeholder="Số nhà, đường, phường/xã...">
+                        </div>
+                    </div>
+
+                    <h6 class="text-uppercase text-primary border-bottom pb-2 mb-3 mt-4">
+                        <i class="fas fa-briefcase me-2"></i>Công việc & Chuyên môn
+                    </h6>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Khoa / Phòng</label>
+                            <select name="MaKhoa" class="form-select">
+                                <option value="">-- Chọn khoa --</option>
+                                @if (ViewBag.DanhSachKhoa != null)
+                                {
+                                    foreach (var khoa in ViewBag.DanhSachKhoa)
+                                    {
+                                                <option value="@khoa.MaKhoa">@khoa.TenKhoa</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Chức vụ</label>
+                            <input type="text" name="ChucVu" class="form-control" placeholder="Vd: Bác sĩ">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Bằng cấp</label>
+                            <input type="text" name="BangCap" class="form-control" placeholder="Vd: Đại học, Thạc sĩ...">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Chuyên khoa</label>
+                            <input type="text" name="ChuyenKhoa" class="form-control" placeholder="Vd: Nội tổng quát">
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-light rounded border">
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="chkCreateAccount" onchange="toggleAccountFields()">
+                            <label class="form-check-label fw-bold" for="chkCreateAccount">Tạo tài khoản đăng nhập</label>
+                        </div>
+                        <div id="accountFields" style="display:none;">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Tên đăng nhập</label>
+                                    <input type="text" name="TenDangNhap" id="txtUsername" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Mật khẩu</label>
+                                    <input type="password" name="MatKhau" id="txtPassword" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-end mt-4 pt-3 border-top">
+                <button type="button" class="btn btn-secondary" onclick="loadEmployeeContent('/Admin/NhanVien/_DSNhanVien')">Hủy bỏ</button>
+                <button type="submit" class="btn btn-primary px-4"><i class="fas fa-save me-2"></i>Thêm nhân viên</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) { $('#previewAvatar').attr('src', e.target.result); }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function toggleAccountFields() {
+        var isChecked = $('#chkCreateAccount').is(':checked');
+        $('#accountFields').slideToggle(isChecked);
+        if (!isChecked) {
+            $('#txtUsername').val('');
+            $('#txtPassword').val('');
+        }
+    }
+
+    $('#createEmployeeForm').on('submit', function(e) {
+        e.preventDefault();
+        var formData = new FormData(this);
+
+        showLoading();
+        $.ajax({
+            url: '/Admin/NhanVien/Create',
+            type: 'POST',
+            data: formData,
+            processData: false, contentType: false,
+            success: function(res) {
+                hideLoading();
+                if (res.success) {
+                    showToast(res.message, 'success');
+                    loadEmployeeContent('/Admin/NhanVien/_DSNhanVien');
+                } else {
+                    Swal.fire('Lỗi', res.message, 'error');
+                }
+            },
+            error: function() {
+                hideLoading();
+                Swal.fire('Lỗi', 'Không thể kết nối máy chủ', 'error');
+            }
+        });
+    });
+</script>

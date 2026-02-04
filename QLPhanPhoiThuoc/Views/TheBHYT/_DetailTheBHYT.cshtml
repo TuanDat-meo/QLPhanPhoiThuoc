@@ -1,0 +1,86 @@
+﻿@model QLPhanPhoiThuoc.Models.Entities.TheBHYT
+
+<div class="modal-body p-4">
+    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px; font-size: 24px;">
+            <i class="fas fa-id-card"></i>
+        </div>
+        <div>
+            <h5 class="mb-1 text-primary fw-bold">Số thẻ: @Model.SoTheBHYT</h5>
+            <div class="text-muted small">Mã quản lý: @Model.MaThe</div>
+        </div>
+        <div class="ms-auto text-end">
+            @{
+                var badgeClass = Model.TrangThai == "ConHan" ? "bg-success" : (Model.TrangThai == "HetHan" ? "bg-danger" : "bg-warning");
+                var textHienThi = Model.TrangThai == "ConHan" ? "Còn hạn" : (Model.TrangThai == "HetHan" ? "Hết hạn" : "Tạm khóa");
+            }
+            <span class="badge @badgeClass px-3 py-2 rounded-pill">
+                @textHienThi
+            </span>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <h6 class="text-uppercase text-muted small fw-bold mb-3 border-bottom pb-1">Chủ thẻ</h6>
+            <div class="mb-2">
+                <label class="fw-bold d-block">Họ và tên:</label>
+                <span class="text-primary fs-5">@Model.BenhNhan?.TenBenhNhan</span>
+            </div>
+            <div class="mb-2">
+                <label class="fw-bold">Mã bệnh nhân:</label>
+                <span>@Model.MaBenhNhan</span>
+            </div>
+            <div class="mb-2">
+                <label class="fw-bold">Ngày sinh:</label>
+                <span>@(Model.BenhNhan?.NgaySinh?.ToString("dd/MM/yyyy") ?? "---")</span>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <h6 class="text-uppercase text-muted small fw-bold mb-3 border-bottom pb-1">Quyền lợi BHYT</h6>
+            <div class="row">
+                <div class="col-6 mb-2">
+                    <label class="fw-bold d-block text-muted small">Mức hưởng:</label>
+                    <span class="fw-bold text-danger fs-5">@Model.MucHuong.ToString("0")%</span>
+                </div>
+                <div class="col-6 mb-2">
+                    <label class="fw-bold d-block text-muted small">Thời điểm 5 năm:</label>
+                    <span class="fw-bold">@(string.IsNullOrEmpty(Model.DiaChi5Nam) ? "---" : Model.DiaChi5Nam)</span>
+                </div>
+            </div>
+            <div class="mb-2 mt-2">
+                <label class="fw-bold d-block text-muted small">Nơi ĐK KCB Ban đầu:</label>
+                <span class="text-dark fw-bold"><i class="fas fa-hospital-alt me-1 text-info"></i>@(Model.NoiDangKyKCB ?? "Chưa cập nhật")</span>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="bg-light p-3 rounded border">
+                <h6 class="text-uppercase text-muted small fw-bold mb-3">Thời hạn sử dụng</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-center">
+                        <small class="text-muted d-block">Ngày bắt đầu</small>
+                        <span class="fw-bold text-success fs-6">@Model.NgayBatDau.ToString("dd/MM/yyyy")</span>
+                    </div>
+                    <div class="text-muted"><i class="fas fa-arrow-right"></i></div>
+                    <div class="text-center">
+                        <small class="text-muted d-block">Ngày hết hạn</small>
+                        <span class="fw-bold text-danger fs-6">@Model.NgayHetHan.ToString("dd/MM/yyyy")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="text-muted small fst-italic text-end border-top pt-2">
+                Created: @Model.NgayTao.ToString("dd/MM/yyyy HH:mm") | 
+                Updated: @(Model.NgayCapNhat?.ToString("dd/MM/yyyy HH:mm") ?? "---")
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+</div>
