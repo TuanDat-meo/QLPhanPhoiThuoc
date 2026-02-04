@@ -491,23 +491,13 @@
                 <div class="menu-submenu">
                     <a class="submenu-item" data-url="/BenhNhan/_DSBenhNhan">
                         <i class="fas fa-circle"></i>
-<<<<<<< HEAD
-                        <span>Danh sách bệnh nhân</span>
-=======
                         Danh sách bệnh nhân
->>>>>>> origin/main
+                        <span>Danh sách bệnh nhân</span>
                     </a>
                     <a class="submenu-item" data-url="/BenhNhan/_BenhNhan">
                         <i class="fas fa-circle"></i>
                         Quản lý bệnh nhân
                     </a>
-<<<<<<< HEAD
-=======
-                    <a class="submenu-item" data-url="/BenhNhan/_BenhAnBenhNhan">
-                        <i class="fas fa-circle"></i>
-                        Hồ sơ bệnh án
-                    </a>
->>>>>>> origin/main
                 </div>
             </div>
 
@@ -546,7 +536,23 @@
                     <i class="fas fa-chevron-right menu-arrow"></i>
                 </div>
                 <div class="menu-submenu">
-<<<<<<< HEAD
+                    <a href="javascript:void(0)" class="submenu-item" data-url="/Admin/Kho/Index">
+                        <i class="fas fa-circle"></i>
+                        <span>Danh sách kho</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Kho -->
+            <div class="menu-group">
+                <div class="menu-group-header" data-section="warehouse">
+                    <div class="menu-header-content">
+                        <i class="fas fa-warehouse"></i>
+                        <span>Quản lý kho</span>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </div>
+                <div class="menu-submenu">
                     <a href="#" class="submenu-item" data-tab="warehouse-list">
                         <i class="fas fa-circle"></i>
                         <span>Danh sách kho</span>
@@ -559,12 +565,6 @@
                         <i class="fas fa-circle"></i>
                         <span>Phiếu xuất</span>
                     </a>
-=======
-                    <a href="javascript:void(0)" class="submenu-item" data-url="/Admin/Kho/Index">
-                        <i class="fas fa-circle"></i>
-                        <span>Danh sách kho</span>
-                    </a>
->>>>>>> origin/main
                 </div>
             </div>
 
@@ -736,10 +736,7 @@
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<<<<<<< HEAD
-=======
     <script src="~/js/BenhNhan/BenhNhan.js"></script>
->>>>>>> origin/main
     <script>
         // ==================== PANEL MANAGEMENT SYSTEM ====================
         let panelStack = [];
@@ -751,45 +748,6 @@
 
             const panelId = 'panel-' + currentPanelLevel;
             const overlayId = 'overlay-' + currentPanelLevel;
-<<<<<<< HEAD
-
-            // Tạo overlay
-            const overlay = $('<div>', {
-                id: overlayId,
-                class: 'panel-overlay',
-                'data-level': currentPanelLevel
-            });
-
-            // Tạo panel container
-            const panel = $('<div>', {
-                id: panelId,
-                class: 'panel-container',
-                'data-level': currentPanelLevel
-            });
-
-            // Tạo panel header
-            const header = $(`
-                <div class="panel-header">
-                    <h4 class="panel-title">
-                        <i class="${icon}"></i>
-                        <span>${title}</span>
-                    </h4>
-                    <button class="panel-close-btn" onclick="closePanel(${currentPanelLevel})">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            `);
-
-            // Tạo panel body
-            const body = $('<div>', {
-                class: 'panel-body'
-            }).html('<div style="text-align: center; padding: 50px;"><div class="spinner"></div></div>');
-
-            panel.append(header).append(body);
-
-            // Thêm vào DOM
-            $('body').append(overlay).append(panel);
-=======
 
             // Tạo overlay
             const overlay = $('<div>', {
@@ -979,7 +937,118 @@
 
             showLoading();
             showSection('warehouse'); // Chuyển sang section warehouse
->>>>>>> origin/main
+
+            $.ajax({
+                url: url,
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function (data) {
+                    console.log('✅ Warehouse data loaded successfully'); // Debug log
+                    $('#warehouseContent').html(data);
+                    hideLoading();
+                },
+                error: function (xhr, status, error) {
+                    console.error('❌ Error loading warehouse:', error);
+                    console.error('Status:', status);
+                    console.error('Response:', xhr.responseText);
+
+                    $('#warehouseContent').html(
+                        '<div class="alert alert-danger" style="margin: 20px;">' +
+                        '<h4><i class="fas fa-exclamation-triangle"></i> Lỗi tải dữ liệu kho</h4>' +
+                        '<p><strong>Chi tiết lỗi:</strong> ' + error + '</p>' +
+                        '<p><strong>Status:</strong> ' + status + '</p>' +
+                        '<p><strong>URL:</strong> ' + url + '</p>' +
+                        '<button class="btn btn-primary" onclick="loadWarehouseContent(\'' + url + '\')">Thử lại</button>' +
+                        '</div>'
+                    );
+                    hideLoading();
+                }
+            });
+        }
+
+        // ==================== PATIENT CONTENT LOADER ====================
+        function loadPatientContent(url) {
+            console.log('🔵 Loading patient from:', url);
+
+            showLoading();
+            showSection('patients');
+
+            $.ajax({
+                url: url,
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function (data) {
+                    console.log('✅ Patient data loaded successfully');
+                    $('#patientContent').html(data);
+                    hideLoading();
+                },
+                error: function (xhr, status, error) {
+                    console.error('❌ Error loading patient:', error);
+                    $('#patientContent').html(
+                        '<div class="alert alert-danger" style="margin: 20px;">Lỗi tải dữ liệu bệnh nhân: ' + error + '</div>'
+                    );
+                    hideLoading();
+                }
+            });
+        }
+
+        // ==================== MENU & NAVIGATION ====================
+        $(document).ready(function () {
+            // Load dashboard khi trang được tải
+            loadDashboard();
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // ==================== PANEL MANAGEMENT SYSTEM ====================
+        let panelStack = [];
+        let currentPanelLevel = 0;
+
+        // Mở panel mới
+        function openPanel(url, title, icon = 'fas fa-file') {
+            currentPanelLevel++;
+
+            const panelId = 'panel-' + currentPanelLevel;
+            const overlayId = 'overlay-' + currentPanelLevel;
+
+            // Tạo overlay
+            const overlay = $('<div>', {
+                id: overlayId,
+                class: 'panel-overlay',
+                'data-level': currentPanelLevel
+            });
+
+            // Tạo panel container
+            const panel = $('<div>', {
+                id: panelId,
+                class: 'panel-container',
+                'data-level': currentPanelLevel
+            });
+
+            // Tạo panel header
+            const header = $(`
+                <div class="panel-header">
+                    <h4 class="panel-title">
+                        <i class="${icon}"></i>
+                        <span>${title}</span>
+                    </h4>
+                    <button class="panel-close-btn" onclick="closePanel(${currentPanelLevel})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `);
+
+            // Tạo panel body
+            const body = $('<div>', {
+                class: 'panel-body'
+            }).html('<div style="text-align: center; padding: 50px;"><div class="spinner"></div></div>');
+
+            panel.append(header).append(body);
+
+            // Thêm vào DOM
+            $('body').append(overlay).append(panel);
 
             // Đóng panel khi click overlay
             overlay.on('click', function() {
@@ -999,7 +1068,6 @@
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 },
-<<<<<<< HEAD
                 success: function(data) {
                     body.html(data);
                 },
@@ -1126,164 +1194,13 @@
             loadDashboard();
 
             // Menu accordion functionality
-            $('.menu-group-header').click(function() {
+            $('.menu-group-header').click(function () {
                 const $header = $(this);
                 const $group = $header.parent();
                 const $submenu = $group.find('.menu-submenu');
                 const section = $header.data('section');
-
-                // Toggle submenu nếu có
-                if ($submenu.length > 0) {
-                    // Close other submenus
-                    $('.menu-submenu').not($submenu).removeClass('show');
-                    $('.menu-group-header').not($header).removeClass('active');
-
-                    // Toggle current submenu
-                    $submenu.toggleClass('show');
-                    $header.toggleClass('active');
-                } else {
-                    // If no submenu, it's a direct link (like Dashboard)
-                    $('.menu-group-header').removeClass('active');
-                    $('.submenu-item').removeClass('active');
-                    $header.addClass('active');
-
-                    // Show corresponding section
-                    if (section === 'dashboard') {
-                        loadDashboard();
-                    }
-                }
-            });
-
-            // Submenu item click
-            $('.submenu-item').click(function(e) {
-                e.preventDefault();
-
-                const $item = $(this);
-                const url = $item.data('url');
-
-                // Update active states
-                $('.submenu-item').removeClass('active');
-                $item.addClass('active');
-
-                // Ensure parent section is active
-                const $header = $item.closest('.menu-group').find('.menu-group-header');
-                $('.menu-group-header').removeClass('active');
-                $header.addClass('active');
-
-                // Load content nếu có URL
-                if (url) {
-                    loadThuocContent(url);
-                }
-            });
-
-            // Đóng panel khi nhấn ESC
-            $(document).keydown(function(e) {
-                if (e.key === 'Escape' && panelStack.length > 0) {
-                    closePanel(panelStack[panelStack.length - 1].level);
-                }
-            });
-        });
-
-        // Helper function to show section
-        function showSection(sectionId) {
-            $('.content-section').removeClass('active');
-            $('#' + sectionId).addClass('active');
-        }
-
-        // Load Dashboard
-        function loadDashboard() {
-            showLoading();
-            showSection('dashboard');
-            closeAllPanels(); // Đóng tất cả panels khi chuyển về dashboard
-
-            $.ajax({
-                url: '/Admin/Dashboard',
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                success: function(data) {
-                    $('#dashboard').html(data);
-                    hideLoading();
-
-                    // Re-initialize charts after loading dashboard
-                    setTimeout(initializeCharts, 100);
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error loading dashboard:', error);
-                    $('#dashboard').html('<div class="alert alert-danger">Lỗi khi tải dashboard</div>');
-=======
-                success: function (data) {
-                    console.log('✅ Warehouse data loaded successfully'); // Debug log
-                    $('#warehouseContent').html(data);
-                    hideLoading();
-                },
-                error: function (xhr, status, error) {
-                    console.error('❌ Error loading warehouse:', error);
-                    console.error('Status:', status);
-                    console.error('Response:', xhr.responseText);
-
-                    $('#warehouseContent').html(
-                        '<div class="alert alert-danger" style="margin: 20px;">' +
-                        '<h4><i class="fas fa-exclamation-triangle"></i> Lỗi tải dữ liệu kho</h4>' +
-                        '<p><strong>Chi tiết lỗi:</strong> ' + error + '</p>' +
-                        '<p><strong>Status:</strong> ' + status + '</p>' +
-                        '<p><strong>URL:</strong> ' + url + '</p>' +
-                        '<button class="btn btn-primary" onclick="loadWarehouseContent(\'' + url + '\')">Thử lại</button>' +
-                        '</div>'
-                    );
->>>>>>> origin/main
-                    hideLoading();
-                }
-            });
-        }
-
-<<<<<<< HEAD
-        // Loading functions
-        function showLoading() {
-            $('#loadingOverlay').addClass('show');
-        }
-
-        function hideLoading() {
-            $('#loadingOverlay').removeClass('show');
-        }
-
-=======
-        // ==================== PATIENT CONTENT LOADER ====================
-        function loadPatientContent(url) {
-            console.log('🔵 Loading patient from:', url);
-
-            showLoading();
-            showSection('patients');
-
-            $.ajax({
-                url: url,
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                success: function (data) {
-                    console.log('✅ Patient data loaded successfully');
-                    $('#patientContent').html(data);
-                    hideLoading();
-                },
-                error: function (xhr, status, error) {
-                    console.error('❌ Error loading patient:', error);
-                    $('#patientContent').html(
-                        '<div class="alert alert-danger" style="margin: 20px;">Lỗi tải dữ liệu bệnh nhân: ' + error + '</div>'
-                    );
-                    hideLoading();
-                }
-            });
-        }
-
-        // ==================== MENU & NAVIGATION ====================
-        $(document).ready(function () {
-            // Load dashboard khi trang được tải
-            loadDashboard();
-
             // Menu accordion functionality
-            $('.menu-group-header').click(function () {
+            $('.menu-group-header').click(function() {
                 const $header = $(this);
                 const $group = $header.parent();
                 const $submenu = $group.find('.menu-submenu');
@@ -1328,6 +1245,21 @@
                 const $header = $item.closest('.menu-group').find('.menu-group-header');
                 $('.menu-group-header').removeClass('active');
                 $header.addClass('active');
+            // Submenu item click
+            $('.submenu-item').click(function(e) {
+                e.preventDefault();
+
+                const $item = $(this);
+                const url = $item.data('url');
+
+                // Update active states
+                $('.submenu-item').removeClass('active');
+                $item.addClass('active');
+
+                // Ensure parent section is active
+                const $header = $item.closest('.menu-group').find('.menu-group-header');
+                $('.menu-group-header').removeClass('active');
+                $header.addClass('active');
 
                 // Load content based on URL
                 if (url) {
@@ -1354,10 +1286,28 @@
                 }
             });
         });
+                // Load content nếu có URL
+                if (url) {
+                    loadThuocContent(url);
+                }
+            });
+
+            // Đóng panel khi nhấn ESC
+            $(document).keydown(function(e) {
+                if (e.key === 'Escape' && panelStack.length > 0) {
+                    closePanel(panelStack[panelStack.length - 1].level);
+                }
+            });
+        });
 
         // Helper function to show section
         function showSection(sectionId) {
             console.log('🔄 Switching to section:', sectionId); // Debug log
+            $('.content-section').removeClass('active');
+            $('#' + sectionId).addClass('active');
+        }
+        // Helper function to show section
+        function showSection(sectionId) {
             $('.content-section').removeClass('active');
             $('#' + sectionId).addClass('active');
         }
@@ -1388,6 +1338,32 @@
                 }
             });
         }
+        // Load Dashboard
+        function loadDashboard() {
+            showLoading();
+            showSection('dashboard');
+            closeAllPanels(); // Đóng tất cả panels khi chuyển về dashboard
+
+            $.ajax({
+                url: '/Admin/Dashboard',
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function(data) {
+                    $('#dashboard').html(data);
+                    hideLoading();
+
+                    // Re-initialize charts after loading dashboard
+                    setTimeout(initializeCharts, 100);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading dashboard:', error);
+                    $('#dashboard').html('<div class="alert alert-danger">Lỗi khi tải dashboard</div>');
+                    hideLoading();
+                }
+            });
+        }
 
         // Loading functions
         function showLoading() {
@@ -1398,14 +1374,15 @@
             $('#loadingOverlay').removeClass('show');
         }
 
->>>>>>> origin/main
         // Chart initialization
         function initializeCharts() {
             console.log('Charts initialized');
         }
     </script>
-<<<<<<< HEAD
 }
-=======
+        // Chart initialization
+        function initializeCharts() {
+            console.log('Charts initialized');
+        }
+    </script>
 }
->>>>>>> origin/main
