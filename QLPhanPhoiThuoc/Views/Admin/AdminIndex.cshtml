@@ -708,15 +708,15 @@
                         <i class="fas fa-chevron-right menu-arrow"></i>
                     </div>
                     <div class="menu-submenu">
-                        <a href="#" class="submenu-item" data-tab="employee-list">
+                        <a href="#" class="submenu-item" data-url="/Admin/NhanVien/_DSNhanVien">
                             <i class="fas fa-circle"></i>
                             <span>Danh sách nhân viên</span>
                         </a>
-                        <a href="#" class="submenu-item" data-tab="employee-add">
+                        <a href="#" class="submenu-item" onclick="loadEmployeeContent('/Admin/NhanVien/Create')">
                             <i class="fas fa-circle"></i>
                             <span>Thêm nhân viên</span>
                         </a>
-                        <a href="#" class="submenu-item" data-tab="employee-roles">
+                        <a href="#" class="submenu-item" onclick="loadEmployeeContent('/Admin/NhanVien/PhanQuyen')">
                             <i class="fas fa-circle"></i>
                             <span>Phân quyền</span>
                         </a>
@@ -803,8 +803,18 @@
                 </div>
             </div>
         </div>
-
-
+        @* Nhân Viên *@
+        <div id="employees" class="content-section">
+            <div class="medicine-container">
+                <div class="page-header">
+                    <h2 style="margin: 0; font-size: 1.8rem; font-weight: 700;">Quản lý nhân viên</h2>
+                    <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 0.95rem;">Quản lý đội ngũ y bác sĩ và nhân viên bệnh viện</p>
+                </div>
+                <div id="employeeContent">
+                    <p style="text-align: center; padding: 50px; color: #6c757d;">Đang tải dữ liệu...</p>
+                </div>
+            </div>
+        </div>
 
     </main>
 </div>
@@ -949,6 +959,31 @@
             }
         });
     }
+
+    // Load Nhan Vien Content
+    function loadEmployeeContent(url) {
+        showLoading();
+        showSection('employees');
+        $.ajax({
+            url: url,
+            method: 'GET',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            success: function(data) {
+                $('#employeeContent').html(data);
+                hideLoading();
+            },
+            error: function() {
+                $('#employeeContent').html('<div class="alert alert-danger">Lỗi tải dữ liệu nhân viên</div>');
+                hideLoading();
+            }
+        });
+    }
+
+    // Cập nhật logic click submenu [cite: 342-344]
+    if (url.includes('/NhanVien/')) {
+        loadEmployeeContent(url);
+    }
+
 
     // Loading functions
     function showLoading() {

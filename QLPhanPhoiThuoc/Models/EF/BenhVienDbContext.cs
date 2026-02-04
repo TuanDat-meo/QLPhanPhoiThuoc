@@ -172,7 +172,7 @@ namespace QLPhanPhoiThuoc.Models.EF
                 entity.Property(e => e.LanDangNhapCuoi);  // THÊM CẤU HÌNH CHO CỘT NÀY
                 entity.Property(e => e.NgayTao).HasDefaultValueSql("GETDATE()");
                 entity.Property(e => e.NgayCapNhat);
-
+                entity.Property(e => e.Avatar).HasMaxLength(500).IsRequired(false); // Cho phép null
                 // Cấu hình quan hệ one-to-one với NhanVien
                 entity.HasOne(t => t.NhanVien)
                     .WithOne(n => n.TaiKhoan)
