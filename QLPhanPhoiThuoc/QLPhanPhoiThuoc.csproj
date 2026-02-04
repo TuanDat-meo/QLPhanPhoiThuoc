@@ -10,7 +10,6 @@
     <Folder Include="Controllers\Auth\" />
     <Folder Include="Controllers\Users\" />
     <Folder Include="Data\Migrations\" />
-    <Folder Include="Views\Admin\" />
     <Folder Include="Views\Account\" />
     <Folder Include="Views\Users\" />
   </ItemGroup>

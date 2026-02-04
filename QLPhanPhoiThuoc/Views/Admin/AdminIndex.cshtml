@@ -551,7 +551,7 @@
                         <i class="fas fa-chevron-right menu-arrow"></i>
                     </div>
                     <div class="menu-submenu">
-                        <a href="#" class="submenu-item" data-tab="patient-list">
+                        <a href="javascript:void(0)" onclick="loadContent('/Admin/BenhNhan/_DSBenhNhan')" class="submenu-item">
                             <i class="fas fa-circle"></i>
                             <span>Danh sách bệnh nhân</span>
                         </a>
@@ -889,87 +889,8 @@
 
             <!-- Patients Section -->
             <div id="patients" class="content-section">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <i class="fas fa-user-injured"></i>
-                        Quản lý bệnh nhân
-                    </h2>
-                    <button class="action-btn btn-primary-custom">
-                        <i class="fas fa-plus"></i>
-                        Thêm bệnh nhân
-                    </button>
-                </div>
-
-                <!-- Tabs -->
-                <div class="content-tabs">
-                    <button class="tab-btn active" data-target="patient-list">
-                        <i class="fas fa-list"></i>
-                        Danh sách
-                    </button>
-                    <button class="tab-btn" data-target="patient-add">
-                        <i class="fas fa-user-plus"></i>
-                        Thêm mới
-                    </button>
-                    <button class="tab-btn" data-target="patient-medical">
-                        <i class="fas fa-file-medical"></i>
-                        Hồ sơ bệnh án
-                    </button>
-                </div>
-
-                <!-- Tab Contents -->
-                <div id="patient-list" class="tab-content active">
-                    <div class="table-container">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Mã BN</th>
-                                    <th>Họ tên</th>
-                                    <th>Ngày sinh</th>
-                                    <th>Giới tính</th>
-                                    <th>Số điện thoại</th>
-                                    <th>Email</th>
-                                    <th>Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>BN001</td>
-                                    <td>Nguyễn Văn A</td>
-                                    <td>01/01/1990</td>
-                                    <td>Nam</td>
-                                    <td>0123456789</td>
-                                    <td>nguyenvana@email.com</td>
-                                    <td>
-                                        <button class="action-btn btn-primary-custom" style="padding: 5px 10px; font-size: 0.85rem;">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <!-- More rows... -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div id="patient-add" class="tab-content">
-                    <div class="card">
-                        <div class="card-header">Thông tin bệnh nhân mới</div>
-                        <div class="card-body">
-                            <p class="text-muted">Form thêm bệnh nhân sẽ được hiển thị ở đây...</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="patient-medical" class="tab-content">
-                    <div class="card">
-                        <div class="card-header">Hồ sơ bệnh án</div>
-                        <div class="card-body">
-                            <p class="text-muted">Danh sách hồ sơ bệnh án sẽ được hiển thị ở đây...</p>
-                        </div>
-                    </div>
-                </div>
+                @await Html.PartialAsync("BenhNhan/_BenhNhan")
             </div>
-
             <!-- Medicines Section -->
             <div id="medicines" class="content-section">
                 <div class="section-header">
@@ -1098,56 +1019,8 @@
 
             <!-- Invoices Section -->
             <div id="invoices" class="content-section">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <i class="fas fa-file-invoice-dollar"></i>
-                        Quản lý hóa đơn
-                    </h2>
-                </div>
-
-                <div class="content-tabs">
-                    <button class="tab-btn active" data-target="invoice-list">
-                        <i class="fas fa-list"></i>
-                        Tất cả hóa đơn
-                    </button>
-                    <button class="tab-btn" data-target="invoice-pending">
-                        <i class="fas fa-hourglass-half"></i>
-                        Chờ thanh toán
-                    </button>
-                    <button class="tab-btn" data-target="invoice-paid">
-                        <i class="fas fa-check-circle"></i>
-                        Đã thanh toán
-                    </button>
-                </div>
-
-                <div id="invoice-list" class="tab-content active">
-                    <div class="card">
-                        <div class="card-header">Tất cả hóa đơn</div>
-                        <div class="card-body">
-                            <p class="text-muted">Danh sách hóa đơn sẽ được hiển thị ở đây...</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="invoice-pending" class="tab-content">
-                    <div class="card">
-                        <div class="card-header">Hóa đơn chờ thanh toán</div>
-                        <div class="card-body">
-                            <p class="text-muted">Danh sách hóa đơn chờ thanh toán sẽ được hiển thị ở đây...</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="invoice-paid" class="tab-content">
-                    <div class="card">
-                        <div class="card-header">Hóa đơn đã thanh toán</div>
-                        <div class="card-body">
-                            <p class="text-muted">Danh sách hóa đơn đã thanh toán sẽ được hiển thị ở đây...</p>
-                        </div>
-                    </div>
-                </div>
+                @await Html.PartialAsync("HoaDon/_HoaDon")
             </div>
-
             <!-- Suppliers Section -->
             <div id="suppliers" class="content-section">
                 <div class="section-header">
@@ -1195,58 +1068,7 @@
             {
                 <!-- Employees Section -->
                 <div id="employees" class="content-section">
-                    <div class="section-header">
-                        <h2 class="section-title">
-                            <i class="fas fa-users"></i>
-                            Quản lý nhân viên
-                        </h2>
-                        <button class="action-btn btn-primary-custom">
-                            <i class="fas fa-user-plus"></i>
-                            Thêm nhân viên
-                        </button>
-                    </div>
-
-                    <div class="content-tabs">
-                        <button class="tab-btn active" data-target="employee-list">
-                            <i class="fas fa-list"></i>
-                            Danh sách nhân viên
-                        </button>
-                        <button class="tab-btn" data-target="employee-add">
-                            <i class="fas fa-user-plus"></i>
-                            Thêm nhân viên
-                        </button>
-                        <button class="tab-btn" data-target="employee-roles">
-                            <i class="fas fa-user-shield"></i>
-                            Phân quyền
-                        </button>
-                    </div>
-
-                    <div id="employee-list" class="tab-content active">
-                        <div class="card">
-                            <div class="card-header">Danh sách nhân viên</div>
-                            <div class="card-body">
-                                <p class="text-muted">Danh sách nhân viên sẽ được hiển thị ở đây...</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="employee-add" class="tab-content">
-                        <div class="card">
-                            <div class="card-header">Thêm nhân viên mới</div>
-                            <div class="card-body">
-                                <p class="text-muted">Form thêm nhân viên sẽ được hiển thị ở đây...</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="employee-roles" class="tab-content">
-                        <div class="card">
-                            <div class="card-header">Quản lý phân quyền</div>
-                            <div class="card-body">
-                                <p class="text-muted">Giao diện phân quyền sẽ được hiển thị ở đây...</p>
-                            </div>
-                        </div>
-                    </div>
+                    @await Html.PartialAsync("NhanVien/_NhanVien")
                 </div>
 
                 <!-- Reports Section -->
@@ -1557,6 +1379,8 @@
                     }
                 });
             }
-        }
+        } 
     </script>
+    <script src="~/js/benhNhan.js"></script>
+
 }

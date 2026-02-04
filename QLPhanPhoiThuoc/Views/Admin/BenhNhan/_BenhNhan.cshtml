@@ -1,0 +1,39 @@
+﻿				<div class="section-header">
+					<h2 class="section-title">
+						<i class="fas fa-user-injured"></i>
+						Quản lý bệnh nhân
+					</h2>
+					<button class="action-btn btn-primary-custom">
+						<i class="fas fa-plus"></i>
+						Thêm bệnh nhân
+					</button>
+				</div>
+
+				<!-- Tabs -->
+				<div class="content-tabs">
+					<button class="tab-btn active" data-target="patient-list">
+						<i class="fas fa-list"></i>
+						Danh sách
+					</button>
+					<button class="tab-btn" data-target="patient-add">
+						<i class="fas fa-user-plus"></i>
+						Thêm mới
+					</button>
+					<button class="tab-btn" data-target="patient-medical">
+						<i class="fas fa-file-medical"></i>
+						Hồ sơ bệnh án
+					</button>
+				</div>
+
+				<!-- Tab Contents -->
+				<div id="patient-list" class="tab-content active">
+					@await Html.PartialAsync("BenhNhan/_DSBenhNhan")
+				</div>
+
+				<div id="patient-add" class="tab-content">
+					@await Html.PartialAsync("BenhNhan/_ThemBenhNhan")
+				</div>
+
+				<div id="patient-medical" class="tab-content">
+					@await Html.PartialAsync("BenhNhan/_BenhAnBenhNhan")
+				</div>
