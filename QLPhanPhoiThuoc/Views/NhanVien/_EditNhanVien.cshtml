@@ -1,0 +1,172 @@
+﻿@model QLPhanPhoiThuoc.Models.Entities.NhanVien
+
+@{
+    // Logic lấy ảnh an toàn
+    string avatarPath = "/images/default-avatar.png";
+    if (Model.TaiKhoan != null && !string.IsNullOrEmpty(Model.TaiKhoan.Avatar))
+    {
+        avatarPath = Model.TaiKhoan.Avatar;
+    }
+    else if (!string.IsNullOrEmpty(Model.TaiKhoan?.Avatar))
+    {
+        avatarPath = Model.TaiKhoan.Avatar;
+    }
+}
+
+<form id="editEmployeeForm" enctype="multipart/form-data">
+    <input type="hidden" name="MaNhanVien" value="@Model.MaNhanVien" />
+
+    <div class="row">
+        <div class="col-md-3 text-center border-end bg-light rounded-start py-3">
+            <div class="mb-3">
+                <div class="position-relative d-inline-block">
+                    <img id="editPreviewAvatar" src="@avatarPath" 
+                         class="rounded-circle img-thumbnail shadow-sm" 
+                         style="width: 140px; height: 140px; object-fit: cover;">
+                    <label for="editFileInput" class="btn btn-sm btn-primary position-absolute bottom-0 end-0 rounded-circle" title="Đổi ảnh">
+                        <i class="fas fa-camera"></i>
+                    </label>
+                    <input type="file" id="editFileInput" name="ImageFile" hidden accept="image/*" onchange="previewEditImage(this)">
+                </div>
+                <h5 class="mt-3 text-primary fw-bold">@Model.MaNhanVien</h5>
+                <span class="text-muted small">Mã nhân viên</span>
+            </div>
+
+            <div class="mb-3 text-start px-2">
+                <label class="form-label small fw-bold text-uppercase text-muted">Trạng thái</label>
+                <select name="TrangThai" class="form-select form-select-sm">
+                    <option value="DangLamViec" selected="@(Model.TrangThai == "DangLamViec")">🟢 Đang làm việc</option>
+                    <option value="DaNghiViec" selected="@(Model.TrangThai == "DaNghiViec")">🔴 Đã nghỉ việc</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-9 py-2 ps-4">
+            <h6 class="text-uppercase text-primary border-bottom pb-2 mb-3">
+                <i class="fas fa-user-edit me-2"></i>Thông tin cá nhân
+            </h6>
+
+            <div class="row g-3">
+                <div class="col-12">
+                    <label class="form-label fw-bold">Họ và tên <span class="text-danger">*</span></label>
+                    <input type="text" name="TenNhanVien" class="form-control fw-bold" value="@Model.TenNhanVien" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Ngày sinh</label>
+                    <input type="date" name="NgaySinh" class="form-control" 
+                           value="@(Model.NgaySinh.HasValue ? Model.NgaySinh.Value.ToString("yyyy-MM-dd") : "")">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">CCCD/CMND <span class="text-danger">*</span></label>
+                    <input type="text" name="CCCD" class="form-control" value="@Model.CCCD" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Giới tính</label>
+                    <select name="GioiTinh" class="form-select">
+                        <option value="Nam" selected="@(Model.GioiTinh == "Nam")">Nam</option>
+                        <option value="Nu" selected="@(Model.GioiTinh == "Nu")">Nữ</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Số điện thoại</label>
+                    <input type="tel" name="SoDienThoai" class="form-control" value="@Model.SoDienThoai">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="Email" class="form-control" value="@Model.Email">
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Địa chỉ liên hệ</label>
+                    <input type="text" name="DiaChi" class="form-control" value="@Model.DiaChi" placeholder="Số nhà, đường, phường/xã...">
+                </div>
+            </div>
+
+            <h6 class="text-uppercase text-primary border-bottom pb-2 mb-3 mt-4">
+                <i class="fas fa-briefcase me-2"></i>Công việc & Chuyên môn
+            </h6>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Khoa / Phòng</label>
+                    <select name="MaKhoa" class="form-select">
+                        @if (ViewBag.DanhSachKhoa != null)
+                        {
+                            foreach (var khoa in ViewBag.DanhSachKhoa)
+                            {
+                                        <option value="@khoa.MaKhoa" selected="@(Model.MaKhoa == khoa.MaKhoa)">@khoa.TenKhoa</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Chức vụ</label>
+                    <input type="text" name="ChucVu" class="form-control" value="@Model.ChucVu">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Bằng cấp</label>
+                    <input type="text" name="BangCap" class="form-control" value="@Model.BangCap" placeholder="Vd: Đại học, Thạc sĩ...">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Chuyên khoa</label>
+                    <input type="text" name="ChuyenKhoa" class="form-control" value="@Model.ChuyenKhoa" placeholder="Vd: Nội tổng quát...">
+                </div>
+            </div>
+
+            @if (Model.TaiKhoan != null)
+            {
+                    <div class="mt-4">
+                        <button class="btn btn-outline-warning btn-sm w-100 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#accountInfo">
+                            <i class="fas fa-key me-2"></i> Quản lý tài khoản (@Model.TaiKhoan.Username) <i class="fas fa-chevron-down float-end mt-1"></i>
+                        </button>
+                        <div class="collapse mt-2" id="accountInfo">
+                            <div class="card card-body bg-light border-warning">
+                                <label class="form-label fw-bold">Đổi mật khẩu mới</label>
+                                <input type="password" name="MatKhauMoi" class="form-control" placeholder="Để trống nếu không muốn thay đổi">
+                                <div class="form-text text-muted">Chỉ nhập khi bạn muốn reset mật khẩu cho nhân viên này.</div>
+                            </div>
+                        </div>
+                    </div>
+            }
+        </div>
+    </div>
+
+    <div class="modal-footer px-0 pb-0 mt-3 pt-3 border-top">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+        <button type="submit" class="btn btn-primary px-4"><i class="fas fa-save me-2"></i>Lưu thay đổi</button>
+    </div>
+</form>
+
+<script>
+    function previewEditImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) { $('#editPreviewAvatar').attr('src', e.target.result); }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    $('#editEmployeeForm').on('submit', function(e) {
+        e.preventDefault();
+        var formData = new FormData(this);
+        $.ajax({
+            url: '/Admin/NhanVien/Edit',
+            type: 'POST',
+            data: formData,
+            processData: false, contentType: false,
+            success: function(res) {
+                if(res.success) {
+                    var modalEl = document.getElementById('commonModal');
+                    var modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) modal.hide();
+                    showToast(res.message, 'success');
+                    loadEmployeeContent('/Admin/NhanVien/_DSNhanVien?page=@ViewBag.CurrentPage');
+                } else { Swal.fire('Lỗi', res.message, 'error'); }
+            }
+        });
+    });
+</script>

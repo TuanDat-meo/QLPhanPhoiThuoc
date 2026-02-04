@@ -496,17 +496,17 @@
                     <i class="fas fa-chevron-right menu-arrow"></i>
                 </div>
                 <div class="menu-submenu">
-                    <a class="submenu-item" data-url="/BenhNhan/_DSBenhNhan">
+                    <a href="#" class="submenu-item" onclick="loadPatientsContent('/Admin/BenhNhan/_DSBenhNhan')">
                         <i class="fas fa-circle"></i>
                         Danh sách bệnh nhân
                     </a>
-                    <a class="submenu-item" data-url="/BenhNhan/_BenhNhan">
+                    <a href="#" class="submenu-item" onclick="loadPatientsContent('/Admin/BenhNhan/Create')">
                         <i class="fas fa-circle"></i>
                         Quản lý bệnh nhân
                     </a>
-                    <a class="submenu-item" data-url="/BenhNhan/_BenhAnBenhNhan">
-                        <i class="fas fa-circle"></i>
-                        Hồ sơ bệnh án
+                    <a href="#" class="submenu-item" onclick="loadPatientsContent('/Admin/TheBHYT/_DSTheBHYT')">
+                                <i class="fas fa-circle"></i>
+                                <span>BHYT</span>
                     </a>
                 </div>
             </div>
@@ -563,15 +563,14 @@
                     <i class="fas fa-chevron-right menu-arrow"></i>
                 </div>
                 <div class="menu-submenu">
-                    <a href="#" class="submenu-item" data-tab="invoice-list">
-                        <i class="fas fa-circle"></i>
+                    <a href="#" class="submenu-item" data-url="/Admin/HoaDon/_DSHoaDon"> <i class="fas fa-circle"></i>
                         <span>Danh sách hóa đơn</span>
                     </a>
-                    <a href="#" class="submenu-item" data-tab="invoice-pending">
+                    <a href="#" class="submenu-item" data-url="/Admin/HoaDon/_HoaDonChoThanhToan">
                         <i class="fas fa-circle"></i>
                         <span>Chờ thanh toán</span>
                     </a>
-                    <a href="#" class="submenu-item" data-tab="invoice-paid">
+                    <a href="#" class="submenu-item" data-url="/Admin/HoaDon/_HoaDonDaThanhToan">
                         <i class="fas fa-circle"></i>
                         <span>Đã thanh toán</span>
                     </a>
@@ -611,15 +610,15 @@
                         <i class="fas fa-chevron-right menu-arrow"></i>
                     </div>
                     <div class="menu-submenu">
-                        <a href="#" class="submenu-item" data-tab="employee-list">
+                        <a href="#" class="submenu-item" data-url="/Admin/NhanVien/_DSNhanVien">
                             <i class="fas fa-circle"></i>
                             <span>Danh sách nhân viên</span>
                         </a>
-                        <a href="#" class="submenu-item" data-tab="employee-add">
+                        <a href="#" class="submenu-item" onclick="loadEmployeeContent('/Admin/NhanVien/Create')">
                             <i class="fas fa-circle"></i>
                             <span>Thêm nhân viên</span>
                         </a>
-                        <a href="#" class="submenu-item" data-tab="employee-roles">
+                        <a href="#" class="submenu-item" onclick="loadEmployeeContent('/Admin/NhanVien/PhanQuyen')">
                             <i class="fas fa-circle"></i>
                             <span>Phân quyền</span>
                         </a>
@@ -695,14 +694,38 @@
             </div>
         </div>
 
-        <!-- Bệnh nhân Section -->
+        @* Invoices Section *@
+        <div id="invoices" class="content-section">
+            <div class="medicine-container"> <div class="page-header">
+                    <h2 style="margin: 0; font-size: 1.8rem; font-weight: 700;">Quản lý hóa đơn</h2>
+                    <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 0.95rem;">Theo dõi thanh toán và doanh thu</p>
+                </div>
+                <div id="invoiceContent">
+                    <p style="text-align: center; padding: 50px; color: #6c757d;">Đang tải dữ liệu...</p>
+                </div>
+            </div>
+        </div>
+        @* Nhân Viên *@
+        <div id="employees" class="content-section">
+            <div class="medicine-container">
+                <div class="page-header">
+                    <h2 style="margin: 0; font-size: 1.8rem; font-weight: 700;">Quản lý nhân viên</h2>
+                    <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 0.95rem;">Quản lý đội ngũ y bác sĩ và nhân viên bệnh viện</p>
+                </div>
+                <div id="employeeContent">
+                    <p style="text-align: center; padding: 50px; color: #6c757d;">Đang tải dữ liệu...</p>
+                </div>
+            </div>
+        </div>
+        @* Bệnh nhân *@
         <div id="patients" class="content-section">
-            <div id="patientContent">
-                <div class="text-center py-5">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Đang tải...</span>
-                    </div>
-                    <p class="mt-3 text-muted">Đang tải danh sách bệnh nhân...</p>
+            <div class="medicine-container">
+                <div class="page-header">
+                    <h2 style="margin: 0; font-size: 1.8rem; font-weight: 700;">Quản lý bệnh nhân</h2>
+                    <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 0.95rem;">Tiếp nhận và quản lý hồ sơ bệnh án</p>
+                </div>
+                <div id="patientContent">
+                    <p style="text-align: center; padding: 50px; color: #6c757d;">Đang tải dữ liệu...</p>
                 </div>
             </div>
         </div>
@@ -797,6 +820,64 @@
                 }
             });
 
+        // Submenu item click - CẢI TIẾN ĐỂ HỖ TRỢ AJAX LOADING
+        $('.submenu-item').click(function(e) {
+            e.preventDefault();
+            
+            const $item = $(this);
+            const url = $item.data('url');
+            
+            // Update active states
+            $('.submenu-item').removeClass('active');
+            $item.addClass('active');
+            
+            // Ensure parent section is active
+            const $header = $item.closest('.menu-group').find('.menu-group-header');
+            $('.menu-group-header').removeClass('active');
+            $header.addClass('active');
+
+            // Load content nếu có URL
+            if (url) {
+                    // Kiểm tra URL để gọi hàm tương ứng
+                    if (url.includes('/HoaDon/')) {
+                        loadInvoiceContent(url);
+                    } else if (url.includes('/BenhNhan/')) {
+                        loadPatientsContent(url);
+                    } else {
+                        loadThuocContent(url); // Mặc định hoặc cho Thuốc
+                    }
+                }
+        });
+    });
+
+    // Helper function to show section
+    function showSection(sectionId) {
+        $('.content-section').removeClass('active');
+        $('#' + sectionId).addClass('active');
+    }
+
+    // Load Dashboard
+    function loadDashboard() {
+        showLoading();
+        showSection('dashboard');
+        
+        $.ajax({
+            url: '/Admin/Dashboard',
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(data) {
+                $('#dashboard').html(data);
+                hideLoading();
+                
+                // Re-initialize charts after loading dashboard
+                setTimeout(initializeCharts, 100);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error loading dashboard:', error);
+                $('#dashboard').html('<div class="alert alert-danger">Lỗi khi tải dashboard</div>');
+                hideLoading();
             // Thêm vào stack
             panelStack.push({
                 id: panelId,
@@ -913,6 +994,60 @@
                     }
                 });
             }
+        });
+    }
+    // Load Hoa Don Content
+    function loadInvoiceContent(url) {
+        showLoading();
+        showSection('invoices'); // Chuyển sang tab Hóa đơn
+
+        $.ajax({
+            url: url,
+            method: 'GET',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            success: function(data) {
+                $('#invoiceContent').html(data);
+                hideLoading();
+            },
+            error: function(xhr, status, error) {
+                console.error('Error loading invoices:', error);
+                $('#invoiceContent').html('<div class="alert alert-danger">Lỗi tải dữ liệu hóa đơn</div>');
+                hideLoading();
+            }
+        });
+    }
+
+    // Load Nhan Vien Content
+    function loadEmployeeContent(url) {
+        showLoading();
+        showSection('employees');
+        $.ajax({
+            url: url,
+            method: 'GET',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            success: function(data) {
+                $('#employeeContent').html(data);
+                hideLoading();
+            },
+            error: function() {
+                $('#employeeContent').html('<div class="alert alert-danger">Lỗi tải dữ liệu nhân viên</div>');
+                hideLoading();
+            }
+        });
+    }
+
+    // Cập nhật logic click submenu [cite: 342-344]
+    if (url.includes('/NhanVien/')) {
+        loadEmployeeContent(url);
+    }
+
+    // Load Bệnh nhân
+     // Load Patient Content
+        function loadPatientsContent(url) {
+            showLoading();
+            // Trước đó, trong AdminIndex bạn cần tạo 1 div có id="patients" giống id="employees"
+            // Nếu chưa có, hãy thêm <div id="patients" class="content-section">...</div> vào phần Main Content
+            showSection('patients'); 
         }
 
         // ==================== WAREHOUSE CONTENT LOADER ====================
@@ -953,9 +1088,15 @@
             });
         }
 
-        // ==================== PATIENT CONTENT LOADER ====================
-        function loadPatientContent(url) {
-            console.log('🔵 Loading patient from:', url);
+        // Cập nhật logic điều hướng
+        if (url.includes('/BenhNhan/')) {
+            loadPatientsContent(url);
+        }
+
+    // Loading functions
+    function showLoading() {
+        $('#loadingOverlay').addClass('show');
+    }
 
             showLoading();
             showSection('patients');

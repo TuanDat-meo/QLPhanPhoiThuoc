@@ -1,0 +1,333 @@
+﻿@model IEnumerable<QLPhanPhoiThuoc.Models.Entities.HoaDon>
+
+@{
+    // Lấy thông tin phân trang và lọc từ ViewBag (được truyền từ Controller)
+    int pageNumber = ViewBag.PageNumber ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    int totalItems = ViewBag.TotalItems ?? 0;
+    string currentFilter = ViewBag.CurrentFilter ?? "";
+    string statusFilter = ViewBag.StatusFilter ?? "";
+
+    string statusLabel = "Trạng thái";
+    string activeClassAll = "active";
+    string activeClassPending = "";
+    string activeClassPaid = "";
+
+    if (statusFilter == "ChuaTra")
+    {
+        statusLabel = "Chưa thanh toán";
+        activeClassAll = "";
+        activeClassPending = "active";
+    }
+    else if (statusFilter == "DaTra")
+    {
+        statusLabel = "Đã thanh toán";
+        activeClassAll = "";
+        activeClassPaid = "active";
+    }
+
+    // Tính số thứ tự hiển thị
+    int pageSize = ViewBag.PageSize ?? 10;
+    int firstItem = totalItems > 0 ? ((pageNumber - 1) * pageSize + 1) : 0;
+    int lastItem = Math.Min(pageNumber * pageSize, totalItems);
+}
+
+<div class="card shadow-sm border-0 animate-fadeIn">
+    <div class="card-body p-0">
+        <div class="p-3 d-flex justify-content-between align-items-center bg-light border-bottom">
+            <div class="search-box w-50">
+                <form id="invoiceSearchForm" onsubmit="return false;"> <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" 
+                               id="invoiceSearchInput" 
+                               class="form-control border-start-0 ps-0" 
+                               placeholder="Tìm theo Mã hóa đơn hoặc Tên bệnh nhân..." 
+                               value="@currentFilter">
+                        <input type="hidden" id="invoiceStatusFilter" value="@statusFilter" />
+
+                        <button class="btn btn-primary" type="button" onclick="searchInvoices()">
+                            Tìm kiếm
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="filter-options d-flex gap-2">
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" id="dropdownMenuButton">
+                        <i class="fas fa-filter me-1"></i> @statusLabel </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item @activeClassAll" href="javascript:void(0)" onclick="filterInvoiceStatus('')">
+                                Tất cả
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item @activeClassPending" href="javascript:void(0)" onclick="filterInvoiceStatus('ChuaTra')">
+                                Chưa thanh toán
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item @activeClassPaid" href="javascript:void(0)" onclick="filterInvoiceStatus('DaTra')">
+                                Đã thanh toán
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <input type="hidden" id="invoiceStatusFilter" value="@statusFilter" />
+
+                <button class="btn btn-outline-success btn-sm" onclick="exportInvoiceExcel()">
+                    <i class="fas fa-file-excel me-1"></i> Xuất Excel
+                </button>
+            </div>
+        </div>
+
+        @if (totalItems > 0)
+        {
+                <div class="p-3 pb-0">
+                    <p class="text-muted mb-0 small">
+                        Hiển thị <strong>@firstItem</strong> - <strong>@lastItem</strong> trong tổng số <strong>@totalItems</strong> hóa đơn
+                    </p>
+                </div>
+        }
+
+        <div class="table-responsive mt-2">
+            @if (Model != null && Model.Any())
+            {
+                    <table class="table medicine-table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-4">Mã HĐ</th>
+                                <th>Bệnh nhân</th>
+                                <th>Ngày tạo</th>
+                                <th>Tổng tiền</th>
+                                <th>BHYT Trả</th>
+                                <th>Còn lại</th>
+                                <th>Trạng thái</th>
+                                <th class="text-end pe-4">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var item in Model)
+                        {
+                                    <tr>
+                                        <td class="ps-4 fw-bold text-primary">
+                                            <i class="fas fa-file-invoice me-1"></i> @item.MaHoaDon
+                                        </td>
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                <span class="fw-bold">
+                                            @(item.BenhNhan != null ? item.BenhNhan.TenBenhNhan : "Khách lẻ")
+                                                </span>
+                                        @if (item.BenhNhan != null)
+                                        {
+                                                        <span class="text-muted small" style="font-size: 0.75rem;">
+                                                            <i class="fas fa-phone-alt me-1"></i>@item.BenhNhan.SoDienThoai
+                                                        </span>
+                                        }
+                                            </div>
+                                        </td>
+                                        <td>@item.NgayTao.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td class="fw-bold text-dark">
+                                    @item.TongTien.ToString("N0") đ
+                                        </td>
+                                        <td class="text-muted">
+                                    @item.TienBHYTChiTra.ToString("N0") đ
+                                        </td>
+                                        <td class="fw-bold text-danger">
+                                    @item.TienBenhNhanCanTra.ToString("N0") đ
+                                        </td>
+                                        <td>
+                                    @if (item.TrangThaiThanhToan == "DaTra" || item.TrangThaiThanhToan == "HoanTat")
+                                    {
+                                                    <span class="badge badge-success">
+                                                        <i class="fas fa-check-circle"></i> Đã thanh toán
+                                                    </span>
+                                    }
+                                    else
+                                    {
+                                                    <span class="badge badge-danger">
+                                                        <i class="fas fa-clock"></i> Chưa trả
+                                                    </span>
+                                    }
+                                        </td>
+                                        <td class="text-end pe-4">
+                                            <button class="btn btn-sm btn-light text-primary border" 
+                                                    onclick="viewInvoiceDetail('@item.MaHoaDon')" 
+                                                    title="Xem chi tiết">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                    @if (item.TrangThaiThanhToan != "DaTra")
+                                    {
+                                                    <button class="btn btn-sm btn-primary ms-1" 
+                                                            onclick="processPayment('@item.MaHoaDon')" 
+                                                            title="Thanh toán ngay">
+                                                        <i class="fas fa-money-bill-wave"></i>
+                                                    </button>
+                                    }
+                                        </td>
+                                    </tr>
+                        }
+                        </tbody>
+                    </table>
+            }
+            else
+            {
+                    <div class="text-center py-5">
+                        <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" width="80" class="mb-3 opacity-50" />
+                        <p class="text-muted">Không tìm thấy hóa đơn nào phù hợp.</p>
+                    </div>
+            }
+        </div>
+
+        @if (totalPages > 1)
+        {
+                <div class="d-flex justify-content-center mt-4 mb-3">
+                    <nav>
+                        <ul class="pagination">
+                            <li class="page-item @(pageNumber == 1 ? "disabled" : "")">
+                                <a class="page-link" href="javascript:void(0)" onclick="loadInvoicePage(@(pageNumber - 1))">‹</a>
+                            </li>
+
+                        @{
+                            int startPage = Math.Max(1, pageNumber - 2);
+                            int endPage = Math.Min(totalPages, pageNumber + 2);
+                        }
+
+                        @for (int i = startPage; i <= endPage; i++)
+                        {
+                                    <li class="page-item @(i == pageNumber ? "active" : "")">
+                                        <a class="page-link" href="javascript:void(0)" onclick="loadInvoicePage(@i)">@i</a>
+                                    </li>
+                        }
+
+                            <li class="page-item @(pageNumber >= totalPages ? "disabled" : "")">
+                                <a class="page-link" href="javascript:void(0)" onclick="loadInvoicePage(@(pageNumber + 1))">›</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+        }
+    </div>
+</div>
+
+
+<div class="modal fade" id="commonModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-gradient-primary text-white py-3">
+                <h5 class="modal-title fw-bold" id="commonModalTitle">
+                    <i class="fas fa-info-circle me-2"></i>Thông tin chi tiết
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body p-0 bg-light" id="commonModalBody">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2 text-muted">Đang tải dữ liệu...</p>
+                </div>
+            </div>
+
+            <div class="modal-footer bg-white">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="commonModalActionBtn" style="display: none;">
+                    <i class="fas fa-save me-1"></i> Lưu thay đổi
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* CSS bổ sung cho Modal đẹp hơn */
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
+    }
+    .modal-content {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+</style>
+
+
+
+
+
+<script>
+    // Hàm xử lý tìm kiếm
+    function searchInvoices() {
+        var keyword = $('#invoiceSearchInput').val();
+        var status = $('#invoiceStatusFilter').val();
+        loadInvoiceList(keyword, status, 1);
+    }
+
+    // Hàm xử lý lọc trạng thái
+    function filterInvoiceStatus(status) {
+        var keyword = $('#invoiceSearchInput').val();
+        loadInvoiceList(keyword, status, 1);
+    }
+
+    // Hàm xử lý chuyển trang
+    function loadInvoicePage(page) {
+        if (page < 1) return;
+        var keyword = $('#invoiceSearchInput').val();
+        var status = $('#invoiceStatusFilter').val();
+        loadInvoiceList(keyword, status, page);
+    }
+
+    // Hàm gọi AJAX chung (Gọi lại Controller)
+    function loadInvoiceList(search, status, page) {
+        // Tái sử dụng hàm loadInvoiceContent đã khai báo ở AdminIndex.cshtml
+        // Tạo URL với query parameters
+        var url = `/Admin/HoaDon/_DSHoaDon?searchString=${encodeURIComponent(search)}&statusFilter=${status}&page=${page}`;
+        loadInvoiceContent(url);
+    }
+
+    // Hàm mở chi tiết (Placeholder - Sẽ làm ở bước sau)
+    function viewInvoiceDetail(id) {
+        // Gọi Modal chi tiết
+        Swal.fire({
+            title: 'Đang tải...',
+            didOpen: () => {
+                Swal.showLoading()
+            }
+        });
+
+        // AJAX gọi action ChiTiet sẽ làm ở bước sau
+        $.get('/Admin/HoaDon/ChiTiet/' + id, function(data) {
+             Swal.close();
+             // Hiển thị modal (cần thêm vùng chứa modal vào Layout hoặc AdminIndex)
+             $('#commonModalBody').html(data);
+             $('#commonModalTitle').text('Chi tiết hóa đơn #' + id);
+             var myModal = new bootstrap.Modal(document.getElementById('commonModal'));
+             myModal.show();
+        }).fail(function() {
+            Swal.fire('Lỗi', 'Không thể tải chi tiết hóa đơn', 'error');
+        });
+    }
+
+    // Bắt sự kiện Enter trong ô tìm kiếm
+    $('#invoiceSearchInput').on('keypress', function (e) {
+        if (e.which === 13) {
+            searchInvoices();
+        }
+    });
+
+
+    // Hàm xuất Excel
+    function exportInvoiceExcel() {
+        // Lấy giá trị bộ lọc hiện tại để xuất đúng dữ liệu đang xem
+        var keyword = $('#invoiceSearchInput').val() || '';
+        var status = $('#invoiceStatusFilter').val() || '';
+
+        // Tạo URL
+        var url = `/Admin/HoaDon/ExportExcel?searchString=${encodeURIComponent(keyword)}&statusFilter=${status}`;
+
+        // Chuyển hướng để tải file (không dùng AJAX cho file download)
+        window.location.href = url;
+    }
+</script>

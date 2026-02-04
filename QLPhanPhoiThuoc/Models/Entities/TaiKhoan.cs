@@ -40,6 +40,9 @@ namespace QLPhanPhoiThuoc.Models.Entities
         public DateTime NgayTao { get; set; } = DateTime.Now;
 
         public DateTime? NgayCapNhat { get; set; }
+        
+        [MaxLength(500)]
+        public string? Avatar { get; set; }
 
         // Navigation properties
         public virtual NhanVien? NhanVien { get; set; }

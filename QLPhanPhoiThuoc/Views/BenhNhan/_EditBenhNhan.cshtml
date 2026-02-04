@@ -1,0 +1,146 @@
+﻿@model QLPhanPhoiThuoc.Models.Entities.BenhNhan
+
+@{
+    var currentMaThe = Model.TheBHYTs?.FirstOrDefault()?.MaThe ?? "";
+}
+
+<form id="editPatientForm">
+    <input type="hidden" name="MaBenhNhan" value="@Model.MaBenhNhan" />
+
+    <div class="row g-3 p-3">
+        <div class="col-12">
+            <span class="badge bg-secondary mb-2">Mã BN: @Model.MaBenhNhan</span>
+        </div>
+
+        <div class="col-md-8">
+            <label class="form-label fw-bold">Họ và tên <span class="text-danger">*</span></label>
+            <input type="text" name="TenBenhNhan" class="form-control fw-bold text-primary" value="@Model.TenBenhNhan" required>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Nhóm máu</label>
+            <select name="NhomMau" class="form-select">
+                <option value="">-- Chưa rõ --</option>
+                <option value="A" selected="@(Model.NhomMau == "A")">Nhóm A</option>
+                <option value="B" selected="@(Model.NhomMau == "B")">Nhóm B</option>
+                <option value="AB" selected="@(Model.NhomMau == "AB")">Nhóm AB</option>
+                <option value="O" selected="@(Model.NhomMau == "O")">Nhóm O</option>
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Ngày sinh</label>
+            <input type="date" name="NgaySinh" class="form-control" 
+                   max="@DateTime.Now.ToString("yyyy-MM-dd")"
+                   value="@(Model?.NgaySinh?.ToString("yyyy-MM-dd") ?? "")">
+            <div class="form-text text-muted small">Phải nhỏ hơn ngày hiện tại</div>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Giới tính</label>
+            <select name="GioiTinh" class="form-select">
+                <option value="Nam" selected="@(Model.GioiTinh == "Nam")">Nam</option>
+                <option value="Nu" selected="@(Model.GioiTinh == "Nu")">Nữ</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">CCCD/CMND</label>
+            <input type="text" name="CCCD" class="form-control" value="@Model.CCCD" placeholder="---">
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+            <input type="tel" name="SoDienThoai" class="form-control" value="@Model.SoDienThoai" required>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Email</label>
+            <input type="email" name="Email" class="form-control" value="@Model.Email" placeholder="---">
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Nghề nghiệp</label>
+            <input type="text" name="NgheNghiep" class="form-control" value="@Model.NgheNghiep">
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Số thẻ BHYT</label>
+            <div class="input-group">
+                <span class="input-group-text bg-white"><i class="fas fa-id-card text-success"></i></span>
+
+                <input type="text" id="txtSoTheBHYT_Edit" name="SoTheBHYT" class="form-control" 
+                       value="@(Model.TheBHYTs?.FirstOrDefault()?.SoTheBHYT ?? "")" 
+                       placeholder="Nhập số thẻ">
+
+                        @if (Model.TheBHYTs != null && Model.TheBHYTs.Any())
+                        {
+                        <button type="button" class="btn btn-outline-primary" onclick="jumpToBHYT()" title="Xem chi tiết thẻ này">
+                            <i class="fas fa-search-arrow me-1"></i> Tra cứu
+                        </button>
+                        }
+            </div>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label">Địa chỉ</label>
+            <input type="text" name="DiaChi" class="form-control" value="@Model.DiaChi">
+        </div>
+
+        <div class="col-12">
+            <label class="form-label text-danger fw-bold">Tiền sử bệnh / Dị ứng</label>
+            <textarea name="TienSuDiUng" class="form-control" rows="2">@Model.TienSuDiUng</textarea>
+        </div>
+
+        <div class="col-12">
+            <div class="p-2 bg-light rounded border d-flex align-items-center gap-3">
+                <label class="form-label mb-0 fw-bold">Trạng thái:</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="TrangThai" id="tt1" value="DangDieuTri" @(Model.TrangThai == "DangDieuTri" ? "checked" : "")>
+                    <label class="form-check-label text-success" for="tt1">Đang điều trị</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="TrangThai" id="tt2" value="NgungDieuTri" @(Model.TrangThai != "DangDieuTri" ? "checked" : "")>
+                    <label class="form-check-label text-muted" for="tt2">Ngừng theo dõi</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer px-0 pb-0 mt-2 border-top">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="submit" class="btn btn-primary px-4"><i class="fas fa-save me-2"></i>Lưu thay đổi</button>
+    </div>
+</form>
+
+<script>
+    $('#editPatientForm').off('submit').on('submit', function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: '/Admin/BenhNhan/Edit',
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function(res) {
+                if(res.success) {
+                    $('#commonModal').modal('hide');
+                    showToast(res.message, 'success');
+                    // Load lại trang hiện tại (nếu có biến currentPage)
+                    var page = typeof currentPage !== 'undefined' ? currentPage : 1;
+                    loadPatientsContent('/Admin/BenhNhan/_DSBenhNhan?page=' + page);
+                } else {
+                    Swal.fire('Lỗi', res.message, 'error');
+                }
+            }
+        });
+    });
+
+    function jumpToBHYT() {
+        // 1. Lấy số thẻ từ ô input
+        var soThe = $('#txtSoTheBHYT_Edit').val();
+
+        if(!soThe) return;
+
+        // 2. Đóng Modal sửa bệnh nhân lại
+        $('#commonModal').modal('hide');
+
+        // 3. Load danh sách BHYT vào khung 'patients', đồng thời search luôn số thẻ đó
+        loadPatientsContent('/Admin/TheBHYT/_DSTheBHYT?search=' + encodeURIComponent(soThe));
+    }
+
+
+</script>

@@ -1,0 +1,167 @@
+﻿@model QLPhanPhoiThuoc.Models.Entities.HoaDon
+
+<div class="p-4 bg-white">
+    <div class="d-flex justify-content-between align-items-start mb-4 border-bottom pb-3">
+        <div>
+            <h4 class="fw-bold text-primary mb-1">HÓA ĐƠN THANH TOÁN</h4>
+            <span class="text-muted small">Mã HĐ: <strong class="text-dark">#@Model.MaHoaDon</strong></span>
+            <br />
+            <span class="text-muted small">Ngày lập: @Model.NgayTao.ToString("dd/MM/yyyy HH:mm")</span>
+        </div>
+        <div class="text-end">
+            @if (Model.TrangThaiThanhToan == "DaTra" || Model.TrangThaiThanhToan == "HoanTat")
+            {
+                    <span class="badge bg-success fs-6 px-3 py-2 rounded-pill">
+                        <i class="fas fa-check-circle me-1"></i> ĐÃ THANH TOÁN
+                    </span>
+            }
+            else
+            {
+                    <span class="badge bg-danger fs-6 px-3 py-2 rounded-pill">
+                        <i class="fas fa-clock me-1"></i> CHƯA THANH TOÁN
+                    </span>
+            }
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h6 class="text-uppercase text-secondary small fw-bold mb-2">Thông tin bệnh nhân</h6>
+            <div class="p-3 bg-light rounded-3">
+                <p class="mb-1"><strong>Họ tên:</strong> @(Model.BenhNhan?.TenBenhNhan ?? "Khách vãng lai")</p>
+                <p class="mb-1"><strong>SĐT:</strong> @(Model.BenhNhan?.SoDienThoai ?? "---")</p>
+                <p class="mb-1"><strong>CCCD:</strong> @(Model.BenhNhan?.CCCD ?? "---")</p>
+                <p class="mb-0"><strong>Địa chỉ:</strong> @(Model.BenhNhan?.DiaChi ?? "---")</p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h6 class="text-uppercase text-secondary small fw-bold mb-2">Thông tin đơn thuốc</h6>
+            <div class="p-3 bg-light rounded-3">
+                <p class="mb-1"><strong>Mã đơn thuốc:</strong> <a href="#" class="text-decoration-none">@Model.MaDonThuoc</a></p>
+                <p class="mb-1"><strong>Bác sĩ kê:</strong> @(Model.DonThuoc?.NhanVien?.TenNhanVien ?? "---")</p>
+                <p class="mb-1"><strong>Chẩn đoán:</strong> @(Model.DonThuoc?.ChanDoanSoBo ?? "---")</p>
+                <p class="mb-0"><strong>Ghi chú:</strong> @(Model.GhiChu ?? "Không có ghi chú")</p>
+            </div>
+        </div>
+    </div>
+
+    <h6 class="text-uppercase text-secondary small fw-bold mb-2">Chi tiết đơn thuốc</h6>
+    <div class="table-responsive border rounded-3 mb-4">
+        <table class="table table-striped table-hover mb-0 text-center">
+            <thead class="bg-primary text-white">
+                <tr>
+                    <th class="text-start ps-3">Tên thuốc</th>
+                    <th>ĐVT</th>
+                    <th>Số lượng</th>
+                    <th class="text-end">Đơn giá</th>
+                    <th class="text-end pe-3">Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.DonThuoc != null && Model.DonThuoc.ChiTietDonThuocs != null)
+                {
+                    foreach (var chiTiet in Model.DonThuoc.ChiTietDonThuocs)
+                    {
+                        // Giả sử lấy giá từ bảng Thuoc (cần Include Thuoc trong Controller)
+                        var donGia = chiTiet.Thuoc?.GiaXuat ?? 0;
+                        var thanhTien = donGia * chiTiet.SoLuong;
+                                <tr>
+                                    <td class="text-start ps-3 fw-bold text-primary">@chiTiet.Thuoc?.TenThuoc</td>
+                                    <td>@chiTiet.Thuoc?.DonViTinh</td>
+                                    <td>@chiTiet.SoLuong</td>
+                                    <td class="text-end">@donGia.ToString("N0")</td>
+                                    <td class="text-end pe-3 fw-bold">@thanhTien.ToString("N0")</td>
+                                </tr>
+                    }
+                }
+                else
+                {
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-3">Không có thông tin thuốc</td>
+                        </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row justify-content-end">
+        <div class="col-md-5">
+            <div class="bg-light p-3 rounded-3">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Tổng tiền thuốc:</span>
+                    <span class="fw-bold">@Model.TongTien.ToString("N0") đ</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2 text-success">
+                    <span><i class="fas fa-shield-alt me-1"></i>BHYT Chi trả:</span>
+                    <span class="fw-bold">- @Model.TienBHYTChiTra.ToString("N0") đ</span>
+                </div>
+                <hr class="my-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold text-dark fs-5">KHÁCH PHẢI TRẢ:</span>
+                    <span class="fw-bold text-danger fs-4">@Model.TienBenhNhanCanTra.ToString("N0") đ</span>
+                </div>
+                <div class="d-flex justify-content-between mt-2 text-muted small">
+                    <span>Đã thanh toán:</span>
+                    <span>@Model.TienDaTra.ToString("N0") đ</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+        <button class="btn btn-outline-secondary" onclick="printInvoice('@Model.MaHoaDon')">
+            <i class="fas fa-print me-1"></i> In hóa đơn
+        </button>
+
+        @if (Model.TrangThaiThanhToan != "DaTra")
+        {
+                <button class="btn btn-primary bg-gradient-primary" onclick="confirmPayment('@Model.MaHoaDon')">
+                    <i class="fas fa-money-bill-wave me-1"></i> Xác nhận thanh toán
+                </button>
+        }
+    </div>
+</div>
+
+<script>
+    // Hàm in hóa đơn (Placeholder)
+    function printInvoice(id) {
+        // Có thể mở một cửa sổ mới để in hoặc gọi API in
+        window.open('/Admin/HoaDon/InHoaDon/' + id, '_blank');
+    }
+
+    // Hàm xác nhận thanh toán
+    function confirmPayment(id) {
+        Swal.fire({
+            title: 'Xác nhận thanh toán?',
+            text: "Xác nhận thu đủ tiền và hoàn tất hóa đơn này?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#1e3a5f',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Đồng ý, thanh toán!',
+            cancelButtonText: 'Hủy'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Gọi AJAX cập nhật trạng thái
+                $.ajax({
+                    url: '/Admin/HoaDon/ThanhToan/' + id, // Cần tạo Action này trong Controller
+                    type: 'POST',
+                    success: function(res) {
+                        if(res.success) {
+                            Swal.fire('Thành công!', 'Hóa đơn đã được thanh toán.', 'success');
+                            $('#commonModal').modal('hide'); // Đóng modal
+                            searchInvoices(); // Tải lại danh sách
+                        } else {
+                            Swal.fire('Lỗi!', res.message, 'error');
+                        }
+                    }
+                });
+            }
+        });
+    }
+    // Hàm in hóa đơn
+    function printInvoice(id) {
+        // Mở tab mới dẫn tới trang in
+        window.open('/Admin/HoaDon/InHoaDon/' + id, '_blank');
+    }
+</script>

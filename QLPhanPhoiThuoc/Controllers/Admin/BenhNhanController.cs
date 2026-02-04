@@ -1,6 +1,4 @@
-﻿// ==================== CẬP NHẬT BENHNHANCONTROLLER.CS ====================
-// File: Controllers/BenhNhanController.cs (KHÔNG PHẢI Controllers/Admin/)
-
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QLPhanPhoiThuoc.Models.EF;
@@ -8,8 +6,8 @@ using QLPhanPhoiThuoc.Models.Entities;
 
 namespace QLPhanPhoiThuoc.Controllers
 {
-    // ========== QUAN TRỌNG: Route phải là "BenhNhan" chứ KHÔNG PHẢI "Admin/BenhNhan" ==========
-    [Route("BenhNhan")]
+    [Route("Admin/[controller]")]
+    [Authorize(Roles = "Admin,NhanVien,BacSi,DuocSi")]
     public class BenhNhanController : Controller
     {
         private readonly BenhVienDbContext _context;
@@ -19,134 +17,90 @@ namespace QLPhanPhoiThuoc.Controllers
             _context = context;
         }
 
-        // ==================== CÁC ACTION METHODS ====================
-
-        // GET: /BenhNhan/_DSBenhNhan - Danh sách bệnh nhân
-        [HttpGet]
-        [Route("_DSBenhNhan")]
-        public async Task<IActionResult> DSBenhNhan(string searchString, int page = 1)
+        // GET: Admin/BenhNhan/_DSBenhNhan
+        [HttpGet("_DSBenhNhan")]
+        public async Task<IActionResult> DSBenhNhan(string search = "", int page = 1)
         {
-            if (_context == null || _context.BenhNhans == null)
+            int pageSize = 10;
+            var query = _context.BenhNhans
+                .Include(bn => bn.TheBHYTs) // Include để lấy mã thẻ
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
             {
-                return Problem("Chưa kết nối được Database hoặc bảng BenhNhan bị null.");
+                search = search.Trim().ToLower();
+                query = query.Where(bn => bn.TenBenhNhan.ToLower().Contains(search) ||
+                                          bn.SoDienThoai.Contains(search) ||
+                                          bn.TheBHYTs.Any(t => t.MaThe.Contains(search)));
             }
 
-            ViewBag.CurrentFilter = searchString;
+            query = query.OrderByDescending(bn => bn.NgayTao);
 
-            var query = from b in _context.BenhNhans select b;
-
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                query = query.Where(s =>
-                    s.TenBenhNhan != null && s.TenBenhNhan.Contains(searchString) ||
-                    s.CCCD != null && s.CCCD.Contains(searchString) ||
-                    s.SoDienThoai != null && s.SoDienThoai.Contains(searchString)
-                );
-            }
-
-            query = query.OrderByDescending(b => b.NgayTao);
-
-            // Phân trang
-            int pageSize = 8;
-            int totalItems = await query.CountAsync();
-            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
-
+            var totalItems = await query.CountAsync();
             var items = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
-            ViewBag.PageNumber = page;
-            ViewBag.PageSize = pageSize;
-            ViewBag.TotalItems = totalItems;
-            ViewBag.TotalPages = totalPages;
+            ViewBag.Search = search;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
             return PartialView("~/Views/BenhNhan/_DSBenhNhan.cshtml", items);
         }
 
-        // GET: /BenhNhan/_BenhNhan - Trang quản lý bệnh nhân (có tabs)
-        [HttpGet]
-        [Route("_BenhNhan")]
-        public IActionResult BenhNhan()
+        // GET: Admin/BenhNhan/Create
+        [HttpGet("Create")]
+        public IActionResult Create()
         {
-            return PartialView("~/Views/BenhNhan/_BenhNhan.cshtml");
+            return PartialView("~/Views/BenhNhan/_CreateBenhNhan.cshtml");
         }
 
-        // GET: /BenhNhan/ChiTiet/{id} - Xem chi tiết bệnh nhân
-        [HttpGet]
-        [Route("ChiTiet/{id}")]
-        public async Task<IActionResult> ChiTiet(string id)
-        {
-            if (string.IsNullOrEmpty(id))
-            {
-                return BadRequest("Mã bệnh nhân không hợp lệ");
-            }
-
-            var benhNhan = await _context.BenhNhans
-                .FirstOrDefaultAsync(b => b.MaBenhNhan == id);
-
-            if (benhNhan == null)
-            {
-                return NotFound("Không tìm thấy bệnh nhân");
-            }
-
-            return PartialView("~/Views/BenhNhan/_ChiTietBenhNhan.cshtml", benhNhan);
-        }
-
-        // GET: /BenhNhan/LayFormSua/{id} - Lấy form sửa bệnh nhân
-        [HttpGet]
-        [Route("LayFormSua/{id}")]
-        public async Task<IActionResult> LayFormSua(string id)
-        {
-            if (string.IsNullOrEmpty(id))
-            {
-                return BadRequest("Mã bệnh nhân không hợp lệ");
-            }
-
-            var benhNhan = await _context.BenhNhans
-                .FirstOrDefaultAsync(b => b.MaBenhNhan == id);
-
-            if (benhNhan == null)
-            {
-                return NotFound("Không tìm thấy bệnh nhân");
-            }
-
-            return PartialView("~/Views/BenhNhan/_SuaBenhNhan.cshtml", benhNhan);
-        }
-
-        // POST: /BenhNhan/SuaBenhNhan - Cập nhật thông tin bệnh nhân
-        [HttpPost]
-        [Route("SuaBenhNhan")]
-        public async Task<IActionResult> SuaBenhNhan([FromBody] BenhNhan model)
+        // POST: Admin/BenhNhan/Create
+        [HttpPost("Create")]
+        public async Task<IActionResult> Create(BenhNhan model, string? MaTheBHYT)
         {
             try
             {
-                if (string.IsNullOrEmpty(model.MaBenhNhan))
+                // 1. check du lieu.
+                if (await _context.BenhNhans.AnyAsync(bn => bn.SoDienThoai == model.SoDienThoai))
+                    return Json(new { success = false, message = "Số điện thoại này đã tồn tại!" });
+
+                if (!string.IsNullOrEmpty(model.CCCD) && await _context.BenhNhans.AnyAsync(bn => bn.CCCD == model.CCCD))
+                    return Json(new { success = false, message = "Số CCCD này đã tồn tại!" });
+                if (model.NgaySinh.HasValue && model.NgaySinh.Value.Date >= DateTime.Now.Date)
                 {
-                    return Json(new { success = false, message = "Mã bệnh nhân không hợp lệ" });
+                    return Json(new { success = false, message = "Ngày sinh không hợp lệ (Phải trước ngày hôm nay)!" });
                 }
 
-                var benhNhan = await _context.BenhNhans
-                    .FirstOrDefaultAsync(b => b.MaBenhNhan == model.MaBenhNhan);
+                model.CCCD = model.CCCD ?? "";
+                model.Email = model.Email ?? "";
+                model.NhomMau = model.NhomMau ?? "";
+                model.NgheNghiep = model.NgheNghiep ?? "";
+                model.TienSuDiUng = model.TienSuDiUng ?? "";
 
-                if (benhNhan == null)
-                {
-                    return Json(new { success = false, message = "Không tìm thấy bệnh nhân" });
-                }
+                model.MaBenhNhan = "BN" + DateTime.Now.ToString("yyMMdd") + new Random().Next(100, 999);
+                model.NgayTao = DateTime.Now;
+                model.TrangThai = "DangDieuTri";
 
-                // Cập nhật thông tin
-                benhNhan.TenBenhNhan = model.TenBenhNhan;
-                benhNhan.CCCD = model.CCCD;
-                benhNhan.SoDienThoai = model.SoDienThoai;
-                benhNhan.Email = model.Email;
-                benhNhan.NgaySinh = model.NgaySinh;
-                benhNhan.GioiTinh = model.GioiTinh;
-                benhNhan.DiaChi = model.DiaChi;
-                benhNhan.TrangThai = model.TrangThai;
-
+                _context.BenhNhans.Add(model);
                 await _context.SaveChangesAsync();
 
-                return Json(new { success = true, message = "Cập nhật thành công" });
+                // Lưu thẻ BHYT 
+                if (!string.IsNullOrEmpty(MaTheBHYT))
+                {
+                    var theBHYT = new TheBHYT
+                    {
+                        MaThe = MaTheBHYT,
+                        MaBenhNhan = model.MaBenhNhan,
+                        NgayBatDau = DateTime.Now,
+                        NgayHetHan = DateTime.Now.AddYears(1)
+                    };
+                    _context.TheBHYTs.Add(theBHYT);
+                    await _context.SaveChangesAsync();
+                }
+
+                return Json(new { success = true, message = "Thêm hồ sơ thành công!" });
             }
             catch (Exception ex)
             {
@@ -154,30 +108,104 @@ namespace QLPhanPhoiThuoc.Controllers
             }
         }
 
-        // POST: /BenhNhan/XoaBenhNhan/{id} - Xóa bệnh nhân
-        [HttpPost]
-        [Route("XoaBenhNhan/{id}")]
-        public async Task<IActionResult> XoaBenhNhan(string id)
+        // POST: Admin/BenhNhan/Edit
+        [HttpPost("Edit")]
+        public async Task<IActionResult> Edit(BenhNhan model, string? MaTheBHYT)
         {
             try
             {
-                if (string.IsNullOrEmpty(id))
+
+                if (model.NgaySinh.HasValue && model.NgaySinh.Value.Date >= DateTime.Now.Date)
                 {
-                    return Json(new { success = false, message = "Mã bệnh nhân không hợp lệ" });
+                    return Json(new { success = false, message = "Ngày sinh không hợp lệ (Phải trước ngày hôm nay)!" });
                 }
 
-                var benhNhan = await _context.BenhNhans
-                    .FirstOrDefaultAsync(b => b.MaBenhNhan == id);
+                var existing = await _context.BenhNhans
+                    .Include(b => b.TheBHYTs)
+                    .FirstOrDefaultAsync(b => b.MaBenhNhan == model.MaBenhNhan);
 
-                if (benhNhan == null)
+                if (existing == null) return Json(new { success = false, message = "Không tìm thấy bệnh nhân!" });
+
+                // Cập nhật thông tin cơ bản
+                existing.TenBenhNhan = model.TenBenhNhan;
+                existing.NgaySinh = model.NgaySinh;
+                existing.GioiTinh = model.GioiTinh;
+                existing.SoDienThoai = model.SoDienThoai;
+                existing.DiaChi = model.DiaChi;
+
+                // Cập nhật các trường mới (cho phép rỗng)
+                existing.CCCD = model.CCCD ?? "";
+                existing.Email = model.Email ?? "";
+                existing.NhomMau = model.NhomMau ?? "";
+                existing.NgheNghiep = model.NgheNghiep ?? "";
+                existing.TienSuDiUng = model.TienSuDiUng ?? "";
+
+                existing.TrangThai = model.TrangThai;
+
+                // Xử lý thẻ BHYT
+                var currentCard = existing.TheBHYTs.FirstOrDefault();
+                if (!string.IsNullOrEmpty(MaTheBHYT))
                 {
-                    return Json(new { success = false, message = "Không tìm thấy bệnh nhân" });
+                    if (currentCard != null)
+                    {
+                        currentCard.MaThe = MaTheBHYT;
+                        _context.TheBHYTs.Update(currentCard);
+                    }
+                    else
+                    {
+                        _context.TheBHYTs.Add(new TheBHYT { MaThe = MaTheBHYT, MaBenhNhan = existing.MaBenhNhan, NgayBatDau = DateTime.Now, NgayHetHan = DateTime.Now.AddYears(1) });
+                    }
                 }
 
-                _context.BenhNhans.Remove(benhNhan);
                 await _context.SaveChangesAsync();
+                return Json(new { success = true, message = "Cập nhật hồ sơ thành công!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi: " + ex.Message });
+            }
+        }
 
-                return Json(new { success = true, message = "Xóa bệnh nhân thành công" });
+        // GET: Admin/BenhNhan/Edit/{id}
+        [HttpGet("Edit/{id}")]
+        public async Task<IActionResult> Edit(string id)
+        {
+            var bn = await _context.BenhNhans
+                .Include(b => b.TheBHYTs)
+                .FirstOrDefaultAsync(b => b.MaBenhNhan == id);
+
+            if (bn == null) return NotFound();
+            return PartialView("~/Views/BenhNhan/_EditBenhNhan.cshtml", bn);
+        }
+
+        // POST: Admin/BenhNhan/Delete/{id}
+        [HttpPost("Delete/{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            try
+            {
+                var bn = await _context.BenhNhans.FindAsync(id);
+                if (bn == null) return Json(new { success = false, message = "Không tìm thấy dữ liệu" });
+
+                // Kiểm tra ràng buộc
+                bool hasHistory = await _context.HoaDons.AnyAsync(h => h.MaBenhNhan == id);
+
+                if (hasHistory)
+                {
+                    bn.TrangThai = "NgungDieuTri";
+                    await _context.SaveChangesAsync();
+                    return Json(new { success = true, message = "Bệnh nhân đã có lịch sử khám. Đã chuyển sang trạng thái 'Ngừng theo dõi'." });
+                }
+                else
+                {
+                    // Nếu chưa có lịch sử khám, xóa luôn cả thẻ BHYT (nếu có) để sạch data
+                    var cards = _context.TheBHYTs.Where(t => t.MaBenhNhan == id);
+                    _context.TheBHYTs.RemoveRange(cards);
+
+                    _context.BenhNhans.Remove(bn);
+                    await _context.SaveChangesAsync();
+                    return Json(new { success = true, message = "Đã xóa hồ sơ bệnh nhân vĩnh viễn." });
+                }
             }
             catch (Exception ex)
             {
