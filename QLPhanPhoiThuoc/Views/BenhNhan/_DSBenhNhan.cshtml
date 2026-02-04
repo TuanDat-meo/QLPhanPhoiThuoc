@@ -1,242 +1,180 @@
 ﻿@model IEnumerable<QLPhanPhoiThuoc.Models.Entities.BenhNhan>
 
-@{
-    ViewData["Title"] = "Danh sách bệnh nhân";
-
-    // Lấy thông tin phân trang từ ViewBag
-    int pageNumber = ViewBag.PageNumber ?? 1;
-    int pageSize = ViewBag.PageSize ?? 10;
-    int totalItems = ViewBag.TotalItems ?? 0;
-    int totalPages = ViewBag.TotalPages ?? 1;
-    string currentFilter = ViewBag.CurrentFilter ?? "";
-
-    int firstItem = totalItems > 0 ? ((pageNumber - 1) * pageSize + 1) : 0;
-    int lastItem = Math.Min(pageNumber * pageSize, totalItems);
-}
-
-<div class="card shadow-sm border-0 animate-fadeIn">
-    <div class="card-body p-0">
-        <div class="p-3 d-flex justify-content-between align-items-center bg-light border-bottom">
-            <div class="search-box w-50">
-                <form method="get" id="searchForm">
-                    <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0">
-                            <i class="fas fa-search text-muted"></i>
-                        </span>
-                        <input type="text" 
-                               name="searchString" 
-                               id="patientSearchInput" 
-                               class="form-control border-start-0 ps-0" 
-                               placeholder="Tìm kiếm theo tên, CCCD hoặc số điện thoại..." 
-                               value="@currentFilter">
-                        <button class="btn btn-primary" type="submit">Tìm</button>
-                    </div>
-                </form>
-            </div>
-            <div class="filter-options d-flex gap-2">
-                <button class="btn btn-outline-primary btn-sm" onclick="exportPatientExcel()">
-                    <i class="fas fa-file-excel me-1"></i> Xuất Excel
-                </button>
-                <button class="btn btn-light btn-sm" onclick="reloadPatientList()">
-                    <i class="fas fa-sync-alt"></i>
-                </button>
-            </div>
+<div class="medicine-table-card animate-fadeIn">
+    <div class="p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
+        <div class="search-box w-50">
+            <form onsubmit="searchPatients(); return false;">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                    <input type="text" id="patientSearch" class="form-control border-start-0 ps-0" 
+                           placeholder="Tên, SĐT hoặc mã BHYT..." value="@ViewBag.Search">
+                    <button class="btn btn-primary" type="button" onclick="searchPatients()">Tìm</button>
+                </div>
+            </form>
         </div>
+        <button class="btn-add" onclick="loadPatientsContent('/Admin/BenhNhan/Create')">
+            <i class="fas fa-user-plus me-2"></i>Tiếp nhận bệnh nhân
+        </button>
+    </div>
 
-        <!-- Thông tin phân trang -->
-        @if (totalItems > 0)
-        {
-                <div class="p-3 pb-0">
-                    <p class="text-muted mb-0">
-                        Hiển thị <strong>@firstItem</strong> - <strong>@lastItem</strong> 
-                        trong tổng số <strong>@totalItems</strong> bệnh nhân
-                        (Trang <strong>@pageNumber</strong> / <strong>@totalPages</strong>)
-                    </p>
-                </div>
-        }
-
-        <div class="table-responsive">
-            @if (Model != null && Model.Any())
+    <table class="medicine-table table-hover">
+        <thead>
+            <tr>
+                <th class="ps-4">Mã BN</th>
+                <th>Họ và tên</th>
+                <th>Ngày sinh (Tuổi)</th>
+                <th>Giới tính</th>
+                <th>SĐT / BHYT</th>
+                <th>Trạng thái</th>
+                <th class="text-end pe-4">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
             {
-                    <table class="table table-hover align-middle mb-0" id="patientTable">
-                        <thead class="bg-gradient-primary text-white">
-                            <tr>
-                                <th class="ps-4">Mã BN</th>
-                                <th>Họ và Tên</th>
-                                <th>Ngày sinh</th>
-                                <th>Giới tính</th>
-                                <th>Số điện thoại</th>
-                                <th>Trạng thái</th>
-                                <th class="text-end pe-4">Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody class="searchable-items">
-                        @foreach (var item in Model)
-                        {
-                                    <tr class="searchable-item">
-                                        <td class="ps-4 fw-bold text-primary">@item.MaBenhNhan</td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar-sm me-2 bg-info-light text-info rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                                    <i class="fas fa-user"></i>
-                                                </div>
-                                                <div>
-                                                    <div class="fw-bold">@item.TenBenhNhan</div>
-                                            @if (!string.IsNullOrEmpty(item.Email))
-                                            {
-                                                            <div class="text-muted small">@item.Email</div>
-                                            }
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="format-date">@(item.NgaySinh.HasValue ? item.NgaySinh.Value.ToString("dd/MM/yyyy") : "")</td>
-                                        <td>
-                                    @if (item.GioiTinh == "Nam")
-                                    {
-                                                    <span class="badge bg-info">Nam</span>
-                                    }
-                                    else
-                                    {
-                                                    <span class="badge bg-danger">Nữ</span>
-                                    }
-                                        </td>
-                                        <td>@item.SoDienThoai</td>
-                                        <td>
-                                    @if (item.TrangThai == "DangDieuTri")
-                                    {
-                                                    <span class="badge bg-success">Đang điều trị</span>
-                                    }
-                                    else if (item.TrangThai == "DaRaVien")
-                                    {
-                                                    <span class="badge bg-secondary">Đã ra viện</span>
-                                    }
-                                    else
-                                    {
-                                                    <span class="badge bg-info">@item.TrangThai</span>
-                                    }
-                                        </td>
-                                        <td class="text-end pe-4">
-                                            <div class="btn-group">
-                                                <button class="btn btn-sm btn-light text-primary" title="Xem chi tiết" onclick="viewPatientDetail('@item.MaBenhNhan')">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-light text-danger btn-delete" title="Xóa">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                        }
-                        </tbody>
-                    </table>
+                var tuoi = item.NgaySinh.HasValue ? (DateTime.Now.Year - item.NgaySinh.Value.Year).ToString() : "?";
+                <tr>
+                    <td class="ps-4 fw-bold text-primary">@item.MaBenhNhan</td>
+                    <td>
+                        <div class="fw-bold">@item.TenBenhNhan</div>
+                        <div class="small text-muted text-truncate" style="max-width: 200px;" title="@item.DiaChi">
+                            <i class="fas fa-map-marker-alt me-1"></i>@(item.DiaChi ?? "---")
+                        </div>
+                    </td>
+                    <td>
+                        @(item.NgaySinh?.ToString("dd/MM/yyyy") ?? "--/--/----") 
+                        <span class="badge bg-light text-dark border ms-1">@tuoi tuổi</span>
+                    </td>
+                    <td>
+                        @if(item.GioiTinh == "Nam") { <span class="text-primary"><i class="fas fa-mars"></i> Nam</span> }
+                        else { <span class="text-danger"><i class="fas fa-venus"></i> Nữ</span> }
+                    </td>
+                    <td>
+                        <div><i class="fas fa-phone-alt me-1 text-muted small"></i>@item.SoDienThoai</div>
+                                        @{
+                                            // Lấy thẻ BHYT đầu tiên (hoặc thẻ còn hạn nếu có logic đó)
+                                            var theBHYT = item.TheBHYTs?.FirstOrDefault()?.MaThe;
+                                        }
+                                        @if (!string.IsNullOrEmpty(theBHYT))
+                                        {
+                                <div class="text-success small fw-bold mt-1">
+                                    <i class="fas fa-id-card me-1"></i>@theBHYT
+                                </div>
+                                        }
+                                        else
+                                        {
+                                 <div class="text-muted small mt-1 fst-italic">-- Không có BHYT --</div>
+                                        }
+                    </td>
+                    <td>
+                        @if (item.TrangThai == "DangDieuTri") { <span class="badge bg-success">Đang điều trị</span> }
+                        else { <span class="badge bg-secondary">Ngừng theo dõi</span> }
+                    </td>
+                    <td class="text-end pe-4">
+                        <button class="btn-action btn-edit" title="Sửa hồ sơ" onclick="editPatient('@item.MaBenhNhan')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-action" style="background: #ef4444; color: white" title="Xóa" onclick="deletePatient('@item.MaBenhNhan')">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
             }
-            else
-            {
-                    <div class="alert alert-warning m-3 text-center">
-                        <i class="fas fa-exclamation-triangle me-2"></i> 
-                        Không tìm thấy dữ liệu bệnh nhân nào phù hợp.
-                    </div>
-            }
-        </div>
-
-        <!-- Pagination -->
-        @if (totalPages > 1)
-        {
-                <div class="d-flex justify-content-center mt-4 mb-3">
-                    <nav>
-                        <ul class="pagination">
-                            <!-- First Page -->
-                            <li class="page-item @(pageNumber == 1 ? "disabled" : "")">
-                                <a class="page-link" href="javascript:void(0)" data-page="1">«</a>
-                            </li>
-
-                            <!-- Previous Page -->
-                            <li class="page-item @(pageNumber == 1 ? "disabled" : "")">
-                                <a class="page-link" href="javascript:void(0)" data-page="@(pageNumber - 1)">‹ Trước</a>
-                            </li>
-
-                            <!-- Page Numbers -->
-                        @{
-                            int startPage = Math.Max(1, pageNumber - 2);
-                            int endPage = Math.Min(totalPages, pageNumber + 2);
-                        }
-
-                        @for (int i = startPage; i <= endPage; i++)
-                        {
-                                    <li class="page-item @(i == pageNumber ? "active" : "")">
-                                        <a class="page-link" href="javascript:void(0)" data-page="@i">@i</a>
-                                    </li>
-                        }
-
-                            <!-- Next Page -->
-                            <li class="page-item @(pageNumber >= totalPages ? "disabled" : "")">
-                                <a class="page-link" href="javascript:void(0)" data-page="@(pageNumber + 1)">Sau ›</a>
-                            </li>
-
-                            <!-- Last Page -->
-                            <li class="page-item @(pageNumber >= totalPages ? "disabled" : "")">
-                                <a class="page-link" href="javascript:void(0)" data-page="@totalPages">»</a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-        }
-
-        @if (Model != null && Model.Any())
-        {
-                <div class="p-3 border-top d-flex justify-content-between align-items-center bg-light">
-                    <span class="text-muted small">Hiển thị @Model.Count() bản ghi trên trang này</span>
-                </div>
-        }
+        </tbody>
+    </table>
+    
+    <div class="p-3 border-top d-flex justify-content-between align-items-center bg-light">
+        <div class="small text-muted">Trang @ViewBag.CurrentPage / @ViewBag.TotalPages</div>
+        <nav>
+            <ul class="pagination pagination-sm m-0">
+                <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" href="javascript:void(0)" onclick="loadPatientsContent('/Admin/BenhNhan/_DSBenhNhan?page=@(ViewBag.CurrentPage - 1)&search=@ViewBag.Search')">Trước</a>
+                </li>
+                @for (int i = 1; i <= ViewBag.TotalPages; i++) {
+                    <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                        <a class="page-link" href="javascript:void(0)" onclick="loadPatientsContent('/Admin/BenhNhan/_DSBenhNhan?page=@i&search=@ViewBag.Search')">@i</a>
+                    </li>
+                }
+                <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                    <a class="page-link" href="javascript:void(0)" onclick="loadPatientsContent('/Admin/BenhNhan/_DSBenhNhan?page=@(ViewBag.CurrentPage + 1)&search=@ViewBag.Search')">Sau</a>
+                </li>
+            </ul>
+        </nav>
     </div>
 </div>
 
-
-<!-- Modal for Patient Details/Edit -->
-<div class="modal fade" id="patientModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="commonModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content" id="modalContent">
-            <!-- Content will be loaded here -->
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white" style="background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);">
+                <h5 class="modal-title" id="commonModalTitle">Thông tin</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body p-0" id="commonModalBody">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Đang tải...</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-
-<style>
-    .pagination {
-        margin-bottom: 0;
+@section Scripts {
     }
 
-    .page-link {
-        color: #1e3a5f;
-        border: 1px solid #dee2e6;
-        padding: 0.5rem 0.75rem;
-        margin: 0 2px;
-        border-radius: 5px;
-        cursor: pointer;
+
+<script>
+    function searchPatients() {
+        var val = $('#patientSearch').val();
+        loadPatientsContent('/Admin/BenhNhan/_DSBenhNhan?search=' + encodeURIComponent(val));
     }
 
-    .page-link:hover {
-        background-color: #1e3a5f;
-        color: white;
-        border-color: #1e3a5f;
+    function editPatient(id) {
+        $.get('/Admin/BenhNhan/Edit/' + id, function(data) {
+
+            $('#commonModalBody').html(data);
+
+            // 3. Đặt tiêu đề cho Modal
+            $('#commonModalTitle').html('<i class="fas fa-user-injured me-2"></i>Cập nhật hồ sơ bệnh nhân');
+
+            // 4. Hiển thị Modal lên màn hình
+            // (Lưu ý: Phải có khung commonModal ở AdminIndex thì mới hiện được)
+            var modalEl = document.getElementById('commonModal');
+            if(modalEl) {
+                new bootstrap.Modal(modalEl).show();
+            } else {
+                alert('Lỗi: Không tìm thấy khung Modal trong AdminIndex!');
+            }
+        });
     }
 
-    .page-item.active .page-link {
-        background-color: #1e3a5f;
-        border-color: #1e3a5f;
-        color: white;
+    function deletePatient(id) {
+        Swal.fire({
+            title: 'Xóa hồ sơ?',
+            text: "Nếu bệnh nhân đã có lịch sử khám, hồ sơ sẽ được lưu trữ thay vì xóa vĩnh viễn.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Đồng ý xóa'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/Admin/BenhNhan/Delete/' + id,
+                    type: 'POST',
+                    success: function(res) {
+                        if (res.success) {
+                            showToast(res.message, 'success');
+                            searchPatients(); // Reload list
+                        } else {
+                            Swal.fire('Lỗi', res.message, 'error');
+                        }
+                    }
+                });
+            }
+        })
     }
-
-    .page-item.disabled .page-link {
-        color: #6c757d;
-        pointer-events: none;
-        background-color: #fff;
-        border-color: #dee2e6;
-        cursor: not-allowed;
-    }
-
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
-    }
-</style>
+</script>

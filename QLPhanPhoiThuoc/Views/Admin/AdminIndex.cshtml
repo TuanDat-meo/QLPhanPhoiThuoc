@@ -610,17 +610,17 @@
                     <i class="fas fa-chevron-right menu-arrow"></i>
                 </div>
                 <div class="menu-submenu">
-                    <a href="#" class="submenu-item" data-tab="patient-list">
+                    <a href="#" class="submenu-item" onclick="loadPatientsContent('/Admin/BenhNhan/_DSBenhNhan')">
                         <i class="fas fa-circle"></i>
                         <span>Danh sách</span>
                     </a>
-                    <a href="#" class="submenu-item" data-tab="patient-add">
+                    <a href="#" class="submenu-item" onclick="loadPatientsContent('/Admin/BenhNhan/Create')">
                         <i class="fas fa-circle"></i>
                         <span>Thêm bệnh nhân</span>
                     </a>
-                    <a href="#" class="submenu-item" data-tab="patient-bhyt">
-                        <i class="fas fa-circle"></i>
-                        <span>BHYT</span>
+                    <a href="#" class="submenu-item" onclick="loadPatientsContent('/Admin/TheBHYT/_DSTheBHYT')">
+                                <i class="fas fa-circle"></i>
+                                <span>BHYT</span>
                     </a>
                 </div>
             </div>
@@ -815,6 +815,18 @@
                 </div>
             </div>
         </div>
+        @* Bệnh nhân *@
+        <div id="patients" class="content-section">
+            <div class="medicine-container">
+                <div class="page-header">
+                    <h2 style="margin: 0; font-size: 1.8rem; font-weight: 700;">Quản lý bệnh nhân</h2>
+                    <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 0.95rem;">Tiếp nhận và quản lý hồ sơ bệnh án</p>
+                </div>
+                <div id="patientContent">
+                    <p style="text-align: center; padding: 50px; color: #6c757d;">Đang tải dữ liệu...</p>
+                </div>
+            </div>
+        </div>
 
     </main>
 </div>
@@ -984,6 +996,34 @@
         loadEmployeeContent(url);
     }
 
+    // Load Bệnh nhân
+     // Load Patient Content
+        function loadPatientsContent(url) {
+            showLoading();
+            // Trước đó, trong AdminIndex bạn cần tạo 1 div có id="patients" giống id="employees"
+            // Nếu chưa có, hãy thêm <div id="patients" class="content-section">...</div> vào phần Main Content
+            showSection('patients'); 
+
+            $.ajax({
+                url: url,
+                method: 'GET',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                success: function(data) {
+                    // Đảm bảo bạn có <div id="patientContent"></div> bên trong div#patients
+                    $('#patientContent').html(data);
+                    hideLoading();
+                },
+                error: function() {
+                    $('#patientContent').html('<div class="alert alert-danger">Lỗi tải dữ liệu bệnh nhân</div>');
+                    hideLoading();
+                }
+            });
+        }
+
+        // Cập nhật logic điều hướng
+        if (url.includes('/BenhNhan/')) {
+            loadPatientsContent(url);
+        }
 
     // Loading functions
     function showLoading() {
